@@ -1,0 +1,6 @@
+bin/
+build/
+.mcp.json
+.claude/
+shaders/spv/
+.DS_Store

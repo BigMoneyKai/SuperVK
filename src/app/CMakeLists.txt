@@ -1,0 +1,21 @@
+add_library(supervk_app STATIC)
+
+target_sources(supervk_app PRIVATE
+    app.cpp
+)
+
+find_package(Vulkan REQUIRED)
+
+target_include_directories(supervk_app PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/glfw/include
+    ${PROJECT_SOURCE_DIR}/glm
+)
+
+target_link_libraries(supervk_app PRIVATE
+    supervk_render
+
+    Vulkan::Vulkan
+    glm
+    glfw
+)
