@@ -82,8 +82,21 @@
     #define SV_STATIC_ASSERT static_assert
     #define SV_COMPILER_BARRIER() _ReadWriteBarrier()
     #define SV_CPU_BARRIER() MemoryBarrier()
-#elif defined(__GNUC__) || defined(__clang__)
-    #define SV_RESTRICT restrict
+#elif defined(__GNUC__)
+    #define SV_RESTRICT __restrict__
+    #define SV_ALIGN(x) __attribute__((aligned(x)))
+    #define SV_BREAK() __builtin_trap()
+    #define SV_FORCE_INLINE inline __attribute__((always_inline)) // only for little functions used extremely much
+    #define SV_INLINE inline
+    #if __STDC_VERSION__ >= 201112L
+        #define SV_STATIC_ASSERT _Static_assert
+    #else
+        #define SV_STATIC_ASSERT(cond, msg) typedef char static_assertion_##__LINE__[(cond)?1:-1]
+    #endif
+    #define SV_COMPILER_BARRIER() __asm__ __volatile__("" ::: "memory")
+    #define SV_CPU_BARRIER() __atomic_thread_fence(__ATOMIC_SEQ_CST)
+#elif defined(__clang__)
+    #define SV_RESTRICT __restrict__
     #define SV_ALIGN(x) __attribute__((aligned(x)))
     #define SV_BREAK() __builtin_debugtrap()
     #define SV_FORCE_INLINE inline __attribute__((always_inline)) // only for little functions used extremely much
