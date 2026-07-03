@@ -1,5 +1,5 @@
 #include "descriptor_pool.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 void DescriptorPool::init(const VkDevice& device, const std::vector<VkDescriptorPoolSize>& poolSizes, u32 maxSets) {
     VkDescriptorPoolCreateInfo poolInfo{};

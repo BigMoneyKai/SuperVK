@@ -1,6 +1,6 @@
 #include "core/parser/gltf/gltfparser.h"
 
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 #include <fstream>
 #include <sstream>
@@ -288,7 +288,7 @@ void GltfParser::loadBuffers(const std::string& gltfDir,
         }
 
         if (m_buffers[i].size() < byteLength) {
-            WARNING("glTF buffer[%zu]: expected %llu bytes, got %zu",
+            WARNING("glTF buffer[%zu]: expected %lu bytes, got %zu",
                     i, byteLength, m_buffers[i].size());
         }
     }

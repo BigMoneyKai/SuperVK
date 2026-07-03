@@ -1,5 +1,5 @@
 #include "buffer.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 #include <cstring>
 #include <vector>
@@ -134,9 +134,9 @@ void Buffer::allocateMemory(const VkDevice& device, const VkPhysicalDevice& phys
 
 void Buffer::printDebugInfo() {
     DEBUG("Buffer type: %s", bufferTypes[m_type]);
-    DEBUG("Buffer Size = %llu", m_size);
+    DEBUG("Buffer Size = %lu", m_size);
     DEBUG("Usage = %u", m_bufferCreateInfo.usage);
-    DEBUG("MemorySize = %llu ", m_memoryAllocateInfo.allocationSize);
+    DEBUG("MemorySize = %lu ", m_memoryAllocateInfo.allocationSize);
 }
 
 void Buffer::update(const VkDevice& device, const void* data, u64 size) {

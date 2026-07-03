@@ -1,6 +1,6 @@
 #include "core/parser/gltf/glbparser.h"
 
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 #include <fstream>
 #include <cstring>
@@ -199,7 +199,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
                     if (binData.size() >= byteLength) {
                         m_buffers[i] = std::move(binData);
                     } else {
-                        WARNING("GLB BIN chunk size %zu < buffer[0].byteLength %llu",
+                        WARNING("GLB BIN chunk size %zu < buffer[0].byteLength %lu",
                                 binData.size(), byteLength);
                         m_buffers[i] = std::move(binData);
                     }

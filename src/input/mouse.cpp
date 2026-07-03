@@ -1,6 +1,8 @@
 #include "mouse.h"
 #include "defines.h"
 
+#include <cstring>
+
 void Mouse::init() {
     memset(m_currButtons, SV_FALSE, BUTTON_MAX_NUM);
     memset(m_prevButtons, SV_FALSE, BUTTON_MAX_NUM);

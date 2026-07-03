@@ -70,4 +70,5 @@ private:
 
     RendererDesc m_desc;
     u32 m_currFrame{0};
+    u32 m_imageIndex{0};
 };

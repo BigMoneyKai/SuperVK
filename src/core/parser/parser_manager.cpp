@@ -1,6 +1,6 @@
 #include "core/parser/parser_manager.h"
 #include "scene/mesh.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 #include <cstring>
 
 void ParserMan::init() {

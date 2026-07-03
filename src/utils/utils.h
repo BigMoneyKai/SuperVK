@@ -1,7 +1,7 @@
 #pragma once
 
 #include "defines.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 #include <stdlib.h>
 

@@ -1,4 +1,14 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.6)
+
+if(APPLE)
+    set(CMAKE_C_COMPILER clang)
+    set(CMAKE_CXX_COMPILER clang++)
+elseif(WIN32)
+elseif(UNIX)
+    set(CMAKE_C_COMPILER gcc)
+    set(CMAKE_CXX_COMPILER g++)
+else()
+endif()
 
 project(SuperVK VERSION 1.0.0)
 

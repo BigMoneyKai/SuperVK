@@ -1,4 +1,4 @@
-#include "debug/debug.h"
+#include "debug/debugger.h"
 #include "scene/mesh.h"
 
 void Mesh::init(const VkDevice& device, const VkPhysicalDevice& physicalDevice) {

@@ -1,5 +1,5 @@
 #include "core/parser/obj/objparser.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 #include <algorithm>
 
 static FaceType scanFaceToken(const std::string& token, FaceIndex* f) {

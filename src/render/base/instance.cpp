@@ -1,8 +1,10 @@
 #include "defines.h"
 #include "instance.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 #include <GLFW/glfw3.h>
+
+#include <cstring>
 
 void Instance::init() {
 

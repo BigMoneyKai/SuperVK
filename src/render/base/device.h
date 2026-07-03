@@ -34,9 +34,10 @@ public:
     }
 
 private:
-    void initDevice(const VkInstance& instance);
+    void initDevice(const VkInstance& instance, const VkSurfaceKHR& surface);
     void initQueue(const VkSurfaceKHR& surface);
     void initDeviceExtensions();
+    bool isDeviceSuitable(const VkPhysicalDevice& device, const VkSurfaceKHR& surface);
     void createDevice();
     VkFormat findSupportedFormat(
         const std::vector<VkFormat>& candidates, 

@@ -1,5 +1,5 @@
 #include "window/window_manager.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 #include "utils/utils.h"
 
 WinMan::WinMan() {

@@ -1,5 +1,5 @@
 #include "descriptor_set_layout.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 void DescriptorSetLayout::init(const VkDevice& device, const std::vector<VkDescriptorSetLayoutBinding>& bindings) {
     VkDescriptorSetLayoutCreateInfo layoutInfo{};

@@ -1,12 +1,12 @@
 #include "device.h"
 #include "instance.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 #include "utils/utils.h"
 
 #include <stdlib.h>
 
 void Device::init(const VkInstance& instance, const VkSurfaceKHR& surface) {
-    initDevice(instance);
+    initDevice(instance, surface);
     initDeviceExtensions();
     initQueue(surface);
     createDevice();
@@ -22,7 +22,7 @@ void Device::destroy() {
 
 }
 
-void Device::initDevice(const VkInstance& instance) {
+void Device::initDevice(const VkInstance& instance, const VkSurfaceKHR& surface) {
     m_deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     m_deviceCreateInfo.queueCreateInfoCount = 1;
     m_deviceCreateInfo.pQueueCreateInfos = &m_queueCreateInfo;
@@ -41,35 +41,20 @@ void Device::initDevice(const VkInstance& instance) {
         DEBUG("%d physical device found", deviceCount);
     }
 
-    b32 discreteGPUFound = SV_FALSE;
-    b32 integratedGPUFound = SV_FALSE;
-    for(const auto& device : devices) {
-        vkGetPhysicalDeviceProperties(device, &m_physicalDeviceProperties);
-        vkGetPhysicalDeviceFeatures(device, &m_physicalDeviceFeatures);
-
-        if(m_physicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
-            m_physicalDevice = device;
-            discreteGPUFound = SV_TRUE;
-        }
-        if(m_physicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) {
-            if(!discreteGPUFound) {
-                m_physicalDevice = device;
-            }
-            integratedGPUFound = SV_TRUE;
+    b32 found = SV_FALSE;
+    for (auto device : devices) {
+        if (isDeviceSuitable(device, surface)) {
+            found = SV_TRUE;
+            break;
         }
     }
-    if(!discreteGPUFound && !integratedGPUFound) {
-        FATAL("Failed to find either discrete GPU or integrated GPU");
-    } else if(discreteGPUFound) {
-        DEBUG("Found discrete GPU(No integrated GPU available): %s", m_physicalDeviceProperties.deviceName);
-    } else if(integratedGPUFound) {
-        DEBUG("Found integrated GPU(No discrete GPU available): %s", m_physicalDeviceProperties.deviceName);
-    } else {
-        DEBUG(
-            "Found discrete GPU and integrated GPU, using discrete GPU: %s",
-            m_physicalDeviceProperties.deviceName
-        );
+    if(!found) {
+        FATAL("No suitable physical device found");
     }
+    DEBUG("Selected GPU: %s (%d)",
+        m_physicalDeviceProperties.deviceName,
+        m_physicalDeviceProperties.deviceType
+    );
 
 }
 void Device::initQueue(const VkSurfaceKHR& surface) {
@@ -103,6 +88,55 @@ void Device::initDeviceExtensions() {
         "VK_KHR_portability_subset"
     );
 #endif
+}
+
+bool Device::isDeviceSuitable(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) {
+    // Device Properties
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+
+    // Device Features
+    VkPhysicalDeviceFeatures features{};
+    vkGetPhysicalDeviceFeatures(physicalDevice, &features);
+
+    // Queue Family
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(
+        physicalDevice,
+        &queueFamilyCount,
+        queueFamilies.data()
+    );
+
+    bool hasGraphicsQueue = false;
+
+    for (uint32_t i = 0; i < queueFamilyCount; i++) {
+        VkBool32 presentSupport = VK_FALSE;
+
+        vkGetPhysicalDeviceSurfaceSupportKHR(
+            physicalDevice,
+            i,
+            surface,
+            &presentSupport
+        );
+
+        if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) &&
+            presentSupport) {
+            hasGraphicsQueue = true;
+            break;
+        }
+    }
+
+    if (!hasGraphicsQueue)
+        return false;
+
+    m_physicalDevice = physicalDevice;
+    m_physicalDeviceProperties = properties;
+    m_physicalDeviceFeatures = features;
+
+    return true;
 }
 
 void Device::createDevice() {

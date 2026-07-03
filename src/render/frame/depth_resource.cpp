@@ -1,5 +1,5 @@
 #include "depth_resource.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 void DepthResource::init(
     const VkDevice& device,

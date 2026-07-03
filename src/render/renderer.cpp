@@ -1,6 +1,6 @@
 #include "render/renderer.h"
 #include "scene/scene.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 #include "utils/utils.h"
 
 void Renderer::init(const RendererDesc& desc) {
@@ -21,7 +21,7 @@ void Renderer::init(const RendererDesc& desc) {
     m_pipelineMan.init(m_device.device(), m_renderPass.renderPass(), m_descriptorMan.layout());
     m_bufferMan.init();
 
-    m_frameResource.init();
+    m_frameResource.init(m_swapchain.imageCount());
     m_frameResource.createSyncPrimitives(m_device.device());
     m_depthResource.init(
         m_device.device(),
@@ -84,7 +84,6 @@ void Renderer::destroy() {
 void Renderer::drawFrame(Scene& scene) {
     auto fence = m_frameResource.inFlightFence(m_currFrame);
     auto imageSem = m_frameResource.imageAvailableSemaphore(m_currFrame);
-    auto finishSem = m_frameResource.renderFinishedSemaphore(m_currFrame);
 
     // Wait for fence
     vkWaitForFences(
@@ -96,21 +95,19 @@ void Renderer::drawFrame(Scene& scene) {
     );
 
     // Acquire swapchain image
-    u32 imageIndex = 0;
     VkResult result = vkAcquireNextImageKHR(
         m_device.device(),
         m_swapchain.swapchain(),
         UINT64_MAX,
         imageSem,
         VK_NULL_HANDLE,
-        &imageIndex
+        &m_imageIndex
     );
-
     if(result != VK_SUCCESS) {
         WARNING("Failed to acquire swapchain image");
         return;
     }
-
+    auto finishSem = m_frameResource.renderFinishedSemaphore(m_imageIndex);
     // Reset fence
     vkResetFences(
         m_device.device(),
@@ -130,7 +127,7 @@ void Renderer::drawFrame(Scene& scene) {
     VkRenderPassBeginInfo renderPassBeginInfo{};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassBeginInfo.renderPass = m_renderPass.renderPass();
-    renderPassBeginInfo.framebuffer = m_framebuffers[imageIndex].framebuffer();
+    renderPassBeginInfo.framebuffer = m_framebuffers[m_imageIndex].framebuffer();
     renderPassBeginInfo.renderArea.offset = {0, 0};
     renderPassBeginInfo.renderArea.extent = m_swapchain.extent();
 
@@ -222,7 +219,7 @@ void Renderer::drawFrame(Scene& scene) {
     presentInfo.pWaitSemaphores = &finishSem;
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = &m_swapchain.swapchain();
-    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pImageIndices = &m_imageIndex;
 
     VK_CHECK_RESULT(vkQueuePresentKHR(m_device.presentQueue(), &presentInfo));
 
