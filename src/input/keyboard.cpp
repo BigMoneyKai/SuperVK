@@ -1,5 +1,6 @@
 #include "keyboard.h"
-#include <cstdlib>
+
+#include <cstring>
 
 void Keyboard::init() {
     memset(m_current, SV_FALSE, sizeof(m_current));

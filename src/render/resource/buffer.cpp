@@ -93,7 +93,7 @@ void Buffer::allocateMemory(const VkDevice& device, const VkPhysicalDevice& phys
     vkGetBufferMemoryRequirements(device, m_buffer, &m_memoryRequirements);
 
     m_memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    m_memoryAllocateInfo.allocationSize = m_bufferCreateInfo.size;
+    m_memoryAllocateInfo.allocationSize = m_memoryRequirements.size;
     switch(m_type) {
         case BT_VERTEX_BUFFER:
         case BT_INDEX_BUFFER:

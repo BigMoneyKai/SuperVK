@@ -33,6 +33,8 @@ foreach(GLSL ${GLSL_SOURCES})
     list(APPEND SPIRV_BINARY_FILES ${SPIRV})
 endforeach()
 
-add_custom_target(shaders ALL
+add_custom_target(shaders
     DEPENDS ${SPIRV_BINARY_FILES}
 )
+
+add_dependencies(supervk shaders)

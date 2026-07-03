@@ -1,11 +1,12 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <vulkan/vulkan.h>
-
 #include "defines.h"
+#include "core/types/vertex.h"
 #include "render/resource/buffer.h"
 #include "render/base/device.h"
+
+#include <glm/glm.hpp>
+#include <vulkan/vulkan.h>
 
 #include <vector>
 

@@ -2,6 +2,7 @@
 
 #include "defines.h"
 #include <vulkan/vulkan.h>
+#include <vector>
 
 class Instance {
 public:

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <glm/glm.hpp>
 
 // platform compatibility
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
@@ -182,12 +181,4 @@ SV_STATIC_ASSERT(sizeof(addr) == sizeof(void*), "Expected addr to match pointer 
 #else
     #define SV_RENDER_API_NO_SUPPORT
 #endif
-
-// Data type struct
-struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 color;
-    glm::vec2 uv;
-    glm::vec3 normal;
-};
 
