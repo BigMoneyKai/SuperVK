@@ -1,5 +1,5 @@
 #include "surface.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 void Surface::init(const VkInstance& instance, GLFWwindow* window) {
     VK_CHECK_RESULT(glfwCreateWindowSurface(instance, window, nullptr, &m_surface));

@@ -1,8 +1,8 @@
 #include "sync.h"
 
-void Synchronizer::init() {
+void Synchronizer::init(u32 swapchainImageCount) {
     m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    m_renderFinishedSemaphores.resize(swapchainImageCount);
     m_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 }
 

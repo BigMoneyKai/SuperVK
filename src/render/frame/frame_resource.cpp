@@ -1,10 +1,11 @@
 #include "frame_resource.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 #include "render/base/device.h"
 
-void FrameResource::init() {
+void FrameResource::init(u32 swapchainImageCount) {
+    m_swapchainImageCount = swapchainImageCount;
     m_imageAvailableSemaphores.resize(m_framebufferCount);
-    m_renderFinishedSemaphores.resize(m_framebufferCount);
+    m_renderFinishedSemaphores.resize(m_swapchainImageCount);
     m_inFlightFences.resize(m_framebufferCount);
 }
 
@@ -20,11 +21,14 @@ void FrameResource::createSyncPrimitives(const VkDevice& device) {
         if(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_imageAvailableSemaphores[i]) != VK_SUCCESS) {
             FATAL("Failed to create image available semaphore");
         }
-        if(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_renderFinishedSemaphores[i]) != VK_SUCCESS) {
-            FATAL("Failed to create render finished semaphore");
-        }
+
         if(vkCreateFence(device, &fenceInfo, nullptr, &m_inFlightFences[i]) != VK_SUCCESS) {
             FATAL("Failed to create in-flight fence");
+        }
+    }
+    for(u32 i = 0; i < m_swapchainImageCount; ++i) {
+        if(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_renderFinishedSemaphores[i]) != VK_SUCCESS) {
+            FATAL("Failed to create render finished semaphore");
         }
     }
 }

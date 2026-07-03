@@ -33,6 +33,9 @@ public:
     SV_FORCE_INLINE const std::vector<VkImageView>& swapchainImageViews() const {
         return m_swapchainImageViews;
     }
+    SV_FORCE_INLINE u32 imageCount() const {
+        return static_cast<u32>(m_swapchainImages.size());
+    }
 
 private:
     VkSwapchainKHR m_swapchain;
@@ -43,5 +46,4 @@ private:
     std::vector<VkSurfaceFormatKHR> m_formats;
     std::vector<VkImage> m_swapchainImages;
     std::vector<VkImageView> m_swapchainImageViews;
-    u32 m_imageCount{0};
 };

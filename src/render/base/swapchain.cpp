@@ -1,5 +1,5 @@
 #include "swapchain.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 #include <algorithm>
 #include <stdexcept>

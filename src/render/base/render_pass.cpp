@@ -1,5 +1,5 @@
 #include "render_pass.h"
-#include "debug/debug.h"
+#include "debug/debugger.h"
 
 #include <array>
 
