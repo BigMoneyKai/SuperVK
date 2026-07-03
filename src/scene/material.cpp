@@ -8,7 +8,7 @@ void Material::update() {
 
 }
 
-void Material::destroy(const VkDevice& device) {
+void Material::destroy() {
     
 }
 

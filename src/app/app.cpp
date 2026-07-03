@@ -9,7 +9,7 @@ void App::init(const char* title, DisplayMode mode) {
 
     // Load mesh data BEFORE scene init — Mesh::init() needs non-empty vertices/indices
     // to create GPU buffers, otherwise it will FATAL.
-    m_parserMan.parse("assets/objects/AntiqueCamera/glTF/AntiqueCamera.gltf", &m_scene.mesh());
+    m_parserMan.parse("assets/objects/heart/Heart.obj", &m_scene.mesh());
 
     m_scene.init(
         m_renderer.device().device(),

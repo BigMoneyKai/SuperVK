@@ -3,9 +3,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // ---- orbit camera speed constants ----
-static constexpr f32 kRotationSpeed = 0.005f;
+static constexpr f32 kRotationSpeed = 0.0005f;
 static constexpr f32 kZoomSpeed     = 0.1f;
-static constexpr f32 kMoveSpeed     = 0.05f;
+static constexpr f32 kMoveSpeed     = 0.01f;
 static constexpr f32 kMinDistance   = 0.5f;
 static constexpr f32 kMaxDistance   = 50.0f;
 static constexpr f32 kMaxPitch      = 1.55f; // ~89 degrees in radians
@@ -31,7 +31,7 @@ void Camera::init(f32 aspect) {
         defaultFar
     );
 
-    m_ubo.pos = glm::vec4(m_eye, 1.f);
+    m_ubo.pos = m_eye;
 }
 
 void Camera::update(const CameraInput& input) {
@@ -68,10 +68,10 @@ void Camera::update(const CameraInput& input) {
 
     // ---- update UBO ----
     m_ubo.view = glm::lookAt(m_eye, m_target, defaultUp);
-    m_ubo.pos  = glm::vec4(m_eye, 1.0f);
+    m_ubo.pos  = m_eye;
     // m_ubo.proj is set once in init() — does not change unless aspect changes
 }
 
-void Camera::destroy(const VkDevice& device) {
+void Camera::destroy() {
     // no Vulkan resources owned by Camera
 }

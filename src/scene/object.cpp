@@ -7,6 +7,6 @@ void Object::update() {
 
 }
 
-void Object::destroy(const VkDevice& device) {
+void Object::destroy() {
     
 }

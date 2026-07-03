@@ -8,7 +8,7 @@ void Light::update() {
 
 }
 
-void Light::destroy(const VkDevice& device) {
+void Light::destroy() {
     
 }
 

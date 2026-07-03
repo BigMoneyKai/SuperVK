@@ -17,7 +17,7 @@ class Object {
 public:
     void init();
     void update();
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE const ObjectUBO& object() const {
         return m_ubo;

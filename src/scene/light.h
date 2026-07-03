@@ -88,7 +88,7 @@ class Light {
 public:
     void init();
     void update();
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE const LightUBO& ubo() const {
         return m_ubo;

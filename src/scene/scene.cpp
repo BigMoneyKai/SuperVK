@@ -11,9 +11,9 @@ void Scene::init(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 }
 
 void Scene::destroy(const VkDevice& device) {
-    m_camera.destroy(device);
-    m_object.destroy(device);
-    m_material.destroy(device);
-    m_light.destroy(device);
+    m_camera.destroy();
+    m_object.destroy();
+    m_material.destroy();
+    m_light.destroy();
     m_mesh.destroy(device);
 }

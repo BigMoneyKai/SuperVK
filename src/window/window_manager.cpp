@@ -40,6 +40,7 @@ void WinMan::init(const char* title, DisplayMode displayMode) {
                 m_monitor,
                 nullptr
             );
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             break;
         case BORDERLESS:
             m_width = m_mode->width;
@@ -53,6 +54,7 @@ void WinMan::init(const char* title, DisplayMode displayMode) {
                 nullptr,
                 nullptr
             );
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             break;
         case WINDOWED:
             m_width = default_width;
@@ -64,6 +66,7 @@ void WinMan::init(const char* title, DisplayMode displayMode) {
                 nullptr,
                 nullptr
             );
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             break;
         default:
             FATAL("Failed to load window");
