@@ -12,6 +12,7 @@ constexpr VkImageType defaultImageType = VK_IMAGE_TYPE_2D;
 constexpr VkFormat defaultFormat = VK_FORMAT_R8G8B8A8_SRGB;
 constexpr VkImageUsageFlags defaultUsage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 constexpr u32 defaultMipLevels = 1;
+constexpr u32 defaultArrayLayers = 1;
 constexpr VkSampleCountFlagBits defaultSamples = VK_SAMPLE_COUNT_1_BIT;
 constexpr VkImageTiling defaultTiling = VK_IMAGE_TILING_OPTIMAL;
 
@@ -23,6 +24,7 @@ struct ImageDesc {
     VkFormat format{defaultFormat};
     VkImageUsageFlags usage{defaultUsage};
     u32 mipLevels{defaultMipLevels};
+    u32 arrayLayers{defaultArrayLayers};
     VkSampleCountFlagBits samples{defaultSamples};
     VkImageTiling tiling{defaultTiling};
     u32 queueFamilyIndexCount{0};

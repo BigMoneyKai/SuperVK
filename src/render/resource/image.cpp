@@ -22,6 +22,7 @@ void Image::init(
     imageCreateInfo.format = m_format;
     imageCreateInfo.extent = m_extent;
     imageCreateInfo.mipLevels = desc.mipLevels;
+    imageCreateInfo.arrayLayers = desc.arrayLayers;
     imageCreateInfo.samples = desc.samples;
     imageCreateInfo.tiling = desc.tiling;
     imageCreateInfo.usage = desc.usage;
