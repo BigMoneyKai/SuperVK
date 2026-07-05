@@ -16,6 +16,7 @@ target_include_directories(supervk PRIVATE
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/thirdparty/glm
     ${PROJECT_SOURCE_DIR}/thirdparty/glfw/include
+    ${PROJECT_SOURCE_DIR}/thirdparty/stb
 )
 
 target_link_libraries(supervk PRIVATE

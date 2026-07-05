@@ -13,7 +13,7 @@
 class Scene {
 public:
     void init(const VkDevice& device, const VkPhysicalDevice& physicalDevice, u32 width, u32 height);
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE Camera& camera() {
         return m_camera;

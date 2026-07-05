@@ -29,7 +29,7 @@ void App::run() {
 
 void App::destroy() {
     m_renderer.waitIdle();
-    m_scene.destroy(m_renderer.device().device());
+    m_scene.destroy();
     m_renderer.destroy();
     m_inputMan.destroy();
     m_winMan.destroy();

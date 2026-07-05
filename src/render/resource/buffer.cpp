@@ -1,5 +1,6 @@
 #include "buffer.h"
 #include "debug/debugger.h"
+#include "utils/utils.h"
 
 #include <cstring>
 #include <vector>
@@ -12,27 +13,6 @@ static const char* bufferTypes[6] = {
     "storage buffer",
 };
 
-static u32 findMemoryType(
-    VkPhysicalDevice physicalDevice,
-    uint32_t typeFilter,
-    VkMemoryPropertyFlags propertiesFlags) {
-    VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties;
-    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &physicalDeviceMemoryProperties);
-
-    for(uint32_t i = 0; i < physicalDeviceMemoryProperties.memoryTypeCount; i++) {
-        bool suitable = typeFilter & (1 << i);
-
-        bool hasProperties = (physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & propertiesFlags) == propertiesFlags;
-
-        if(suitable && hasProperties) {
-            return i;
-        }
-    }
-    FATAL("Failed to find suitable memory type");
-    return UINT32_MAX;
-
-}
-
 void Buffer::init(
     BufferType type,
     const VkDevice& device,
@@ -40,28 +20,29 @@ void Buffer::init(
     void* data,
     u64 size
 ) {
+    m_device = device;
     m_type = type;
     m_data = data;
     if(m_data == nullptr) {
         WARNING("No data in this address");
     }
     m_size = size;
-    createBuffer(device);
-    allocateMemory(device, physicalDevice);
+    createBuffer();
+    allocateMemory(physicalDevice);
 }
 
-void Buffer::destroy(const VkDevice& device) {
+void Buffer::destroy() {
     if(m_buffer != VK_NULL_HANDLE) {
-        vkDestroyBuffer(device, m_buffer, nullptr);
+        vkDestroyBuffer(m_device, m_buffer, nullptr);
         m_buffer = VK_NULL_HANDLE;
     }
     if(m_memory != VK_NULL_HANDLE) {
-        vkFreeMemory(device, m_memory, nullptr);
+        vkFreeMemory(m_device, m_memory, nullptr);
         m_memory = VK_NULL_HANDLE;
     }
 }
 
-void Buffer::createBuffer(const VkDevice& device) {
+void Buffer::createBuffer() {
     VkBufferUsageFlags usage;
     switch(m_type) {
         case BT_VERTEX_BUFFER:
@@ -86,11 +67,11 @@ void Buffer::createBuffer(const VkDevice& device) {
     m_bufferCreateInfo.size = m_size;
     m_bufferCreateInfo.usage = usage;
     m_bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    VK_CHECK_RESULT(vkCreateBuffer(device, &m_bufferCreateInfo, nullptr, &m_buffer));
+    VK_CHECK_RESULT(vkCreateBuffer(m_device, &m_bufferCreateInfo, nullptr, &m_buffer));
 }
 
-void Buffer::allocateMemory(const VkDevice& device, const VkPhysicalDevice& physicalDevice) {
-    vkGetBufferMemoryRequirements(device, m_buffer, &m_memoryRequirements);
+void Buffer::allocateMemory(const VkPhysicalDevice& physicalDevice) {
+    vkGetBufferMemoryRequirements(m_device, m_buffer, &m_memoryRequirements);
 
     m_memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     m_memoryAllocateInfo.allocationSize = m_memoryRequirements.size;
@@ -122,14 +103,14 @@ void Buffer::allocateMemory(const VkDevice& device, const VkPhysicalDevice& phys
         default:
             break;
     }
-    VK_CHECK_RESULT(vkAllocateMemory(device, &m_memoryAllocateInfo, nullptr, &m_memory));
+    VK_CHECK_RESULT(vkAllocateMemory(m_device, &m_memoryAllocateInfo, nullptr, &m_memory));
     void* bufferData;
     if(m_data != nullptr && m_bufferCreateInfo.size > 0) {
-        VK_CHECK_RESULT(vkMapMemory(device, m_memory, 0, m_bufferCreateInfo.size, 0, &bufferData));
+        VK_CHECK_RESULT(vkMapMemory(m_device, m_memory, 0, m_bufferCreateInfo.size, 0, &bufferData));
         memcpy(bufferData, m_data, m_bufferCreateInfo.size);
-        vkUnmapMemory(device, m_memory);
+        vkUnmapMemory(m_device, m_memory);
     }
-    VK_CHECK_RESULT(vkBindBufferMemory(device, m_buffer, m_memory, 0));
+    VK_CHECK_RESULT(vkBindBufferMemory(m_device, m_buffer, m_memory, 0));
 }
 
 void Buffer::printDebugInfo() {
@@ -139,7 +120,7 @@ void Buffer::printDebugInfo() {
     DEBUG("MemorySize = %lu ", m_memoryAllocateInfo.allocationSize);
 }
 
-void Buffer::update(const VkDevice& device, const void* data, u64 size) {
+void Buffer::update(const void* data, u64 size) {
     if(m_memory == VK_NULL_HANDLE || data == nullptr) {
         return;
     }
@@ -150,7 +131,7 @@ void Buffer::update(const VkDevice& device, const void* data, u64 size) {
     }
 
     void* bufferData = nullptr;
-    VK_CHECK_RESULT(vkMapMemory(device, m_memory, 0, copySize, 0, &bufferData));
+    VK_CHECK_RESULT(vkMapMemory(m_device, m_memory, 0, copySize, 0, &bufferData));
     memcpy(bufferData, data, static_cast<size_t>(copySize));
-    vkUnmapMemory(device, m_memory);
+    vkUnmapMemory(m_device, m_memory);
 }

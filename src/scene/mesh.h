@@ -15,7 +15,7 @@ namespace mesh {
 class Mesh {
 public:
     void init(const VkDevice& device, const VkPhysicalDevice& physicalDevice);
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE const std::vector<Vertex>& vertices() const {
         return m_vertices;

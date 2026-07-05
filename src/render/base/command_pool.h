@@ -11,7 +11,7 @@
 class CommandPool {
 public:
     void init(const VkDevice& device, u32 graphicsQueueFamilyIndex);
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE const VkCommandPool& pool() const {
         return commandPool;
@@ -21,7 +21,8 @@ public:
     }
 
 private:
+    VkDevice m_device{VK_NULL_HANDLE};
     VkCommandPoolCreateInfo commandPoolCreateInfo{};
     VkCommandPool commandPool{VK_NULL_HANDLE};
-    
+
 };

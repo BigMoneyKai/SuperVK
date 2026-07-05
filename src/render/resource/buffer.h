@@ -26,9 +26,9 @@ public:
         void* data,
         u64 size
     );
-    void destroy(const VkDevice& device);
+    void destroy();
     void printDebugInfo();
-    void update(const VkDevice& device, const void* data, u64 size = 0);
+    void update(const void* data, u64 size = 0);
 
     SV_FORCE_INLINE const VkBuffer& buffer() const {
         return m_buffer;
@@ -41,10 +41,11 @@ public:
     }
 
 private:
-    void createBuffer(const VkDevice& device);
-    void allocateMemory(const VkDevice& device, const VkPhysicalDevice& physicalDevice);
+    void createBuffer();
+    void allocateMemory(const VkPhysicalDevice& physicalDevice);
 
 private:
+    VkDevice m_device{VK_NULL_HANDLE};
     BufferType m_type{BT_MAX_NUM};
     VkMemoryRequirements m_memoryRequirements{};
     VkDeviceMemory m_memory{VK_NULL_HANDLE};

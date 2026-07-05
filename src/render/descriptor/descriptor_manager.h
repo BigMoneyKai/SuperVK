@@ -7,6 +7,7 @@
 #include "descriptor_set_layout.h"
 
 #include "render/resource/buffer.h"
+#include "render/resource/sampler.h"
 
 #include <vulkan/vulkan.h>
 
@@ -19,27 +20,32 @@
 //   binding 1 — ObjectUBO
 //   binding 2 — LightUBO
 //   binding 3 — MaterialUBO
+//   binding 4 — Sampler2D
 // ---------------------------------------------------------------------------
 class DescriptorMan {
 public:
     void init(const VkDevice& device, const VkPhysicalDevice& physicalDevice);
-    void destroy(const VkDevice& device);
+    void destroy();
 
     // per-frame UBO upload (delegates to Buffer::update)
-    void updateCameraUBO(const VkDevice& device, const void* data, u64 size);
-    void updateObjectUBO(const VkDevice& device, const void* data, u64 size);
-    void updateLightUBO(const VkDevice& device, const void* data, u64 size);
-    void updateMaterialUBO(const VkDevice& device, const void* data, u64 size);
+    void updateCameraUBO(const void* data, u64 size);
+    void updateObjectUBO(const void* data, u64 size);
+    void updateLightUBO(const void* data, u64 size);
+    void updateMaterialUBO(const void* data, u64 size);
+
+    void writeBufferDescriptorSet();
+    void writeImageDescriptorSet(const VkImageView& imageView, const VkImageLayout& layout);
 
     SV_FORCE_INLINE VkDescriptorSetLayout layout() const { return m_setLayout.layout(); }
     SV_FORCE_INLINE VkDescriptorSet descriptorSet() const { return m_set.set(); }
 
 private:
-    void createLayout(const VkDevice& device);
-    void createPool(const VkDevice& device);
-    void allocateSet(const VkDevice& device);
-    void createBuffers(const VkDevice& device, const VkPhysicalDevice& physicalDevice);
-    void writeDescriptorSet(const VkDevice& device);
+    void createLayout();
+    void createPool();
+    void allocateSet();
+    void createBuffers(const VkPhysicalDevice& physicalDevice);
+
+    VkDevice m_device{VK_NULL_HANDLE};
 
     DescriptorSetLayout m_setLayout;
     DescriptorPool      m_pool;
@@ -49,4 +55,5 @@ private:
     Buffer m_objectUBO;
     Buffer m_lightUBO;
     Buffer m_materialUBO;
+    Sampler m_texSampler2D;
 };

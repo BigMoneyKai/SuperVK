@@ -42,7 +42,7 @@ struct PipelineDesc {
 class Pipeline {
 public:
     void init(const VkDevice& device, const VkRenderPass& renderPass, const PipelineDesc& desc);
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE const VkPipeline& pipeline() const {
         return m_pipeline;
@@ -52,6 +52,7 @@ public:
     }
 
 private:
+    VkDevice m_device{VK_NULL_HANDLE};
     VkPipelineLayout m_pipelineLayout{};
     VkPipeline m_pipeline{};
 

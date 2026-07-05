@@ -20,6 +20,7 @@
 #include "frame/sync.h"
 
 #include "resource/buffer_manager.h"
+#include "resource/texture_manager.h"
 
 #include "window/window_manager.h"
 
@@ -42,6 +43,9 @@ public:
     void waitIdle();
     void destroy();
 
+    SV_FORCE_INLINE const Device& device() const {
+        return m_device;
+    }
     SV_FORCE_INLINE Device& device() {
         return m_device;
     }
@@ -63,6 +67,7 @@ private:
     PipelineMan m_pipelineMan;
     DescriptorMan m_descriptorMan;
     BufferMan m_bufferMan;
+    TextureMan m_textureMan;
 
     FrameResource m_frameResource;
     DepthResource m_depthResource;

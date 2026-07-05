@@ -6,13 +6,14 @@
 class RenderPass {
 public:
     void init(const VkDevice& device, VkFormat colorFormat, VkFormat depthFormat);
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE const VkRenderPass& renderPass() const {
         return m_renderPass;
     }
 
 private:
+    VkDevice m_device{VK_NULL_HANDLE};
     VkAttachmentDescription m_colorAttachment{};
     VkAttachmentDescription m_depthAttachment{};
     VkAttachmentReference m_colorAttachmentRef{}; 

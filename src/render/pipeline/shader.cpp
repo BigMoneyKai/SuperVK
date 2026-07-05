@@ -6,6 +6,7 @@
 #include <fstream>
 
 void Shader::init(const VkDevice& device, const char* path, ShaderType type) {
+    m_device = device;
     m_path = path;
     m_type = type;
     readShader(m_path);
@@ -43,9 +44,9 @@ void Shader::load() {
 
 }
 
-void Shader::destroy(const VkDevice& device) {
+void Shader::destroy() {
     if(m_shaderModule != VK_NULL_HANDLE) {
-        vkDestroyShaderModule(device, m_shaderModule, nullptr);
+        vkDestroyShaderModule(m_device, m_shaderModule, nullptr);
         m_shaderModule = VK_NULL_HANDLE;
     }
 }

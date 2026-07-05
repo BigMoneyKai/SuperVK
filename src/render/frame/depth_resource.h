@@ -11,13 +11,14 @@ public:
         VkFormat depthFormat,
         VkExtent2D extent
     );
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE const VkImageView& depthImageView() const {
         return m_depthImageView;
     }
 
 private:
+    VkDevice m_device{VK_NULL_HANDLE};
     VkImage m_depthImage{VK_NULL_HANDLE};
     VkImageView m_depthImageView{VK_NULL_HANDLE};
     VkDeviceMemory m_depthImageMemory{VK_NULL_HANDLE};

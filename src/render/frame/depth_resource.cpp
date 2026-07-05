@@ -7,6 +7,7 @@ void DepthResource::init(
     VkFormat depthFormat,
     VkExtent2D extent
 ) {
+    m_device = device;
     // Create depth image
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -75,17 +76,17 @@ void DepthResource::init(
     }
 }
 
-void DepthResource::destroy(const VkDevice& device) {
+void DepthResource::destroy() {
     if(m_depthImageView != VK_NULL_HANDLE) {
-        vkDestroyImageView(device, m_depthImageView, nullptr);
+        vkDestroyImageView(m_device, m_depthImageView, nullptr);
         m_depthImageView = VK_NULL_HANDLE;
     }
     if(m_depthImage != VK_NULL_HANDLE) {
-        vkDestroyImage(device, m_depthImage, nullptr);
+        vkDestroyImage(m_device, m_depthImage, nullptr);
         m_depthImage = VK_NULL_HANDLE;
     }
     if(m_depthImageMemory != VK_NULL_HANDLE) {
-        vkFreeMemory(device, m_depthImageMemory, nullptr);
+        vkFreeMemory(m_device, m_depthImageMemory, nullptr);
         m_depthImageMemory = VK_NULL_HANDLE;
     }
 }

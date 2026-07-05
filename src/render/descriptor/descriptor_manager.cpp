@@ -8,44 +8,45 @@
 #include "scene/material.h"
 
 void DescriptorMan::init(const VkDevice& device, const VkPhysicalDevice& physicalDevice) {
-    createLayout(device);
-    createPool(device);
-    allocateSet(device);
-    createBuffers(device, physicalDevice);
-    writeDescriptorSet(device);
+    m_device = device;
+    createLayout();
+    createPool();
+    allocateSet();
+    createBuffers(physicalDevice);
 }
 
-void DescriptorMan::destroy(const VkDevice& device) {
-    m_cameraUBO.destroy(device);
-    m_objectUBO.destroy(device);
-    m_lightUBO.destroy(device);
-    m_materialUBO.destroy(device);
-    m_pool.destroy(device);
-    m_setLayout.destroy(device);
+void DescriptorMan::destroy() {
+    m_cameraUBO.destroy();
+    m_objectUBO.destroy();
+    m_lightUBO.destroy();
+    m_materialUBO.destroy();
+    m_texSampler2D.destroy();
+    m_pool.destroy();
+    m_setLayout.destroy();
 }
 
 // ---- UBO updates -----------------------------------------------------------
 
-void DescriptorMan::updateCameraUBO(const VkDevice& device, const void* data, u64 size) {
-    m_cameraUBO.update(device, data, size);
+void DescriptorMan::updateCameraUBO(const void* data, u64 size) {
+    m_cameraUBO.update(data, size);
 }
 
-void DescriptorMan::updateObjectUBO(const VkDevice& device, const void* data, u64 size) {
-    m_objectUBO.update(device, data, size);
+void DescriptorMan::updateObjectUBO(const void* data, u64 size) {
+    m_objectUBO.update(data, size);
 }
 
-void DescriptorMan::updateLightUBO(const VkDevice& device, const void* data, u64 size) {
-    m_lightUBO.update(device, data, size);
+void DescriptorMan::updateLightUBO(const void* data, u64 size) {
+    m_lightUBO.update(data, size);
 }
 
-void DescriptorMan::updateMaterialUBO(const VkDevice& device, const void* data, u64 size) {
-    m_materialUBO.update(device, data, size);
+void DescriptorMan::updateMaterialUBO(const void* data, u64 size) {
+    m_materialUBO.update(data, size);
 }
 
 // ---- internal helpers ------------------------------------------------------
 
-void DescriptorMan::createLayout(const VkDevice& device) {
-    std::vector<VkDescriptorSetLayoutBinding> bindings(4);
+void DescriptorMan::createLayout() {
+    std::vector<VkDescriptorSetLayoutBinding> bindings(5);
 
     // binding 0 — CameraUBO
     bindings[0].binding            = 0;
@@ -75,54 +76,77 @@ void DescriptorMan::createLayout(const VkDevice& device) {
     bindings[3].stageFlags         = VK_SHADER_STAGE_ALL_GRAPHICS;
     bindings[3].pImmutableSamplers = nullptr;
 
-    m_setLayout.init(device, bindings);
+    // binding 4 — Sampler2D
+    bindings[4].binding            = 4;
+    bindings[4].descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    bindings[4].descriptorCount    = 1;
+    bindings[4].stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+    bindings[4].pImmutableSamplers = nullptr;
+
+    m_setLayout.init(m_device, bindings);
 }
 
-void DescriptorMan::createPool(const VkDevice& device) {
+void DescriptorMan::createPool() {
     std::vector<VkDescriptorPoolSize> poolSizes = {
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4}
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}
     };
-    m_pool.init(device, poolSizes, 1);
+    m_pool.init(m_device, poolSizes, 1);
 }
 
-void DescriptorMan::allocateSet(const VkDevice& device) {
-    VkDescriptorSet set = m_pool.allocate(device, m_setLayout.layout());
+void DescriptorMan::allocateSet() {
+    VkDescriptorSet set = m_pool.allocate(m_setLayout.layout());
     m_set.init(set);
 }
 
-void DescriptorMan::createBuffers(const VkDevice& device, const VkPhysicalDevice& physicalDevice) {
-    m_cameraUBO.init(BT_UNIFORM_BUFFER, device, physicalDevice, nullptr, sizeof(CameraUBO));
-    m_objectUBO.init(BT_UNIFORM_BUFFER, device, physicalDevice, nullptr, sizeof(ObjectUBO));
-    m_lightUBO.init(BT_UNIFORM_BUFFER, device, physicalDevice, nullptr, sizeof(LightUBO));
-    m_materialUBO.init(BT_UNIFORM_BUFFER, device, physicalDevice, nullptr, sizeof(MaterialUBO));
+void DescriptorMan::createBuffers(const VkPhysicalDevice& physicalDevice) {
+    m_cameraUBO.init(BT_UNIFORM_BUFFER, m_device, physicalDevice, nullptr, sizeof(CameraUBO));
+    m_objectUBO.init(BT_UNIFORM_BUFFER, m_device, physicalDevice, nullptr, sizeof(ObjectUBO));
+    m_lightUBO.init(BT_UNIFORM_BUFFER, m_device, physicalDevice, nullptr, sizeof(LightUBO));
+    m_materialUBO.init(BT_UNIFORM_BUFFER, m_device, physicalDevice, nullptr, sizeof(MaterialUBO));
+    m_texSampler2D.init(m_device, {});
 }
 
-void DescriptorMan::writeDescriptorSet(const VkDevice& device) {
+void DescriptorMan::writeBufferDescriptorSet() {
     DescriptorWriter writer;
+    writer.init(m_device);
 
     VkDescriptorBufferInfo camInfo{};
     camInfo.buffer = m_cameraUBO.buffer();
     camInfo.offset = 0;
     camInfo.range  = VK_WHOLE_SIZE;
-    writer.writeBuffer(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, camInfo);
+    writer.writeBuffer({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, camInfo});
 
     VkDescriptorBufferInfo objInfo{};
     objInfo.buffer = m_objectUBO.buffer();
     objInfo.offset = 0;
     objInfo.range  = VK_WHOLE_SIZE;
-    writer.writeBuffer(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, objInfo);
+    writer.writeBuffer({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, objInfo});
 
     VkDescriptorBufferInfo lightInfo{};
     lightInfo.buffer = m_lightUBO.buffer();
     lightInfo.offset = 0;
     lightInfo.range  = VK_WHOLE_SIZE;
-    writer.writeBuffer(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, lightInfo);
+    writer.writeBuffer({2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, lightInfo});
 
     VkDescriptorBufferInfo matInfo{};
     matInfo.buffer = m_materialUBO.buffer();
     matInfo.offset = 0;
     matInfo.range  = VK_WHOLE_SIZE;
-    writer.writeBuffer(3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, matInfo);
+    writer.writeBuffer({3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, matInfo});
 
-    writer.build(device, m_set.set());
+    writer.buildBufferWrite(m_set.set());
+}
+
+void DescriptorMan::writeImageDescriptorSet(const VkImageView& imageView, const VkImageLayout& layout) {
+    DescriptorWriter writer;
+    writer.init(m_device);
+
+    VkDescriptorImageInfo texInfo{};
+    texInfo.sampler     = m_texSampler2D.sampler();
+    texInfo.imageView   = imageView;
+    texInfo.imageLayout = layout;
+    writer.writeImage({4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, texInfo});
+
+    writer.buildImageWrite(m_set.set());
 }

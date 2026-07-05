@@ -13,12 +13,13 @@ public:
         const VkImageView& depthImageView,
         VkExtent2D extent
     );
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE const VkFramebuffer& framebuffer() const {
         return m_framebuffer;
     }
 
 private:
+    VkDevice m_device{VK_NULL_HANDLE};
     VkFramebuffer m_framebuffer{VK_NULL_HANDLE};
 };

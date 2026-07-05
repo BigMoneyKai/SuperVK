@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "debug/debugger.h"
 
+#include <vulkan/vulkan.h>
 #include <stdlib.h>
 
 SV_INLINE void success_exit_impl() {
@@ -35,3 +36,18 @@ SV_INLINE void except_exit_impl() {
         except_exit_impl(code);\
     } while(0)
 
+u32 findMemoryType(
+    VkPhysicalDevice physicalDevice,
+    uint32_t typeFilter,
+    VkMemoryPropertyFlags propertiesFlags
+);
+VkCommandBuffer beginSingleTimeCommands(
+    VkDevice device,
+    VkCommandPool commandPool
+);
+void endSingleTimeCommands(
+    VkDevice device,
+    VkQueue queue,
+    VkCommandPool commandPool,
+    VkCommandBuffer commandBuffer
+);

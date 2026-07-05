@@ -4,6 +4,8 @@ target_sources(supervk_utils PRIVATE
     utils.cpp
 )
 
+find_package(Vulkan REQUIRED)
+
 target_include_directories(supervk_utils PRIVATE
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/thirdparty/glfw/include
@@ -11,6 +13,7 @@ target_include_directories(supervk_utils PRIVATE
 )
 
 target_link_libraries(supervk_utils PRIVATE
+    Vulkan::Vulkan
     glm
     glfw
 )

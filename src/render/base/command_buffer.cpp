@@ -2,6 +2,7 @@
 #include "debug/debugger.h"
 
 void CommandBuffer::init(const VkDevice& device, VkCommandPool pool, u32 count) {
+    m_device = device;
     m_pool = pool;
     m_commandBuffers.resize(count);
 
@@ -17,10 +18,10 @@ void CommandBuffer::init(const VkDevice& device, VkCommandPool pool, u32 count) 
     ));
 }
 
-void CommandBuffer::destroy(const VkDevice& device) {
+void CommandBuffer::destroy() {
     if(!m_commandBuffers.empty() && m_pool != VK_NULL_HANDLE) {
         vkFreeCommandBuffers(
-            device,
+            m_device,
             m_pool,
             static_cast<u32>(m_commandBuffers.size()),
             m_commandBuffers.data()

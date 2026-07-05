@@ -10,6 +10,7 @@ void Pipeline::init(
     const VkRenderPass& renderPass,
     const PipelineDesc& desc)
 {
+    m_device = device;
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType =
@@ -193,7 +194,7 @@ void Pipeline::init(
         &m_pipeline));
 }
 
-void Pipeline::destroy(const VkDevice& device) {
-    vkDestroyPipeline(device, m_pipeline, nullptr);
-    vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
+void Pipeline::destroy() {
+    vkDestroyPipeline(m_device, m_pipeline, nullptr);
+    vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
 }

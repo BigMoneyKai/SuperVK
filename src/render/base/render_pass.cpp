@@ -4,6 +4,7 @@
 #include <array>
 
 void RenderPass::init(const VkDevice& device, VkFormat colorFormat, VkFormat depthFormat) {
+    m_device = device;
     m_colorAttachment.format = colorFormat;
     m_colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     m_colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -52,9 +53,9 @@ void RenderPass::init(const VkDevice& device, VkFormat colorFormat, VkFormat dep
 
 }
 
-void RenderPass::destroy(const VkDevice& device) {
+void RenderPass::destroy() {
     if(m_renderPass != VK_NULL_HANDLE) {
-        vkDestroyRenderPass(device, m_renderPass, nullptr);
+        vkDestroyRenderPass(m_device, m_renderPass, nullptr);
         m_renderPass = VK_NULL_HANDLE;
     }
 }

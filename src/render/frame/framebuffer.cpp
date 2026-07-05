@@ -8,6 +8,7 @@ void Framebuffer::init(
     const VkImageView& depthImageView,
     VkExtent2D extent
 ) {
+    m_device = device;
     std::vector<VkImageView> attachments = {colorImageView, depthImageView};
 
     VkFramebufferCreateInfo framebufferInfo{};
@@ -23,9 +24,9 @@ void Framebuffer::init(
 
 }
 
-void Framebuffer::destroy(const VkDevice& device) {
+void Framebuffer::destroy() {
     if(m_framebuffer != VK_NULL_HANDLE) {
-        vkDestroyFramebuffer(device, m_framebuffer, nullptr);
+        vkDestroyFramebuffer(m_device, m_framebuffer, nullptr);
         m_framebuffer = VK_NULL_HANDLE;
     }
 }

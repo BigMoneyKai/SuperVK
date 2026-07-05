@@ -21,8 +21,8 @@ void Renderer::init(const RendererDesc& desc) {
     m_pipelineMan.init(m_device.device(), m_renderPass.renderPass(), m_descriptorMan.layout());
     m_bufferMan.init();
 
-    m_frameResource.init(m_swapchain.imageCount());
-    m_frameResource.createSyncPrimitives(m_device.device());
+    m_frameResource.init(m_device.device(), m_swapchain.imageCount());
+    m_frameResource.createSyncPrimitives();
     m_depthResource.init(
         m_device.device(),
         m_device.physicalDevice(),
@@ -32,6 +32,15 @@ void Renderer::init(const RendererDesc& desc) {
 
     m_commandPool.init(m_device.device(), m_device.graphicsQueueFamilyIndex());
     m_commandBuffer.init(m_device.device(), m_commandPool.pool(), m_frameResource.framebufferCount());
+
+    m_textureMan.init(m_device.device(), m_device.physicalDevice(), m_commandPool.pool(), m_device.graphicsQueue());
+    m_descriptorMan.writeBufferDescriptorSet();
+
+    u32 texIndex = m_textureMan.loadTexture("assets/textures/red.jpg");
+    m_descriptorMan.writeImageDescriptorSet(
+        m_textureMan.texture(texIndex).imageView(),
+        m_textureMan.texture(texIndex).imageLayout()
+    );
 
     const auto& swapchainImageViews = m_swapchain.swapchainImageViews();
     m_framebuffers.resize(swapchainImageViews.size());
@@ -60,23 +69,26 @@ void Renderer::waitIdle() {
 void Renderer::destroy() {
     // framebuffers
     for(auto& fb : m_framebuffers) {
-        fb.destroy(m_device.device());
+        fb.destroy();
     }
     m_framebuffers.clear();
 
     // sync, depth, commands
-    m_frameResource.destroy(m_device.device());
-    m_depthResource.destroy(m_device.device());
-    m_commandPool.destroy(m_device.device());
+    m_frameResource.destroy();
+    m_depthResource.destroy();
+
+    m_textureMan.destroy();
+
+    m_commandPool.destroy();
 
     // pipeline + descriptors
-    m_pipelineMan.destroy(m_device.device());
-    m_descriptorMan.destroy(m_device.device());
+    m_pipelineMan.destroy();
+    m_descriptorMan.destroy();
 
     // render pass, swapchain, surface, device, instance
-    m_renderPass.destroy(m_device.device());
-    m_swapchain.destroy(m_device.device());
-    m_surface.destroy(m_instance.instance());
+    m_renderPass.destroy();
+    m_swapchain.destroy();
+    m_surface.destroy();
     m_device.destroy();
     m_instance.destroy();
 }
@@ -140,10 +152,10 @@ void Renderer::drawFrame(Scene& scene) {
     vkCmdBeginRenderPass(cmdBuf, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     // ---- update UBOs from scene data ----
-    m_descriptorMan.updateCameraUBO(m_device.device(), &scene.camera().ubo(), sizeof(CameraUBO));
-    m_descriptorMan.updateObjectUBO(m_device.device(), &scene.object().ubo(), sizeof(ObjectUBO));
-    m_descriptorMan.updateLightUBO(m_device.device(), &scene.light().ubo(), sizeof(LightUBO));
-    m_descriptorMan.updateMaterialUBO(m_device.device(), &scene.material().ubo(), sizeof(MaterialUBO));
+    m_descriptorMan.updateCameraUBO(&scene.camera().ubo(), sizeof(CameraUBO));
+    m_descriptorMan.updateObjectUBO(&scene.object().ubo(), sizeof(ObjectUBO));
+    m_descriptorMan.updateLightUBO(&scene.light().ubo(), sizeof(LightUBO));
+    m_descriptorMan.updateMaterialUBO(&scene.material().ubo(), sizeof(MaterialUBO));
 
     // ---- bind pipeline ----
     vkCmdBindPipeline(cmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineMan.graphicsPipeline());

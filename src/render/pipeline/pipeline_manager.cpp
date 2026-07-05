@@ -2,6 +2,7 @@
 
 void PipelineMan::init(const VkDevice& device, const VkRenderPass& renderPass,
                        VkDescriptorSetLayout descriptorSetLayout) {
+    m_device = device;
     // load shaders
     m_vertShader.init(device, "shaders/spv/basic.vert.spv", ST_VERTEX_SHADER);
     m_fragShader.init(device, "shaders/spv/basic.frag.spv", ST_FRAGMENT_SHADER);
@@ -18,8 +19,8 @@ void PipelineMan::init(const VkDevice& device, const VkRenderPass& renderPass,
     m_graphics.init(device, renderPass, desc);
 }
 
-void PipelineMan::destroy(const VkDevice& device) {
-    m_graphics.destroy(device);
-    m_vertShader.destroy(device);
-    m_fragShader.destroy(device);
+void PipelineMan::destroy() {
+    m_graphics.destroy();
+    m_vertShader.destroy();
+    m_fragShader.destroy();
 }

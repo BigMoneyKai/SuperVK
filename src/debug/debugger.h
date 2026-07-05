@@ -123,9 +123,9 @@ typedef enum {
     do {\
         VkResult result = func;\
         if(result != VK_SUCCESS) {\
-            FATAL(#func" failure");\
+            FATAL("Failed to load "#func);\
         }\
-        TRACE(#func" success");\
+        TRACE("Success to load "#func);\
     } while(0)
 #else
 #define VK_CHECK_RESULT(func) (func)

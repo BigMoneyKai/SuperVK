@@ -2,6 +2,7 @@
 #include "debug/debugger.h"
 
 void DescriptorSetLayout::init(const VkDevice& device, const std::vector<VkDescriptorSetLayoutBinding>& bindings) {
+    m_device = device;
     VkDescriptorSetLayoutCreateInfo layoutInfo{};
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     layoutInfo.bindingCount = static_cast<u32>(bindings.size());
@@ -10,9 +11,9 @@ void DescriptorSetLayout::init(const VkDevice& device, const std::vector<VkDescr
     VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &m_layout));
 }
 
-void DescriptorSetLayout::destroy(const VkDevice& device) {
+void DescriptorSetLayout::destroy() {
     if(m_layout != VK_NULL_HANDLE) {
-        vkDestroyDescriptorSetLayout(device, m_layout, nullptr);
+        vkDestroyDescriptorSetLayout(m_device, m_layout, nullptr);
         m_layout = VK_NULL_HANDLE;
     }
 }

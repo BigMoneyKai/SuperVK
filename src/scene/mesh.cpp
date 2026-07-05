@@ -25,7 +25,7 @@ void Mesh::init(const VkDevice& device, const VkPhysicalDevice& physicalDevice) 
 
 }
 
-void Mesh::destroy(const VkDevice& device) {
-    m_vertexBuffer.destroy(device);
-    m_indexBuffer.destroy(device);
+void Mesh::destroy() {
+    m_vertexBuffer.destroy();
+    m_indexBuffer.destroy();
 }

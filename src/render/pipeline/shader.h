@@ -21,7 +21,7 @@ class Shader {
 public:
     void init(const VkDevice& device, const char* path, ShaderType type);
     void load();
-    void destroy(const VkDevice& device);
+    void destroy();
 
     SV_FORCE_INLINE VkShaderStageFlagBits stage() const {
         return m_shaderStageCreateInfo.stage;
@@ -34,6 +34,7 @@ private:
     void readShader(const char* filePath);
 
 private:
+    VkDevice m_device{VK_NULL_HANDLE};
     const char* m_path{nullptr};
     ShaderType m_type;
     std::vector<u32> m_code;

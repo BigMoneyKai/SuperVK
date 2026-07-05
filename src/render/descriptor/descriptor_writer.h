@@ -5,17 +5,31 @@
 
 #include <vector>
 
+struct ImageWriteDesc {
+    u32 binding;
+    VkDescriptorType type;
+    VkDescriptorImageInfo info;
+};
+
+struct BufferWriteDesc {
+    u32 binding;
+    VkDescriptorType type;
+    VkDescriptorBufferInfo info;
+};
+
 class DescriptorWriter {
 public:
-    void writeBuffer(u32 binding, VkDescriptorType type, const VkDescriptorBufferInfo& bufferInfo);
-    void build(const VkDevice& device, VkDescriptorSet descriptorSet);
+    void init(const VkDevice& device);
+
+    void writeBuffer(const BufferWriteDesc& desc);
+    void writeImage(const ImageWriteDesc& desc);
+
+    void buildBufferWrite(VkDescriptorSet descriptorSet);
+    void buildImageWrite(VkDescriptorSet descriptorSet);
 
 private:
-    struct BufferWrite {
-        u32 binding;
-        VkDescriptorType type;
-        VkDescriptorBufferInfo info;
-    };
+    VkDevice m_device{VK_NULL_HANDLE};
+    std::vector<BufferWriteDesc> m_bufferWriteDescs;
+    std::vector<ImageWriteDesc> m_imageWriteDescs;
 
-    std::vector<BufferWrite> m_bufferWrites;
 };

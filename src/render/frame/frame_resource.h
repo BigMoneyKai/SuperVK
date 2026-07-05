@@ -9,9 +9,9 @@
 
 class FrameResource {
 public:
-    void init(u32 swapchainImageCount);
-    void createSyncPrimitives(const VkDevice& device);
-    void destroy(const VkDevice& device);
+    void init(const VkDevice& device, u32 swapchainImageCount);
+    void createSyncPrimitives();
+    void destroy();
 
     SV_FORCE_INLINE u32 framebufferCount() const {
         return m_framebufferCount;
@@ -27,6 +27,7 @@ public:
     }
 
 private:
+    VkDevice m_device{VK_NULL_HANDLE};
     u32 m_framebufferCount{3};
     u32 m_swapchainImageCount{0};
     std::vector<VkSemaphore> m_imageAvailableSemaphores;

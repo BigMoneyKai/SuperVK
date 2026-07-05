@@ -28,6 +28,7 @@ void Swapchain::init(
     const VkSurfaceKHR& surface,
     VkExtent2D windowExtent
 ) {
+    m_device = device;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &m_capabilities);
     u32 formatCount = 0;
 
@@ -106,14 +107,14 @@ void Swapchain::init(
     }
 }
 
-void Swapchain::destroy(const VkDevice& device) {
+void Swapchain::destroy() {
     for(auto swapchainImageView : m_swapchainImageViews) {
         if(swapchainImageView != VK_NULL_HANDLE) {
-            vkDestroyImageView(device, swapchainImageView, nullptr);
+            vkDestroyImageView(m_device, swapchainImageView, nullptr);
         }
     }
     if(m_swapchain != VK_NULL_HANDLE) {
-        vkDestroySwapchainKHR(device, m_swapchain, nullptr);
+        vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
         m_swapchain = VK_NULL_HANDLE;
     }
 }

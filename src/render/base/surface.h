@@ -8,7 +8,7 @@
 class Surface {
 public:
     void init(const VkInstance& instance, GLFWwindow* window);
-    void destroy(const VkInstance& instance);
+    void destroy();
 
     SV_FORCE_INLINE const VkSurfaceKHR& surface() const {
         return m_surface;
@@ -18,6 +18,7 @@ public:
     }
 
 private:
+    VkInstance m_instance{VK_NULL_HANDLE};
     VkSurfaceKHR m_surface;
 
 };
