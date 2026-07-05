@@ -1,10 +1,11 @@
+add_subdirectory(utils)
 add_subdirectory(app)
 add_subdirectory(core)
 add_subdirectory(scene)
 add_subdirectory(render)
 add_subdirectory(input)
 add_subdirectory(window)
-add_subdirectory(utils)
+
 
 add_executable(supervk
     main.cpp
@@ -27,7 +28,7 @@ target_link_libraries(supervk PRIVATE
     supervk_input
     supervk_window
     supervk_utils
-
+    
     Vulkan::Vulkan
 )
 

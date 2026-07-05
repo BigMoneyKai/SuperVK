@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.1...3.6)
 
 if(APPLE)
     set(CMAKE_C_COMPILER clang)
