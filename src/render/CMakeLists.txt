@@ -28,4 +28,5 @@ target_link_libraries(supervk_render PRIVATE
     supervk_render_pipeline
 
     Vulkan::Vulkan
+    glm
 )

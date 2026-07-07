@@ -1,21 +1,20 @@
-add_library(supervk_core STATIC)
+add_library(supervk_core INTERFACE)
 
-target_sources(supervk_core PRIVATE
-    parser/obj/objparser.cpp
-    parser/gltf/gltfparser.cpp
-    parser/gltf/glbparser.cpp
-    parser/parser_manager.cpp
-)
+add_subdirectory(memory)
+add_subdirectory(container)
+add_subdirectory(parser)
 
 find_package(Vulkan REQUIRED)
 
-target_include_directories(supervk_core PRIVATE
+target_include_directories(supervk_core INTERFACE
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/thirdparty/glm
 )
 
-target_link_libraries(supervk_core PRIVATE
-    supervk_scene
+target_link_libraries(supervk_core INTERFACE
+    supervk_core_memory
+    supervk_core_container
+    supervk_core_parser
 
     Vulkan::Vulkan
     glm

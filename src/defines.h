@@ -10,56 +10,30 @@
     #endif
 
 #elif defined(__APPLE__)
-    #define SV_PLATFORM_APPLE 1
+    #define SV_PLATFORM_APPLE
     #include <TargetConditionals.h>
     #if TARGET_OS_IPHONE
-        #define SV_PLATFORM_IOS 1
+        #define SV_PLATFORM_IOS
     #elif TARGET_OS_MAC
-        #define SV_PLATFORM_MAC 1
+        #define SV_PLATFORM_MAC
     #else
         #error "Other unsupported operating system."
     #endif
 
 #elif defined(__linux__) || defined(__gnu_linux__)
-    #define SV_PLATFORM_LINUX 1
+    #define SV_PLATFORM_LINUX
     #if defined(__ANDROID__)
-        #define SV_PLATFORM_ANDROID 1
+        #define SV_PLATFORM_ANDROID
     #endif
 
 #elif defined(__unix__)
-    #define SV_PLATFORM_UNIX 1
+    #define SV_PLATFORM_UNIX
     #if defined(_POSIX_VERSION)
-        #define SV_PLATFORM_POSIX 1
+        #define SV_PLATFORM_POSIX
     #endif
 
 #else
     #error "Unknown/Unsupported operating system."
-#endif
-
-// Ensure all platform macros are defined for compatibility.
-#ifndef SV_PLATFORM_WINDOWS
-    #define SV_PLATFORM_WINDOWS 0
-#endif
-#ifndef SV_PLATFORM_APPLE
-    #define SV_PLATFORM_APPLE 0
-#endif
-#ifndef SV_PLATFORM_IOS
-    #define SV_PLATFORM_IOS 0
-#endif
-#ifndef SV_PLATFORM_MAC
-    #define SV_PLATFORM_MAC 0
-#endif
-#ifndef SV_PLATFORM_LINUX
-    #define SV_PLATFORM_LINUX 0
-#endif
-#ifndef SV_PLATFORM_ANDROID
-    #define SV_PLATFORM_ANDROID 0
-#endif
-#ifndef SV_PLATFORM_UNIX
-    #define SV_PLATFORM_UNIX 0
-#endif
-#ifndef SV_PLATFORM_POSIX
-    #define SV_PLATFORM_POSIX 0
 #endif
 
 // compiler detection
@@ -183,13 +157,13 @@ SV_STATIC_ASSERT(sizeof(addr) == sizeof(void*), "Expected addr to match pointer 
 #endif
 
 // API choice
-#if SV_PLATFORM_WINDOWS
+#if defined(SV_PLATFORM_WINDOWS)
     #define SV_RENDER_API_D3D11
     #define SV_RENDER_API_VULKAN
-#elif SV_PLATFORM_APPLE
+#elif defined(SV_PLATFORM_APPLE)
     #define SV_RENDER_API_METAL
     #define SV_RENDER_API_VULKAN
-#elif SV_PLATFORM_LINUX
+#elif defined(SV_PLATFORM_LINUX)
     #define SV_RENDER_API_VULKAN
 #else
     #define SV_RENDER_API_NO_SUPPORT
