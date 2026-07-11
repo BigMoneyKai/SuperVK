@@ -1,15 +1,19 @@
 #include "defines.h"
+#include "core/container/string/string.hpp"
 #include "debug/debugger.h"
-#include "core/container/array.h"
+
+#include <glm/glm.hpp>
+#include <cstdio>
+#include <format>
+#include <string>
+#include <iostream>
 
 int main() {
-    Array<i32> array;
-    for(i32 i = 0; i < 32; i++) {
-        array.push_back(i);
-    }
-    for(auto element : array) {
-        INFO("Element %d", element);
-    }
+    // quick smoke test
+
+    String string = "Hello";
+
+    std::cout << string << std::endl;
 
     return 0;
 }
