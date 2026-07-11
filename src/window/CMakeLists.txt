@@ -13,6 +13,8 @@ target_include_directories(supervk_window PRIVATE
 )
 
 target_link_libraries(supervk_window PRIVATE
+    supervk_debug
+
     Vulkan::Vulkan
     glm
     glfw

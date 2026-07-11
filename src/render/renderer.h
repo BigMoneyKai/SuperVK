@@ -17,7 +17,6 @@
 #include "frame/depth_resource.h"
 #include "frame/frame_resource.h"
 #include "frame/framebuffer.h"
-#include "frame/sync.h"
 
 #include "resource/buffer_manager.h"
 #include "resource/texture_manager.h"

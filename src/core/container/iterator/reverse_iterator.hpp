@@ -4,9 +4,9 @@
 
 template <typename It>
 class ReverseIterator {
-public:
+  public:
     explicit ReverseIterator(It it)
-    : m_it(it) {}
+        : m_it(it) {}
 
     auto& operator*() const {
         It tmp = m_it;
@@ -43,11 +43,10 @@ public:
     b32 operator==(const ReverseIterator& rhs) const {
         return m_it == rhs.m_it;
     }
-
     b32 operator!=(const ReverseIterator& rhs) const {
         return m_it != rhs.m_it;
     }
 
-private:
+  private:
     It m_it;
 };

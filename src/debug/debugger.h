@@ -2,7 +2,8 @@
 
 #include "utils/utils.h"
 
-#include <stdio.h>
+#include <format>
+#include <print>
 #include <stdlib.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
@@ -51,82 +52,84 @@
 #define EMOJI_ALERT     "🚨"
 #endif
 
-// NOTE: Trace mode - show trace/debug/info/warning/error/fatal
-// NOTE: Debug mode - show debug/info/warning/error/fatal
-// NOTE: Release mode - info/warning/error/fatal
-
 typedef enum {
     DL_TRACE,
     DL_DEBUG,
-
     DL_INFO,
     DL_WARNING,
     DL_ERROR,
     DL_FATAL,
-
 } DebugLevel;
 
+// =========================================================================
+// C++23 std::print backend — platform-portable, no %lu/%llu issues
+// =========================================================================
+
 #ifdef TRACE_MODE
-#define TRACE(...) \
-    do{\
-        fprintf(stdout, EMOJI_OK EMOJI_SMILE " " COLOR_GREEN "TRACE" COLOR_RESET": ");\
-        fprintf(stderr, EMOJI_DEVIL EMOJI_WARNING " in \"%s\" %s:%d " COLOR_PURPLE "[TRACE]" COLOR_RESET " ", __func__, __FILE__, __LINE__);\
-        fprintf(stdout, __VA_ARGS__);\
-        fprintf(stdout, "\n");\
+#define TRACE(fmt, ...) \
+    do { \
+        std::print("{} {}[TRACE] in \"{}\" {}:{} [TRACE] {}\n", \
+            EMOJI_OK, COLOR_GREEN, __func__, __FILE__, __LINE__, COLOR_PURPLE, \
+            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
     } while(0)
 #else
 #define TRACE(...) ((void)0)
 #endif
 
 #ifndef NDEBUG
-#define DEBUG(...) \
-    do{\
-        fprintf(stdout, EMOJI_RUN EMOJI_CODEGEN " " COLOR_ORANGE "[DEBUG]" COLOR_RESET " ");\
-        fprintf(stdout, __VA_ARGS__);\
-        fprintf(stdout, "\n");\
+#define DEBUG(fmt, ...) \
+    do { \
+        std::print("{}{} {}[DEBUG]{} {}\n", \
+            EMOJI_RUN, EMOJI_CODEGEN, COLOR_ORANGE, COLOR_RESET, \
+            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
     } while(0)
 #else
 #define DEBUG(...) ((void)0)
 #endif
 
-#define INFO(...) \
-    do{\
-        fprintf(stdout, EMOJI_OK EMOJI_SMILE " " COLOR_GREEN "[INFO]" COLOR_RESET " ");\
-        fprintf(stdout, __VA_ARGS__);\
-        fprintf(stdout, "\n");\
+#define INFO(fmt, ...) \
+    do { \
+        std::print("{}{} {}[INFO]{} {}\n", \
+            EMOJI_OK, EMOJI_SMILE, COLOR_GREEN, COLOR_RESET, \
+            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
     } while(0)
 
-#define WARNING(...) \
-    do{\
-        fprintf(stderr, EMOJI_DEVIL EMOJI_WARNING " in \"%s\" %s:%d " COLOR_PURPLE "[WARNING]" COLOR_RESET " ", __func__, __FILE__, __LINE__);\
-        fprintf(stderr, __VA_ARGS__);\
-        fprintf(stderr, "\n");\
+#define WARNING(fmt, ...) \
+    do { \
+        std::print(stderr, "{}{} in \"{}\" {}:{} {}[WARNING]{} {}\n", \
+            EMOJI_DEVIL, EMOJI_WARNING, __func__, __FILE__, __LINE__, \
+            COLOR_PURPLE, COLOR_RESET, \
+            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
     } while(0)
 
-#define ERROR(...) \
-    do{\
-        fprintf(stderr, EMOJI_ERROR EMOJI_DEBUG " in \"%s\" %s:%d " COLOR_RED "[ERROR]" COLOR_RESET " ", __func__, __FILE__, __LINE__);\
-        fprintf(stderr, __VA_ARGS__);\
-        fprintf(stderr, "\n");\
+#define ERROR(fmt, ...) \
+    do { \
+        std::print(stderr, "{}{} in \"{}\" {}:{} {}[ERROR]{} {}\n", \
+            EMOJI_ERROR, EMOJI_DEBUG, __func__, __FILE__, __LINE__, \
+            COLOR_RED, COLOR_RESET, \
+            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
     } while(0)
 
-#define FATAL(...) \
-    do{\
-        fprintf(stderr, EMOJI_ALERT EMOJI_FATAL " in \"%s\" %s:%d " COLOR_DARK_RED "[FATAL]" COLOR_RESET " ", __func__, __FILE__, __LINE__);\
-        fprintf(stderr, __VA_ARGS__);\
-        fprintf(stderr, "\n");\
-        failure_exit();\
+#define FATAL(fmt, ...) \
+    do { \
+        std::print(stderr, "{}{} in \"{}\" {}:{} {}[FATAL]{} {}\n", \
+            EMOJI_ALERT, EMOJI_FATAL, __func__, __FILE__, __LINE__, \
+            COLOR_DARK_RED, COLOR_RESET, \
+            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
+        failure_exit(); \
     } while(0)
 
 #ifndef NDEBUG
 #define VK_CHECK_RESULT(func)\
-    do {\
-        VkResult result = func;\
-        if(result != VK_SUCCESS) {\
-            FATAL("Failed to load "#func);\
-        }\
-        TRACE("Success to load "#func);\
+    do { \
+        VkResult result = func; \
+        if(result != VK_SUCCESS) { \
+            FATAL("Failed to load " #func); \
+        } \
+        TRACE("Success to load " #func); \
     } while(0)
 #else
 #define VK_CHECK_RESULT(func) (func)
 #endif
+
+#define VAL_NAME(val) #val

@@ -16,5 +16,6 @@ target_include_directories(supervk_core_memory PRIVATE
 
 target_link_libraries(supervk_core_memory PRIVATE
     supervk_platform
+    supervk_debug
     Vulkan::Vulkan
 )

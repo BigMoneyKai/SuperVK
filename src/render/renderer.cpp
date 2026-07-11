@@ -1,7 +1,6 @@
 #include "render/renderer.h"
-#include "scene/scene.h"
 #include "debug/debugger.h"
-#include "utils/utils.h"
+#include "scene/scene.h"
 
 void Renderer::init(const RendererDesc& desc) {
     m_desc = desc;
@@ -12,8 +11,7 @@ void Renderer::init(const RendererDesc& desc) {
         m_device.device(),
         m_device.physicalDevice(),
         m_surface.surface(),
-        {desc.pWinMan->width(), desc.pWinMan->height()}
-    );
+        {desc.pWinMan->width(), desc.pWinMan->height()});
     m_renderPass.init(m_device.device(), m_swapchain.colorFormat(), m_device.depthFormat());
 
     // DescriptorMan must init BEFORE PipelineMan (pipeline needs the layout)
@@ -27,8 +25,7 @@ void Renderer::init(const RendererDesc& desc) {
         m_device.device(),
         m_device.physicalDevice(),
         m_device.depthFormat(),
-        m_swapchain.extent()
-    );
+        m_swapchain.extent());
 
     m_commandPool.init(m_device.device(), m_device.graphicsQueueFamilyIndex());
     m_commandBuffer.init(m_device.device(), m_commandPool.pool(), m_frameResource.framebufferCount());
@@ -39,20 +36,18 @@ void Renderer::init(const RendererDesc& desc) {
     u32 texIndex = m_textureMan.loadTexture("assets/textures/red.jpg");
     m_descriptorMan.writeImageDescriptorSet(
         m_textureMan.texture(texIndex).imageView(),
-        m_textureMan.texture(texIndex).imageLayout()
-    );
+        m_textureMan.texture(texIndex).imageLayout());
 
     const auto& swapchainImageViews = m_swapchain.swapchainImageViews();
     m_framebuffers.resize(swapchainImageViews.size());
 
-    for(size_t i = 0; i < swapchainImageViews.size(); ++i) {
+    for (size_t i = 0; i < swapchainImageViews.size(); ++i) {
         m_framebuffers[i].init(
             m_device.device(),
             m_renderPass.renderPass(),
             swapchainImageViews[i],
             m_depthResource.depthImageView(),
-            m_swapchain.extent()
-        );
+            m_swapchain.extent());
     }
 
     DEBUG("Renderer initialized");
@@ -68,7 +63,7 @@ void Renderer::waitIdle() {
 
 void Renderer::destroy() {
     // framebuffers
-    for(auto& fb : m_framebuffers) {
+    for (auto& fb : m_framebuffers) {
         fb.destroy();
     }
     m_framebuffers.clear();
@@ -103,8 +98,7 @@ void Renderer::drawFrame(Scene& scene) {
         1,
         &fence,
         VK_TRUE,
-        UINT64_MAX
-    );
+        UINT64_MAX);
 
     // Acquire swapchain image
     VkResult result = vkAcquireNextImageKHR(
@@ -113,9 +107,8 @@ void Renderer::drawFrame(Scene& scene) {
         UINT64_MAX,
         imageSem,
         VK_NULL_HANDLE,
-        &m_imageIndex
-    );
-    if(result != VK_SUCCESS) {
+        &m_imageIndex);
+    if (result != VK_SUCCESS) {
         WARNING("Failed to acquire swapchain image");
         return;
     }
@@ -124,15 +117,14 @@ void Renderer::drawFrame(Scene& scene) {
     vkResetFences(
         m_device.device(),
         1,
-        &fence
-    );
+        &fence);
 
     // Record command buffer
     VkCommandBuffer cmdBuf = m_commandBuffer.get(m_currFrame);
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    if(vkBeginCommandBuffer(cmdBuf, &beginInfo) != VK_SUCCESS) {
+    if (vkBeginCommandBuffer(cmdBuf, &beginInfo) != VK_SUCCESS) {
         FATAL("Failed to record command buffer");
     }
 
@@ -167,15 +159,14 @@ void Renderer::drawFrame(Scene& scene) {
         VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_pipelineMan.graphicsPipelineLayout(),
         0, 1, &ds,
-        0, nullptr
-    );
+        0, nullptr);
 
     // ---- dynamic viewport + scissor ----
     VkViewport viewport{};
-    viewport.x        = 0.0f;
-    viewport.y        = 0.0f;
-    viewport.width    = static_cast<f32>(m_swapchain.extent().width);
-    viewport.height   = static_cast<f32>(m_swapchain.extent().height);
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = static_cast<f32>(m_swapchain.extent().width);
+    viewport.height = static_cast<f32>(m_swapchain.extent().height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
     vkCmdSetViewport(cmdBuf, 0, 1, &viewport);
@@ -197,7 +188,7 @@ void Renderer::drawFrame(Scene& scene) {
 
     vkCmdEndRenderPass(cmdBuf);
 
-    if(vkEndCommandBuffer(cmdBuf) != VK_SUCCESS) {
+    if (vkEndCommandBuffer(cmdBuf) != VK_SUCCESS) {
         FATAL("Failed to record command buffer");
     }
 
@@ -215,12 +206,11 @@ void Renderer::drawFrame(Scene& scene) {
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &finishSem;
 
-    if(vkQueueSubmit(
-        m_device.graphicsQueue(),
-        1,
-        &submitInfo,
-        fence
-    ) != VK_SUCCESS) {
+    if (vkQueueSubmit(
+            m_device.graphicsQueue(),
+            1,
+            &submitInfo,
+            fence) != VK_SUCCESS) {
         FATAL("Failed to submit draw command buffer");
     }
 

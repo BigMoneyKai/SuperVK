@@ -54,12 +54,12 @@ void Shader::destroy() {
 void Shader::readShader(const char* path) {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if(!file.is_open()) {
-        FATAL("Failed to open shader file: %s", path);
+        FATAL("Failed to open shader file: {}", path);
     }
 
     const std::streamsize size = file.tellg();
     if(size <= 0) {
-        FATAL("Failed to read shader file size: %s", path);
+        FATAL("Failed to read shader file size: {}", path);
     }
     if(size % 4 != 0) {
         FATAL("The size of spir-v file should be aligned in 4 bytes");
@@ -70,6 +70,6 @@ void Shader::readShader(const char* path) {
     file.seekg(0);
     file.read(reinterpret_cast<char*>(m_code.data()), size);
     if(!file) {
-        FATAL("Failed to read shader file: %s", path);
+        FATAL("Failed to read shader file: {}", path);
     }
 }

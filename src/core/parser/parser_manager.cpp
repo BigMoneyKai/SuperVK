@@ -21,15 +21,15 @@ void ParserMan::parse(const char* path, Mesh* mesh) {
 
     if(strcmp(ext, ".obj") == 0) {
         m_objParser.parse(path, mesh);
-        DEBUG("Loaded OBJ file: %s", path);
+        DEBUG("Loaded OBJ file: {}", path);
     } else if(strcmp(ext, ".gltf") == 0) {
         m_gltfParser.parse(path, mesh);
-        DEBUG("Loaded GLTF file: %s", path);
+        DEBUG("Loaded GLTF file: {}", path);
     } else if(strcmp(ext, ".glb") == 0) {
         m_glbParser.parse(path, mesh);
-        DEBUG("Loaded GLB file: %s", path);
+        DEBUG("Loaded GLB file: {}", path);
     } else {
-        ERROR("Unsupported file format: %s", ext);
+        ERROR("Unsupported file format: {}", ext);
     }
 }
 

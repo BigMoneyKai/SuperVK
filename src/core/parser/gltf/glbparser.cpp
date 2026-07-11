@@ -18,7 +18,7 @@ u32 GlbParser::getComponentSize(u32 componentType) const {
     case 5125: return 4; // UNSIGNED_INT
     case 5126: return 4; // FLOAT
     default:
-        WARNING("Unknown glTF componentType: %u — assuming 4 bytes", componentType);
+        WARNING("Unknown glTF componentType: {} — assuming 4 bytes", componentType);
         return 4;
     }
 }
@@ -31,7 +31,7 @@ u32 GlbParser::getTypeCount(const std::string& type) const {
     if (type == "MAT2")   return 4;
     if (type == "MAT3")   return 9;
     if (type == "MAT4")   return 16;
-    WARNING("Unknown glTF accessor type: %s — assuming 1", type.c_str());
+    WARNING("Unknown glTF accessor type: {} — assuming 1", type.c_str());
     return 1;
 }
 
@@ -71,7 +71,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     // ---- read entire .glb file as binary -----------------------------------
     std::ifstream file(path, std::ios::in | std::ios::binary | std::ios::ate);
     if (!file.is_open()) {
-        ERROR("Failed to open GLB file: %s", path);
+        ERROR("Failed to open GLB file: {}", path);
         return;
     }
 
@@ -80,14 +80,14 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
 
     std::vector<u8> rawFile(static_cast<size_t>(fileSize));
     if (!file.read(reinterpret_cast<char*>(rawFile.data()), fileSize)) {
-        ERROR("Failed to read GLB file: %s", path);
+        ERROR("Failed to read GLB file: {}", path);
         return;
     }
     file.close();
 
     // ---- parse header (12 bytes) -------------------------------------------
     if (fileSize < 12) {
-        ERROR("GLB file too small for header: %s (%ld bytes)", path, static_cast<long>(fileSize));
+        ERROR("GLB file too small for header: {} ({} bytes)", path, static_cast<long>(fileSize));
         return;
     }
 
@@ -101,11 +101,11 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     }
 
     if (version != 2) {
-        WARNING("GLB version %u — parser targets version 2", version);
+        WARNING("GLB version {} — parser targets version 2", version);
     }
 
     if (static_cast<u64>(totalLength) != static_cast<u64>(fileSize)) {
-        WARNING("GLB header length %u != file size %ld", totalLength, static_cast<long>(fileSize));
+        WARNING("GLB header length {} != file size {}", totalLength, static_cast<long>(fileSize));
     }
 
     // ---- parse chunks -------------------------------------------------------
@@ -120,7 +120,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
         offset += 8;
 
         if (offset + chunkLength > rawFile.size()) {
-            ERROR("GLB chunk length %u exceeds file bounds at offset %zu", chunkLength, offset);
+            ERROR("GLB chunk length {} exceeds file bounds at offset {}", chunkLength, offset);
             return;
         }
 
@@ -140,7 +140,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     }
 
     if (jsonStr.empty()) {
-        ERROR("GLB file contains no JSON chunk: %s", path);
+        ERROR("GLB file contains no JSON chunk: {}", path);
         return;
     }
 
@@ -156,7 +156,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     if (root.has("asset") && root["asset"].has("version")) {
         const std::string& ver = root["asset"]["version"].getString();
         if (ver[0] != '2') {
-            WARNING("glTF version %s — parser targets 2.0", ver.c_str());
+            WARNING("glTF version {} — parser targets 2.0", ver.c_str());
         }
     }
 
@@ -187,9 +187,9 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
                         // Use a simple static decode — we don't have GltfParser's method here
                         // but for GLB the BIN chunk is the primary data source
                     }
-                    WARNING("GLB buffer[%zu] uses data URI — not fully supported in GLB mode", i);
+                    WARNING("GLB buffer[{}] uses data URI — not fully supported in GLB mode", i);
                 } else {
-                    ERROR("GLB buffer[%zu] references external file '%s' — "
+                    ERROR("GLB buffer[{}] references external file '{}' — "
                           "GLB buffers should be embedded or use the BIN chunk",
                           i, uri.c_str());
                 }
@@ -199,7 +199,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
                     if (binData.size() >= byteLength) {
                         m_buffers[i] = std::move(binData);
                     } else {
-                        WARNING("GLB BIN chunk size %zu < buffer[0].byteLength %lu",
+                        WARNING("GLB BIN chunk size {} < buffer[0].byteLength {}",
                                 binData.size(), byteLength);
                         m_buffers[i] = std::move(binData);
                     }
@@ -209,7 +209,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
                 } else {
                     // buffer[1+] without URI — the spec allows all buffers to
                     // share the same BIN chunk with different byteOffsets
-                    WARNING("GLB buffer[%zu] without URI — multiple-buffer GLB "
+                    WARNING("GLB buffer[{}] without URI — multiple-buffer GLB "
                             "not fully supported", i);
                     m_buffers[i].resize(static_cast<size_t>(byteLength), 0);
                 }
@@ -233,13 +233,13 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     }
 
     if (sceneIdx < 0 || static_cast<size_t>(sceneIdx) >= scenes.size()) {
-        ERROR("GLB default scene index %d out of range", sceneIdx);
+        ERROR("GLB default scene index {} out of range", sceneIdx);
         return;
     }
 
     const auto& scene = scenes[static_cast<size_t>(sceneIdx)];
     if (!scene.has("nodes")) {
-        ERROR("GLB scene[%d] has no nodes", sceneIdx);
+        ERROR("GLB scene[{}] has no nodes", sceneIdx);
         return;
     }
 
@@ -248,7 +248,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     for (size_t ni = 0; ni < sceneNodes.size(); ++ni) {
         int nodeIdx = sceneNodes[ni].getInt();
         if (nodeIdx < 0 || static_cast<size_t>(nodeIdx) >= nodes.size()) {
-            WARNING("GLB node index %d out of range", nodeIdx);
+            WARNING("GLB node index {} out of range", nodeIdx);
             continue;
         }
 
@@ -257,7 +257,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
 
         int meshIdx = node["mesh"].getInt();
         if (meshIdx < 0 || static_cast<size_t>(meshIdx) >= meshes.size()) {
-            WARNING("GLB mesh index %d out of range", meshIdx);
+            WARNING("GLB mesh index {} out of range", meshIdx);
             continue;
         }
 
@@ -265,12 +265,12 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     }
 
     DEBUG(
-        "GLB Loaded: %s\n"
-        "  Positions : %zu\n"
-        "  Normals   : %zu\n"
-        "  Texcoords : %zu\n"
-        "  Vertices  : %zu\n"
-        "  Indices   : %zu",
+        "GLB Loaded: {}\n"
+        "  Positions : {}\n"
+        "  Normals   : {}\n"
+        "  Texcoords : {}\n"
+        "  Vertices  : {}\n"
+        "  Indices   : {}",
         path,
         m_currMesh->positions().size(),
         m_currMesh->normals().size(),
@@ -438,7 +438,7 @@ std::vector<u8> GlbParser::readAccessorData(const gltf_json::JsonValue& accessor
 
     int bvIndex = accessor["bufferView"].getInt();
     if (bvIndex < 0 || static_cast<size_t>(bvIndex) >= bufferViews.size()) {
-        ERROR("GLB accessor bufferView index %d out of range", bvIndex);
+        ERROR("GLB accessor bufferView index {} out of range", bvIndex);
         return {};
     }
 
@@ -457,7 +457,7 @@ std::vector<u8> GlbParser::readAccessorData(const gltf_json::JsonValue& accessor
     }
 
     if (bufferIdx >= m_buffers.size()) {
-        ERROR("GLB bufferView references buffer[%u] but only %zu buffers loaded",
+        ERROR("GLB bufferView references buffer[{}] but only {} buffers loaded",
               bufferIdx, m_buffers.size());
         return {};
     }
@@ -472,7 +472,7 @@ std::vector<u8> GlbParser::readAccessorData(const gltf_json::JsonValue& accessor
     u32 totalOffset = bvByteOffset + accessorByteOffset;
 
     if (totalOffset + bvByteLength > buffer.size()) {
-        ERROR("GLB accessor data out of bounds: offset=%u length=%u bufferSize=%zu",
+        ERROR("GLB accessor data out of bounds: offset={} length={} bufferSize={}",
               totalOffset, bvByteLength, buffer.size());
         return {};
     }

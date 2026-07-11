@@ -114,10 +114,10 @@ void Buffer::allocateMemory(const VkPhysicalDevice& physicalDevice) {
 }
 
 void Buffer::printDebugInfo() {
-    DEBUG("Buffer type: %s", bufferTypes[m_type]);
-    DEBUG("Buffer Size = %lu", m_size);
-    DEBUG("Usage = %u", m_bufferCreateInfo.usage);
-    DEBUG("MemorySize = %lu ", m_memoryAllocateInfo.allocationSize);
+    DEBUG("Buffer type: {}", bufferTypes[m_type]);
+    DEBUG("Buffer Size = {}", m_size);
+    DEBUG("Usage = {}", m_bufferCreateInfo.usage);
+    DEBUG("MemorySize = {} ", m_memoryAllocateInfo.allocationSize);
 }
 
 void Buffer::update(const void* data, u64 size) {

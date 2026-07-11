@@ -38,7 +38,7 @@ void Device::initDevice(const VkInstance& instance, const VkSurfaceKHR& surface)
     if(deviceCount == 1)
         DEBUG("1 physical device found");
     else {
-        DEBUG("%d physical device found", deviceCount);
+        DEBUG("{} physical device found", deviceCount);
     }
 
     b32 found = SV_FALSE;
@@ -51,7 +51,7 @@ void Device::initDevice(const VkInstance& instance, const VkSurfaceKHR& surface)
     if(!found) {
         FATAL("No suitable physical device found");
     }
-    DEBUG("Selected GPU: %s (%d)",
+    DEBUG("Selected GPU: {} ({})",
         m_physicalDeviceProperties.deviceName,
         m_physicalDeviceProperties.deviceType
     );
@@ -76,7 +76,7 @@ void Device::initQueue(const VkSurfaceKHR& surface) {
     if(m_graphicsQueueFamilyIndex == UINT32_MAX) {
         FATAL("Failed to find graphics queue family to present and render");
     }
-    DEBUG("Graphics queue family found, index: %d", m_graphicsQueueFamilyIndex);
+    DEBUG("Graphics queue family found, index: {}", m_graphicsQueueFamilyIndex);
 
 }
 

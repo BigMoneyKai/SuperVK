@@ -55,3 +55,4 @@ void endSingleTimeCommands(
 u64 align_up(u64 value, u64 alignment) {
     return (value + alignment - 1) & ~(alignment - 1);
 };
+
