@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 
 // platform compatibility
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
@@ -54,6 +55,18 @@
     #define SV_FORCE_INLINE __forceinline // only for little functions used extremely much
     #define SV_INLINE inline
     #define SV_STATIC_ASSERT static_assert
+    #define SV_ASSERT(cond, fmt, ...)\
+        do {\
+            if(!(cond)) {\
+                std::cerr\
+                    << "Abort: ["\
+                    << std::format(fmt __VA_OPT__(,) __VA_ARGS__)\
+                    << "] at "\
+                    << __FILE__ << ":" << __LINE__\
+                    << std::endl;\
+                abort();\
+            }\
+        } while(0)
     #define SV_COMPILER_BARRIER() _ReadWriteBarrier()
     #define SV_CPU_BARRIER() MemoryBarrier()
 #elif defined(__GNUC__)
@@ -62,11 +75,19 @@
     #define SV_BREAK() __builtin_trap()
     #define SV_FORCE_INLINE inline __attribute__((always_inline)) // only for little functions used extremely much
     #define SV_INLINE inline
-    #if __STDC_VERSION__ >= 201112L
-        #define SV_STATIC_ASSERT _Static_assert
-    #else
-        #define SV_STATIC_ASSERT(cond, msg) typedef char static_assertion_##__LINE__[(cond)?1:-1]
-    #endif
+    #define SV_STATIC_ASSERT static_assert
+    #define SV_ASSERT(cond, fmt, ...)\
+        do {\
+            if(!(cond)) {\
+                std::cerr\
+                    << "Abort: ["\
+                    << std::format(fmt __VA_OPT__(,) __VA_ARGS__)\
+                    << "] at "\
+                    << __FILE__ << ":" << __LINE__\
+                    << std::endl;\
+                abort();\
+            }\
+        } while(0)
     #define SV_COMPILER_BARRIER() __asm__ __volatile__("" ::: "memory")
     #define SV_CPU_BARRIER() __atomic_thread_fence(__ATOMIC_SEQ_CST)
 #elif defined(__clang__)
@@ -75,11 +96,19 @@
     #define SV_BREAK() __builtin_debugtrap()
     #define SV_FORCE_INLINE inline __attribute__((always_inline)) // only for little functions used extremely much
     #define SV_INLINE inline
-    #if __STDC_VERSION__ >= 201112L
-        #define SV_STATIC_ASSERT _Static_assert
-    #else
-        #define SV_STATIC_ASSERT(cond, msg) typedef char static_assertion_##__LINE__[(cond)?1:-1]
-    #endif
+    #define SV_STATIC_ASSERT static_assert
+    #define SV_ASSERT(cond, fmt, ...)\
+        do {\
+            if(!(cond)) {\
+                std::cerr\
+                    << "Abort: ["\
+                    << std::format(fmt __VA_OPT__(,) __VA_ARGS__)\
+                    << "] at "\
+                    << __FILE__ << ":" << __LINE__\
+                    << std::endl;\
+                abort();\
+            }\
+        } while(0)
     #define SV_COMPILER_BARRIER() __asm__ __volatile__("" ::: "memory")
     #define SV_CPU_BARRIER() __atomic_thread_fence(__ATOMIC_SEQ_CST)
 #else
@@ -88,6 +117,7 @@
     #define SV_BREAK() (void(0))
     #define SV_INLINE
     #define SV_STATIC_ASSERT
+    #define SV_ASSERT(cond, fmt, ...) (void(0))
     #define SV_COMPILER_BARRIER() (void(0))
     #define SV_CPU_BARRIER() (void(0))
 #endif
