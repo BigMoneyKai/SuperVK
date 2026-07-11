@@ -1,15 +1,18 @@
-add_subdirectory(utils)
 add_subdirectory(app)
+add_subdirectory(debug)
 add_subdirectory(core)
 add_subdirectory(scene)
 add_subdirectory(render)
 add_subdirectory(input)
 add_subdirectory(window)
 add_subdirectory(platform)
+add_subdirectory(utils)
 
 add_executable(supervk
     main.cpp
 )
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_DEBUG_BINARY_DIR}/bin)
 
 find_package(Vulkan REQUIRED)
 
@@ -18,10 +21,12 @@ target_include_directories(supervk PRIVATE
     ${PROJECT_SOURCE_DIR}/thirdparty/glm
     ${PROJECT_SOURCE_DIR}/thirdparty/glfw/include
     ${PROJECT_SOURCE_DIR}/thirdparty/stb
+    ${PROJECT_SOURCE_DIR}/thirdparty/benchmark
 )
 
 target_link_libraries(supervk PRIVATE
     supervk_app
+    supervk_debug
     supervk_core
     supervk_scene
     supervk_render
