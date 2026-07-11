@@ -1,11 +1,6 @@
-#include "defines.h"
 #include "core/container/string/string.hpp"
-#include "debug/debugger.h"
 
 #include <glm/glm.hpp>
-#include <cstdio>
-#include <format>
-#include <string>
 #include <iostream>
 
 int main() {
