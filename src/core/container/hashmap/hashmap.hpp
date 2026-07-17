@@ -10,7 +10,6 @@
 
 #include <utility>
 
-
 template <typename K, typename V, typename Entry = HashEntry<K, V>>
 class HashMap {
 public:

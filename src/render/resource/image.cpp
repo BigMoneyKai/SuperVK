@@ -1,6 +1,6 @@
 #include "image.h"
 #include "utils/utils.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 #include "render/base/command_pool.h"
 
 void Image::init(

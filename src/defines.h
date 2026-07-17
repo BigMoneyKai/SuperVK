@@ -142,8 +142,8 @@ typedef float f32;
 typedef double f64;
 
 // boolean types
-typedef uint32_t b32;
-typedef uint8_t b8;
+typedef int32_t b32;
+typedef int8_t b8;
 
 // address types
 typedef uintptr_t addr;

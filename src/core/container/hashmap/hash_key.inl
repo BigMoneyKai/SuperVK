@@ -4,10 +4,9 @@
 #include "defines.h"
 #include "wyhash.hpp"
 #include "core/types/vertex.h"
-#include "glm/glm.hpp"
 
 #include <bit>
-#include <string>
+#include <type_traits>
 
 template<typename T>
 SV_FORCE_INLINE void hash_key_combine(u64& seed, const T& value)
@@ -79,10 +78,16 @@ struct hash_key<const char[N]> {
         return wyhash(str, N - 1, 0, _wyp);
     }
 };
+template<>
+struct hash_key<const char*> {
+    u64 operator()(const char* str) const {
+        return wyhash(str, strlen(str), 0, _wyp);
+    }
+};
 
 template<>
 struct hash_key<String> {
-    u64 operator()(const std::string& str) const {
+    u64 operator()(const String& str) const {
         return wyhash(str.data(), str.size(), 0, _wyp);
     }
 };
@@ -148,3 +153,32 @@ struct hash_key<glm::vec4> {
     }
 };
 
+template<typename T>
+requires std::is_enum_v<T>
+struct hash_key<T> {
+    u64 operator()(T v) const {
+        using U = std::underlying_type_t<T>;
+        return hash_key<U>{}(static_cast<U>(v));
+    }
+};
+
+template<>
+struct hash_key<Vertex> {
+    u64 operator()(const Vertex& v) const {
+        u64 seed = 0;
+
+        hash_key_combine(seed, v.color);
+        hash_key_combine(seed, v.normal);
+        hash_key_combine(seed, v.pos);
+        hash_key_combine(seed, v.uv);
+
+        return seed;
+    }
+};
+
+template<AssetType T>
+struct hash_key<AssetHandle<T>> {
+    u64 operator()(const AssetHandle<T>& handle) const {
+        return hash_key<u64>{}(handle.id);
+    }
+};

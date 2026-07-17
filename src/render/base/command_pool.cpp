@@ -1,6 +1,6 @@
 #include "command_pool.h"
 #include "defines.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 
 void CommandPool::init(const VkDevice& device, u32 graphicsQueueFamilyIndex) {
     m_device = device;

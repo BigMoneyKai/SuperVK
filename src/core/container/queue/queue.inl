@@ -3,7 +3,6 @@
 #include "queue.hpp"
 
 #include "core/memory/allocator.h"
-#include "debug/debugger.h"
 #include "platform/memory.h"
 
 #include <algorithm>
@@ -45,7 +44,7 @@ Queue<T>& Queue<T>::operator=(Queue<T>&& other) noexcept {
             m_data[i].~T();
 
         if (m_allocator)
-            m_allocator->deallocate(m_data);
+            m_allocator->deallocate(m_data, m_capacity * sizeof(T));
         else
             platform_aligned_free(m_data);
 
@@ -72,7 +71,7 @@ Queue<T>::~Queue() {
     }
 
     if (m_allocator)
-        m_allocator->deallocate(m_data);
+        m_allocator->deallocate(m_data, m_capacity * sizeof(T));
     else
         platform_aligned_free(m_data);
 
@@ -106,7 +105,7 @@ void Queue<T>::reserve(u64 newCapacity) {
     }
 
     if (m_allocator) {
-        m_allocator->deallocate(m_data);
+        m_allocator->deallocate(m_data, m_capacity * sizeof(T));
     } else {
         platform_aligned_free(m_data);
     }
@@ -153,7 +152,7 @@ void Queue<T>::resize(u64 newSize, const T& value) {
     }
 
     if (m_allocator) {
-        m_allocator->deallocate(m_data);
+        m_allocator->deallocate(m_data, m_capacity * sizeof(T));
     } else {
         platform_aligned_free(m_data);
     }
@@ -188,7 +187,7 @@ void Queue<T>::shrink_to_fit() {
     }
 
     if (m_allocator) {
-        m_allocator->deallocate(m_data);
+        m_allocator->deallocate(m_data, m_capacity * sizeof(T));
     } else {
         platform_aligned_free(m_data);
     }
@@ -213,49 +212,37 @@ b32 Queue<T>::empty() const { return m_size == 0; }
 
 template <typename T>
 T& Queue<T>::operator[](u64 i) {
-    if (i >= m_size) {
-        FATAL("Queue index {} out of bound", i);
-    }
+    SV_ASSERT(i < m_size, "Queue index {} out of bound", i);
     return m_data[i];
 }
 
 template <typename T>
-const T& Queue<T>::operator[](u64 i) const {
-    if (i >= m_size) {
-        FATAL("Queue index {} out of bound", i);
-    }
+const T& Queue<T>::operator[](u64 i) const {  
+    SV_ASSERT(i < m_size, "Queue index {} out of bound", i);
     return m_data[i];
 }
 
 template <typename T>
 T& Queue<T>::front() {
-    if (m_size == 0) {
-        FATAL("Queue is empty");
-    }
+    SV_ASSERT(m_size > 0, "Queue is empty");
     return m_data[0];
 }
 
 template <typename T>
 const T& Queue<T>::front() const {
-    if (m_size == 0) {
-        FATAL("Queue is empty");
-    }
+    SV_ASSERT(m_size > 0, "Queue is empty");
     return m_data[0];
 }
 
 template <typename T>
 T& Queue<T>::back() {
-    if (m_size == 0) {
-        FATAL("Queue is empty");
-    }
+    SV_ASSERT(m_size > 0, "Queue is empty");
     return m_data[m_size - 1];
 }
 
 template <typename T>
 const T& Queue<T>::back() const {
-    if (m_size == 0) {
-        FATAL("Queue is empty");
-    }
+    SV_ASSERT(m_size > 0, "Queue is empty");
     return m_data[m_size - 1];
 }
 
@@ -288,7 +275,6 @@ void Queue<T>::push_back(T&& value) {
 template <typename T>
 void Queue<T>::pop_front() {
     if (m_size == 0) {
-        FATAL("Queue is empty");
         return;
     }
 
@@ -328,10 +314,7 @@ T& Queue<T>::emplace_back(Args&&... args) {
 
 template <typename T>
 void Queue<T>::insert(u64 index, const T& value) {
-    if (index > m_size) {
-        FATAL("Queue index {} out of bound", index);
-        return;
-    }
+    SV_ASSERT(index <= m_size, "Queue index {} out of bound", index);
 
     if (m_size == m_capacity) {
         u64 newCap = m_capacity == 0 ? 1 : m_capacity + (m_capacity >> 1);
@@ -354,10 +337,7 @@ void Queue<T>::insert(u64 index, const T& value) {
 
 template <typename T>
 void Queue<T>::insert(u64 index, T&& value) {
-    if (index > m_size) {
-        FATAL("Queue index {} out of bound", index);
-        return;
-    }
+    SV_ASSERT(index <= m_size, "Queue index {} out of bound", index);
 
     if (m_size == m_capacity) {
         u64 newCap = m_capacity == 0 ? 1 : m_capacity + (m_capacity >> 1);
@@ -381,13 +361,10 @@ void Queue<T>::insert(u64 index, T&& value) {
 template <typename T>
 void Queue<T>::erase(u64 index) {
     if (m_size == 0) {
-        FATAL("Queue is empty");
         return;
     }
-    if (index >= m_size) {
-        FATAL("Queue index {} out of bound", index);
-        return;
-    }
+    SV_ASSERT(index < m_size, "Queue index {} out of bound", index);
+
 
     if constexpr (std::is_trivially_copyable_v<T>) {
         u64 tail = m_size - index - 1;

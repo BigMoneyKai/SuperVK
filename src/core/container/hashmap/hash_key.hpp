@@ -3,6 +3,10 @@
 #include "defines.h"
 #include <glm/glm.hpp>
 #include "core/container/string/string.hpp"
+#include "core/types/vertex.h"
+
+#include "asset/asset_type.h"
+#include "asset/handle/asset_handle.h"
 
 template<typename T>
 struct hash_key;
@@ -20,6 +24,7 @@ template<> struct hash_key<f32>;
 template<> struct hash_key<f64>;
 
 template<u64 N> struct hash_key<const char[N]>;
+template<> struct hash_key<const char*>;
 template<> struct hash_key<String>;
 
 template<typename T>
@@ -31,5 +36,12 @@ template<> struct hash_key<glm::vec1>;
 template<> struct hash_key<glm::vec2>;
 template<> struct hash_key<glm::vec3>;
 template<> struct hash_key<glm::vec4>;
+
+template<typename T> requires std::is_enum_v<T> struct hash_key<T>;
+
+template<> struct hash_key<Vertex>;
+
+// AssetHandle
+template<AssetType T> struct hash_key<AssetHandle<T>>;
 
 #include "hash_key.inl"

@@ -3,7 +3,7 @@
 #include "array.hpp"
 
 #include "core/memory/allocator.h"
-#include "debug/debugger.h"
+#include "defines.h"
 #include "platform/memory.h"
 
 #include <algorithm>
@@ -32,6 +32,13 @@ Array<T>::Array(u64 size, const T& value, Allocator* a)
 }
 
 template <typename T>
+Array<T>::Array(void* data, u64 size, Allocator* a)
+    : m_allocator(a) {
+    resize(size);
+    memcpy(m_data, data, size);
+}
+
+template <typename T>
 Array<T>::Array(Array<T>&& other) noexcept
     : m_allocator(other.m_allocator), m_data(other.m_data),
       m_size(other.m_size), m_capacity(other.m_capacity) {
@@ -48,7 +55,7 @@ Array<T>& Array<T>::operator=(Array<T>&& other) noexcept {
             m_data[i].~T();
 
         if (m_allocator)
-            m_allocator->deallocate(m_data);
+            m_allocator->deallocate(m_data, m_capacity * sizeof(T));
         else
             platform_aligned_free(m_data);
 
@@ -75,7 +82,7 @@ Array<T>::~Array() {
     }
 
     if (m_allocator)
-        m_allocator->deallocate(m_data);
+        m_allocator->deallocate(m_data, m_capacity * sizeof(T));
     else
         platform_aligned_free(m_data);
 
@@ -98,18 +105,23 @@ void Array<T>::reserve(u64 newCapacity) {
             platform_aligned_alloc(newCapacity * sizeof(T), ALIGNMENT));
     }
 
-    for (u64 i = 0; i < m_size; i++) {
-        new (newData + i) T(std::move_if_noexcept(m_data[i]));
-    }
+    if constexpr (std::is_trivially_copyable_v<T>) {
+        if(m_size > 0) {
+            memcpy(newData, m_data, sizeof(T) * m_size);
+        }
+    } else {
+        for (u64 i = 0; i < m_size; i++)
+            new (newData + i) T(std::move_if_noexcept(m_data[i]));
 
-    if constexpr(!std::is_trivially_destructible_v<T>) {
-        for (u64 i = 0; i < m_size; i++) {
-            m_data[i].~T();
+        if constexpr (!std::is_trivially_destructible_v<T>) {
+            for (u64 i = 0; i < m_size; i++) {
+                m_data[i].~T();
+            }
         }
     }
 
     if (m_allocator) {
-        m_allocator->deallocate(m_data);
+        m_allocator->deallocate(m_data, m_capacity * sizeof(T));
     } else {
         platform_aligned_free(m_data);
     }
@@ -160,7 +172,7 @@ void Array<T>::resize(u64 newSize, const T& value) {
     }
 
     if (m_allocator) {
-        m_allocator->deallocate(m_data);
+        m_allocator->deallocate(m_data, m_capacity * sizeof(T));
     } else {
         platform_aligned_free(m_data);
     }
@@ -189,49 +201,37 @@ b32 Array<T>::empty() const { return m_size == 0; }
 
 template <typename T>
 T& Array<T>::operator[](u64 i) {
-    if (i >= m_size) {
-        FATAL("Index {} out of bound", i);
-    }
+    SV_ASSERT(i < m_size, "Index {} out of bound", i);
     return m_data[i];
 }
 
 template <typename T>
 const T& Array<T>::operator[](u64 i) const {
-    if (i >= m_size) {
-        FATAL("Index {} out of bound", i);
-    }
+    SV_ASSERT(i < m_size, "Index {} out of bound", i);
     return m_data[i];
 }
 
 template <typename T>
 T& Array<T>::front() {
-    if (m_size == 0) {
-        FATAL("Array is empty");
-    }
+    SV_ASSERT(m_size > 0, "Array is empty");
     return m_data[0];
 }
 
 template <typename T>
 const T& Array<T>::front() const {
-    if (m_size == 0) {
-        FATAL("Array is empty");
-    }
+    SV_ASSERT(m_size > 0, "Array is empty");
     return m_data[0];
 }
 
 template <typename T>
 T& Array<T>::back() {
-    if (m_size == 0) {
-        FATAL("Array is empty");
-    }
+    SV_ASSERT(m_size > 0, "Array is empty");
     return m_data[m_size - 1];
 }
 
 template <typename T>
 const T& Array<T>::back() const {
-    if (m_size == 0) {
-        FATAL("Array is empty");
-    }
+    SV_ASSERT(m_size > 0, "Array is empty");
     return m_data[m_size - 1];
 }
 
@@ -271,13 +271,12 @@ T& Array<T>::emplace_back(Args&&... args) {
 
     T* obj = new (m_data + m_size) T(std::forward<Args>(args)...);
     ++m_size;
-    return obj;
+    return *obj;
 }
 
 template <typename T>
 void Array<T>::pop_back() {
     if (m_size == 0) {
-        FATAL("Array is empty");
         return;
     }
     if constexpr(!std::is_trivially_destructible_v<T>) {
@@ -288,10 +287,7 @@ void Array<T>::pop_back() {
 
 template <typename T>
 void Array<T>::insert(u64 index, const T& value) {
-    if (index > m_size) {
-        FATAL("Index {} out of bound", index);
-        return;
-    }
+    SV_ASSERT(index > m_size, "Index {} out of bound", index);
 
     if (m_size == m_capacity) {
         u64 newCap = m_capacity == 0 ? 1 : m_capacity + (m_capacity >> 1);
@@ -314,10 +310,7 @@ void Array<T>::insert(u64 index, const T& value) {
 
 template <typename T>
 void Array<T>::insert(u64 index, T&& value) {
-    if (index > m_size) {
-        FATAL("Index {} out of bound", index);
-        return;
-    }
+    SV_ASSERT(index <= m_size, "Index {} out of bound", index);
 
     if (m_size == m_capacity) {
         u64 newCap = m_capacity == 0 ? 1 : m_capacity + (m_capacity >> 1);
@@ -339,6 +332,14 @@ void Array<T>::insert(u64 index, T&& value) {
 }
 
 template <typename T>
+void Array<T>::append(const T* data, u64 size) {
+    u64 oldSize = m_size;
+    resize(m_size + oldSize);
+
+    memcpy(m_data + oldSize, data, size * sizeof(T));
+}
+
+template <typename T>
 void Array<T>::clear() {
     if (m_size == 0) {
         return;
@@ -354,13 +355,10 @@ void Array<T>::clear() {
 template <typename T>
 void Array<T>::erase(u64 index) {
     if (m_size == 0) {
-        FATAL("Array is empty");
         return;
     }
-    if (index >= m_size) {
-        FATAL("Index {} out of bound", index);
-        return;
-    }
+
+    SV_ASSERT(index < m_size, "Index {} out of bound", index);
 
     if constexpr (std::is_trivially_copyable_v<T>) {
         u64 tail = m_size - index - 1;

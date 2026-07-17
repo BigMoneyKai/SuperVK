@@ -1,5 +1,5 @@
 #include "surface.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 
 void Surface::init(const VkInstance& instance, GLFWwindow* window) {
     m_instance = instance;

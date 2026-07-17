@@ -1,14 +1,9 @@
-#include "core/container/string/string.hpp"
-
-#include <glm/glm.hpp>
-#include <iostream>
+#include "app/app.h"
 
 int main() {
-    // quick smoke test
-
-    String string = "Hello";
-
-    std::cout << string << std::endl;
-
+    App app;
+    app.init();
+    app.run();
+    app.destroy();
     return 0;
 }

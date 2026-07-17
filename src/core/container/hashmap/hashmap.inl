@@ -2,7 +2,6 @@
 
 #include "hashmap.hpp"
 #include "hash_key.hpp"
-#include "debug/debugger.h"
 #include <utility>
 
 // ---- helpers: swap / move across all parallel arrays (incl fingerprints) ----
@@ -248,9 +247,8 @@ V& HashMap<K, V, Entry>::operator[](const K& key) {
 template <typename K, typename V, typename Entry>
 const V& HashMap<K, V, Entry>::operator[](const K& key) const {
     auto it = find(key);
-    if (it != end()) return m_vals[it.index()];
-    FATAL("Key not found in const HashMap::operator[]");
-    failure_exit();
+    SV_ASSERT(it != end(), "Key not found in const HashMap::operator[]");
+    return m_vals[it.index()];
 }
 
 // =========================================================================

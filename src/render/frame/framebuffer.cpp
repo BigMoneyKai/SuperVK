@@ -1,5 +1,5 @@
 #include "framebuffer.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 
 void Framebuffer::init(
     const VkDevice& device,

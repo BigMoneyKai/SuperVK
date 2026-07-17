@@ -33,6 +33,20 @@ class HashMapIterator {
         return tmp;
     }
 
+    SV_FORCE_INLINE NK& first() {
+        return m_keys[m_idx];
+    }
+    SV_FORCE_INLINE const NK& first() const {
+        return m_keys[m_idx];
+    }
+
+    SV_FORCE_INLINE NV& second() {
+        return m_vals[m_idx];
+    }
+    SV_FORCE_INLINE const NV& second() const {
+        return m_vals[m_idx];
+    }
+
     bool operator==(const HashMapIterator& other) const { return m_idx == other.m_idx; }
     bool operator!=(const HashMapIterator& other) const { return m_idx != other.m_idx; }
 

@@ -1,5 +1,4 @@
 add_subdirectory(app)
-add_subdirectory(debug)
 add_subdirectory(core)
 add_subdirectory(scene)
 add_subdirectory(render)
@@ -7,6 +6,7 @@ add_subdirectory(input)
 add_subdirectory(window)
 add_subdirectory(platform)
 add_subdirectory(utils)
+add_subdirectory(asset)
 
 add_executable(supervk
     main.cpp
@@ -34,6 +34,8 @@ target_link_libraries(supervk PRIVATE
     supervk_window
     supervk_utils
     supervk_platform
+    supervk_asset_parser
+    supervk_asset
 
     Vulkan::Vulkan
 )
@@ -51,10 +53,10 @@ add_custom_command(TARGET supervk POST_BUILD
 
 add_custom_command(TARGET supervk POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory
-    $<TARGET_FILE_DIR:supervk>/assets
+    $<TARGET_FILE_DIR:supervk>/resource
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${PROJECT_SOURCE_DIR}/assets
-    $<TARGET_FILE_DIR:supervk>/assets
+    ${PROJECT_SOURCE_DIR}/resource
+    $<TARGET_FILE_DIR:supervk>/resource
     COMMENT "Copying assets to build output"
 )
 

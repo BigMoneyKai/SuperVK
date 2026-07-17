@@ -1,5 +1,5 @@
 #include "pipeline.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 #include "core/types/vertex.h"
 
 #include <array>

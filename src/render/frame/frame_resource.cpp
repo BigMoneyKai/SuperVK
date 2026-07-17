@@ -1,5 +1,5 @@
 #include "frame_resource.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 #include "render/base/device.h"
 
 void FrameResource::init(const VkDevice& device, u32 swapchainImageCount) {

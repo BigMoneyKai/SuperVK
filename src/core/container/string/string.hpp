@@ -9,7 +9,7 @@
 class String {
 public:
     static constexpr u64 npos = ~u64{0};
-    static constexpr u64 SSO_CAPACITY = 22;
+    static constexpr u64 SSO_CAPACITY = 23;
 
     using iterator = Iterator<char>;
     using const_iterator = Iterator<const char>;
@@ -51,6 +51,7 @@ public:
     const char& back() const;
     const char* c_str() const;
     const char* data() const;
+    char* data();
 
     // --- capacity ---
     u64 size() const;
@@ -169,3 +170,4 @@ private:
 };
 
 #include "string.inl"
+

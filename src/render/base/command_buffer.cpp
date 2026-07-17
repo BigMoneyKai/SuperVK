@@ -1,5 +1,5 @@
 #include "command_buffer.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 
 void CommandBuffer::init(const VkDevice& device, VkCommandPool pool, u32 count) {
     m_device = device;

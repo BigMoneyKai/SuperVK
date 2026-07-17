@@ -1,9 +1,32 @@
 #include "device.h"
 #include "instance.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 #include "utils/utils.h"
 
 #include <stdlib.h>
+
+static const char* device_type_to_string(VkPhysicalDeviceType type) {
+    switch (type)
+    {
+    case VK_PHYSICAL_DEVICE_TYPE_OTHER:
+        return "Other";
+
+    case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+        return "Integrated GPU";
+
+    case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+        return "Discrete GPU";
+
+    case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+        return "Virtual GPU";
+
+    case VK_PHYSICAL_DEVICE_TYPE_CPU:
+        return "CPU";
+
+    default:
+        return "Unknown";
+    }
+}
 
 void Device::init(const VkInstance& instance, const VkSurfaceKHR& surface) {
     initDevice(instance, surface);
@@ -51,9 +74,8 @@ void Device::initDevice(const VkInstance& instance, const VkSurfaceKHR& surface)
     if(!found) {
         FATAL("No suitable physical device found");
     }
-    DEBUG("Selected GPU: {} ({})",
-        m_physicalDeviceProperties.deviceName,
-        m_physicalDeviceProperties.deviceType
+    DEBUG("Selected GPU: {}",
+        device_type_to_string(m_physicalDeviceProperties.deviceType)
     );
 
 }
@@ -155,7 +177,7 @@ void Device::createDevice() {
     VK_CHECK_RESULT(vkCreateDevice(m_physicalDevice, &m_deviceCreateInfo, nullptr, &m_device));
     vkGetDeviceQueue(m_device, m_graphicsQueueFamilyIndex, 0, &m_graphicsQueue);
     m_presentQueue = m_graphicsQueue;
-    DEBUG("Lo=gical device created");
+    DEBUG("Logical device created");
 }
 
 VkFormat Device::findSupportedFormat(

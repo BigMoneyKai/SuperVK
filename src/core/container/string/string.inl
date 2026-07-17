@@ -2,10 +2,8 @@
 
 #include "string.hpp"
 
-#include "debug/debugger.h"
 #include "platform/memory.h"
 
-#include <exception>
 #include <cstring>
 
 // ============================================================================
@@ -29,14 +27,14 @@ SV_FORCE_INLINE const char* String::data_ptr() const {
     return m_heap ? m_storage.heap.data : m_storage.local;
 }
 
-void String::release_heap() {
+inline void String::release_heap() {
     if (m_allocator)
-        m_allocator->deallocate(m_storage.heap.data);
+        m_allocator->deallocate(m_storage.heap.data, m_storage.heap.capacity * sizeof(char));
     else
         platform_aligned_free(m_storage.heap.data);
 }
 
-void String::grow(u64 minCapacity) {
+inline void String::grow(u64 minCapacity) {
     if (minCapacity <= capacity())
         return;
 
@@ -82,14 +80,14 @@ void String::grow(u64 minCapacity) {
 // constructors / destructor
 // ============================================================================
 
-String::String(Allocator* a)
+inline String::String(Allocator* a)
     : m_allocator(a) {
     m_size = 0;
     m_heap = 0;
     m_storage.local[0] = '\0';
 }
 
-String::String(const String& other)
+inline String::String(const String& other)
     : m_allocator(other.m_allocator) {
     m_size = other.m_size;
     m_heap = 0;
@@ -117,7 +115,7 @@ String::String(const String& other)
     }
 }
 
-String::String(String&& other) noexcept
+inline String::String(String&& other) noexcept
     : m_allocator(other.m_allocator)
 {
     m_size = other.m_size;
@@ -136,7 +134,7 @@ String::String(String&& other) noexcept
     other.m_storage.local[0] = '\0';
 }
 
-String::String(const char* str, Allocator* a)
+inline String::String(const char* str, Allocator* a)
     : m_allocator(a)
 {
     u64 len = str ? strlen(str) : 0;
@@ -161,7 +159,7 @@ String::String(const char* str, Allocator* a)
     }
 }
 
-String::String(const char* str, u64 count, Allocator* a)
+inline String::String(const char* str, u64 count, Allocator* a)
     : m_allocator(a)
 {
     u64 len = str ? strlen(str) : 0;
@@ -188,7 +186,7 @@ String::String(const char* str, u64 count, Allocator* a)
     }
 }
 
-String::String(u64 count, char ch, Allocator* a)
+inline String::String(u64 count, char ch, Allocator* a)
     : m_allocator(a)
 {
     m_size = count;
@@ -212,7 +210,7 @@ String::String(u64 count, char ch, Allocator* a)
     }
 }
 
-String::~String() {
+inline String::~String() {
     if (m_heap)
         release_heap();
 }
@@ -221,7 +219,7 @@ String::~String() {
 // assignment
 // ============================================================================
 
-String& String::operator=(const String& other) {
+inline String& String::operator=(const String& other) {
     if (this == &other)
         return *this;
 
@@ -258,7 +256,7 @@ String& String::operator=(const String& other) {
     return *this;
 }
 
-String& String::operator=(String&& other) noexcept {
+inline String& String::operator=(String&& other) noexcept {
     if (this != &other) {
         if (m_heap)
             release_heap();
@@ -282,7 +280,7 @@ String& String::operator=(String&& other) noexcept {
     return *this;
 }
 
-String& String::operator=(const char* str) {
+inline String& String::operator=(const char* str) {
     u64 len = str ? strlen(str) : 0;
 
     // Fast path: capacity is sufficient
@@ -328,33 +326,33 @@ String& String::operator=(const char* str) {
 // element access
 // ============================================================================
 
-char& String::operator[](u64 i) {
-    SV_ASSERT(i > m_size, "Index {} out of bound", i);
+inline char& String::operator[](u64 i) {
+    SV_ASSERT(i < m_size, "Index {} out of bound", i);
     return data_ptr()[i];
 }
 
-const char& String::operator[](u64 i) const {
-    SV_ASSERT(i > m_size, "Index {} out of bound", i);
+inline const char& String::operator[](u64 i) const {
+    SV_ASSERT(i < m_size, "Index {} out of bound", i);
     return data_ptr()[i];
 }
 
-char& String::front() {
-    SV_ASSERT(m_size == 0, "String is empty");
+inline char& String::front() {
+    SV_ASSERT(m_size > 0, "String is empty");
     return data_ptr()[0];
 }
 
-const char& String::front() const {
-    SV_ASSERT(m_size == 0, "String is empty");
+inline const char& String::front() const {
+    SV_ASSERT(m_size > 0, "String is empty");
     return data_ptr()[0];
 }
 
-char& String::back() {
-    SV_ASSERT(m_size == 0, "String is empty");
+inline char& String::back() {
+    SV_ASSERT(m_size > 0, "String is empty");
     return data_ptr()[m_size - 1];
 }
 
-const char& String::back() const {
-    SV_ASSERT(m_size == 0, "String is empty");
+inline const char& String::back() const {
+    SV_ASSERT(m_size > 0, "String is empty");
     return data_ptr()[m_size - 1];
 }
 
@@ -363,6 +361,10 @@ SV_FORCE_INLINE const char* String::c_str() const {
 }
 
 SV_FORCE_INLINE const char* String::data() const {
+    return data_ptr();
+}
+
+SV_FORCE_INLINE char* String::data() {
     return data_ptr();
 }
 
@@ -395,7 +397,7 @@ SV_FORCE_INLINE void String::resize(u64 count) {
     resize(count, '\0');
 }
 
-void String::resize(u64 count, char ch) {
+inline void String::resize(u64 count, char ch) {
     if (count > capacity())
         grow(count);
 
@@ -409,7 +411,7 @@ void String::resize(u64 count, char ch) {
     m_size = count;
 }
 
-void String::shrink_to_fit() {
+inline void String::shrink_to_fit() {
     if (!m_heap)
         return;
     if (m_size == m_storage.heap.capacity)
@@ -421,7 +423,7 @@ void String::shrink_to_fit() {
         memcpy(m_storage.local, oldData, m_size);
         m_storage.local[m_size] = '\0';
         if (m_allocator)
-            m_allocator->deallocate(oldData);
+            m_allocator->deallocate(oldData, m_storage.heap.capacity * sizeof(char));
         else
             platform_aligned_free(oldData);
         m_heap = 0;
@@ -445,7 +447,7 @@ void String::shrink_to_fit() {
 // modifiers
 // ============================================================================
 
-void String::clear() {
+inline void String::clear() {
     if (m_heap)
         m_storage.heap.data[0] = '\0';
     else
@@ -453,8 +455,8 @@ void String::clear() {
     m_size = 0;
 }
 
-void String::insert(u64 index, const char* str) {
-    SV_ASSERT(index > m_size, "Index {} out of bound", index);
+inline void String::insert(u64 index, const char* str) {
+    SV_ASSERT(index <= m_size, "Index {} out of bound", index);
 
     u64 len = str ? strlen(str) : 0;
     if (len == 0)
@@ -478,8 +480,8 @@ SV_FORCE_INLINE void String::insert(u64 index, const String& str) {
     insert(index, str.data_ptr());
 }
 
-void String::insert(u64 index, u64 count, char ch) {
-    SV_ASSERT(index > m_size, "Index {} out of bound", index);
+inline void String::insert(u64 index, u64 count, char ch) {
+    SV_ASSERT(index <= m_size, "Index {} out of bound", index);
     if (count == 0)
         return;
 
@@ -497,8 +499,8 @@ void String::insert(u64 index, u64 count, char ch) {
     m_size = newSize;
 }
 
-void String::erase(u64 index, u64 count) {
-    SV_ASSERT(index > m_size, "Index {} out of bound", index);
+inline void String::erase(u64 index, u64 count) {
+    SV_ASSERT(index < m_size, "Index {} out of bound", index);
 
     if (count == 0 || index == m_size)
         return;
@@ -512,7 +514,7 @@ void String::erase(u64 index, u64 count) {
     data_ptr()[m_size] = '\0';
 }
 
-void String::push_back(char ch) {
+inline void String::push_back(char ch) {
     if (m_size + 1 > capacity())
         grow(m_size + 1);
 
@@ -521,14 +523,14 @@ void String::push_back(char ch) {
     m_size++;
 }
 
-void String::pop_back() {
-    SV_ASSERT(m_size == 0, "String is empty");
+inline void String::pop_back() {
+    SV_ASSERT(m_size > 0, "String is empty");
 
     data_ptr()[m_size - 1] = '\0';
     m_size--;
 }
 
-void String::append(const char* str) {
+inline void String::append(const char* str) {
     u64 len = str ? strlen(str) : 0;
     if (len == 0)
         return;
@@ -546,7 +548,7 @@ SV_FORCE_INLINE void String::append(const String& str) {
     append(str.data_ptr());
 }
 
-void String::append(u64 count, char ch) {
+inline void String::append(u64 count, char ch) {
     if (count == 0)
         return;
 
@@ -559,7 +561,7 @@ void String::append(u64 count, char ch) {
     m_size = newSize;
 }
 
-void String::swap(String& other) noexcept {
+inline void String::swap(String& other) noexcept {
     // storage
     std::swap(m_storage, other.m_storage);
 
@@ -577,8 +579,8 @@ void String::swap(String& other) noexcept {
     std::swap(m_allocator, other.m_allocator);
 }
 
-char& String::at(u64 index) {
-    SV_ASSERT(index > m_size, "Index {} out of bound", index);
+inline char& String::at(u64 index) {
+    SV_ASSERT(index < m_size, "Index {} out of bound", index);
 
     if(!m_heap) {
         return m_storage.local[index];
@@ -587,8 +589,8 @@ char& String::at(u64 index) {
     }
 }
 
-const char& String::at(u64 index) const {
-    SV_ASSERT(index > m_size, "Index {} out of bound", index);
+inline const char& String::at(u64 index) const {
+    SV_ASSERT(index < m_size, "Index {} out of bound", index);
 
     if(!m_heap) {
         return m_storage.local[index];
@@ -638,10 +640,10 @@ inline u64 String::find(const char* str, u64 pos) const {
     u64 end     = m_size > len ? m_size - len : 0;
 
     for (u64 i = pos; i <= end; i++) {
-        bool found = true;
+        b32 found = SV_TRUE;
         for (u64 j = 0; j < len; j++) {
             if (ptr[i + j] != str[j]) {
-                found = false;
+                found = SV_FALSE;
                 break;
             }
         }
@@ -655,7 +657,7 @@ SV_FORCE_INLINE u64 String::find(const String& str, u64 pos) const {
     return find(str.data_ptr(), pos);
 }
 
-u64 String::rfind(char ch, u64 pos) const {
+inline u64 String::rfind(char ch, u64 pos) const {
     if (m_size == 0)
         return npos;
 
@@ -672,7 +674,7 @@ u64 String::rfind(char ch, u64 pos) const {
     return npos;
 }
 
-u64 String::rfind(const char* str, u64 pos) const {
+inline u64 String::rfind(const char* str, u64 pos) const {
     if (!str || !*str)
         return pos <= m_size ? pos : npos;
     if (m_size == 0)
@@ -688,10 +690,10 @@ u64 String::rfind(const char* str, u64 pos) const {
 
     const char* ptr = data_ptr();
     for (i64 i = static_cast<i64>(pos); i >= 0; i--) {
-        bool found = true;
+        b32 found = SV_TRUE;
         for (u64 j = 0; j < len; j++) {
             if (ptr[i + j] != str[j]) {
-                found = false;
+                found = SV_FALSE;
                 break;
             }
         }
@@ -705,12 +707,12 @@ SV_FORCE_INLINE b32 String::starts_with(const String& str) const {
     return starts_with(str.data_ptr());
 }
 
-b32 String::starts_with(const char* str) const {
+inline b32 String::starts_with(const char* str) const {
     if (!str)
-        return false;
+        return SV_FALSE;
     u64 len = strlen(str);
     if (len > m_size)
-        return false;
+        return SV_FALSE;
     return memcmp(data_ptr(), str, len) == 0;
 }
 
@@ -722,12 +724,12 @@ SV_FORCE_INLINE b32 String::ends_with(const String& str) const {
     return ends_with(str.data_ptr());
 }
 
-b32 String::ends_with(const char* str) const {
+inline b32 String::ends_with(const char* str) const {
     if (!str)
-        return false;
+        return SV_FALSE;
     u64 len = strlen(str);
     if (len > m_size)
-        return false;
+        return SV_FALSE;
     return memcmp(data_ptr() + m_size - len, str, len) == 0;
 }
 
@@ -735,8 +737,8 @@ SV_FORCE_INLINE b32 String::ends_with(char ch) const {
     return m_size > 0 && data_ptr()[m_size - 1] == ch;
 }
 
-String String::substr(u64 pos, u64 count) const {
-    SV_ASSERT(pos > m_size, "Position {} out of bound", pos);
+inline String String::substr(u64 pos, u64 count) const {
+    SV_ASSERT(pos < m_size, "Position {} out of bound", pos);
 
     u64 actualCount = min(count, m_size - pos);
     return String(data_ptr() + pos, actualCount, m_allocator);
@@ -746,7 +748,7 @@ SV_FORCE_INLINE i32 String::compare(const String& str) const {
     return compare(str.data_ptr());
 }
 
-i32 String::compare(const char* str) const {
+inline i32 String::compare(const char* str) const {
     if (!str)
         return 1;
 

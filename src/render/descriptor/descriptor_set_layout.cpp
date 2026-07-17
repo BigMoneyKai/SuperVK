@@ -1,5 +1,5 @@
 #include "descriptor_set_layout.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 
 void DescriptorSetLayout::init(const VkDevice& device, const std::vector<VkDescriptorSetLayoutBinding>& bindings) {
     m_device = device;

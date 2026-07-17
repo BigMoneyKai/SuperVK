@@ -1,7 +1,7 @@
 #pragma once
 
 #include "defines.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 
 #include <vulkan/vulkan.h>
 #include <stdlib.h>
@@ -52,7 +52,7 @@ void endSingleTimeCommands(
     VkCommandBuffer commandBuffer
 );
 
-u64 align_up(u64 value, u64 alignment) {
+inline u64 align_up(u64 value, u64 alignment) {
     return (value + alignment - 1) & ~(alignment - 1);
-};
+}
 

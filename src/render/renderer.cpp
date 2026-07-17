@@ -1,5 +1,5 @@
 #include "render/renderer.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 #include "scene/scene.h"
 
 void Renderer::init(const RendererDesc& desc) {
@@ -33,7 +33,7 @@ void Renderer::init(const RendererDesc& desc) {
     m_textureMan.init(m_device.device(), m_device.physicalDevice(), m_commandPool.pool(), m_device.graphicsQueue());
     m_descriptorMan.writeBufferDescriptorSet();
 
-    u32 texIndex = m_textureMan.loadTexture("assets/textures/red.jpg");
+    u32 texIndex = m_textureMan.loadTexture("resource/textures/red.png");
     m_descriptorMan.writeImageDescriptorSet(
         m_textureMan.texture(texIndex).imageView(),
         m_textureMan.texture(texIndex).imageLayout());

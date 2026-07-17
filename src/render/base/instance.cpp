@@ -1,6 +1,6 @@
 #include "defines.h"
 #include "instance.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 
 #include <GLFW/glfw3.h>
 

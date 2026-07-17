@@ -7,7 +7,7 @@
 
 template <typename T>
 class Array {
-  public:
+public:
     using iterator = Iterator<T>;
     using const_iterator = Iterator<const T>;
     using reverse_iterator = ReverseIterator<iterator>;
@@ -15,6 +15,7 @@ class Array {
 
     explicit Array(Allocator* a = &default_allocator());
     Array(u64 capacity, const T& value = T{}, Allocator* a = &default_allocator());
+    Array(void* data, u64 size, Allocator* a = &default_allocator());
 
     // copy not allowed, move allowed
     Array(const Array&) = delete;
@@ -48,6 +49,7 @@ class Array {
     void pop_back();
     void insert(u64 index, const T& value);
     void insert(u64 index, T&& value);
+    void append(const T* data, u64 size);
     void erase(u64 index);
     void clear();
 
@@ -77,7 +79,7 @@ class Array {
         return const_reverse_iterator(begin());
     }
 
-  private:
+private:
     Allocator* m_allocator{nullptr};
     T* m_data{nullptr};
     u64 m_size{0};

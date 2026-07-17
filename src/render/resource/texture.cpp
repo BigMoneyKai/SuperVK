@@ -1,5 +1,5 @@
 #include "texture.h"
-#include "debug/debugger.h"
+#include "core/debug/debugger.h"
 #include "utils/utils.h"
 
 void Texture::init(

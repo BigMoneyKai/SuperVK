@@ -7,7 +7,8 @@ public:
     LinearAllocator(u64 size, Allocator* backing = &default_allocator());
     ~LinearAllocator();
 
-    void* allocate(u64 size, u64 alignment = 16) override;
+    void* allocate(u64 size, u64 alignment = DEFAULT_ALIGNMENT) override;
+    void  deallocate(void* ptr, u64 size) override;
 
     void reset();
 
