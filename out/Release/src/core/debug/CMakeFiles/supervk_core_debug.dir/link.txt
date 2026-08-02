@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsupervk_core_debug.a CMakeFiles/supervk_core_debug.dir/logger.cpp.o CMakeFiles/supervk_core_debug.dir/log_tag.cpp.o CMakeFiles/supervk_core_debug.dir/except/exception_str.cpp.o
-/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_core_debug.a

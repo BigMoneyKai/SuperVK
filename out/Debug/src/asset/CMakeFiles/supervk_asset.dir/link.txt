@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsupervk_asset.a CMakeFiles/supervk_asset.dir/asset_manager.cpp.o
-/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_asset.a

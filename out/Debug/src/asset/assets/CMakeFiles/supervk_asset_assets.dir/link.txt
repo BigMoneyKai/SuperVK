@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsupervk_asset_assets.a CMakeFiles/supervk_asset_assets.dir/asset.cpp.o CMakeFiles/supervk_asset_assets.dir/mesh_asset.cpp.o CMakeFiles/supervk_asset_assets.dir/texture_asset.cpp.o CMakeFiles/supervk_asset_assets.dir/material_asset.cpp.o CMakeFiles/supervk_asset_assets.dir/shader_asset.cpp.o CMakeFiles/supervk_asset_assets.dir/animation_asset.cpp.o CMakeFiles/supervk_asset_assets.dir/skeleton_asset.cpp.o CMakeFiles/supervk_asset_assets.dir/scene_asset.cpp.o
-/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_asset_assets.a

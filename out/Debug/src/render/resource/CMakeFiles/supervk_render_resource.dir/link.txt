@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsupervk_render_resource.a CMakeFiles/supervk_render_resource.dir/stb_image_impl.cpp.o CMakeFiles/supervk_render_resource.dir/buffer.cpp.o CMakeFiles/supervk_render_resource.dir/buffer_manager.cpp.o CMakeFiles/supervk_render_resource.dir/image.cpp.o CMakeFiles/supervk_render_resource.dir/sampler.cpp.o CMakeFiles/supervk_render_resource.dir/texture.cpp.o CMakeFiles/supervk_render_resource.dir/texture_manager.cpp.o
-/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_render_resource.a

@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsupervk_core_memory.a CMakeFiles/supervk_core_memory.dir/linear_allocator.cpp.o CMakeFiles/supervk_core_memory.dir/stack_allocator.cpp.o CMakeFiles/supervk_core_memory.dir/pool_allocator.cpp.o CMakeFiles/supervk_core_memory.dir/heap_allocator.cpp.o CMakeFiles/supervk_core_memory.dir/allocator.cpp.o
-/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_core_memory.a

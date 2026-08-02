@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsupervk_render_frame.a CMakeFiles/supervk_render_frame.dir/depth_resource.cpp.o CMakeFiles/supervk_render_frame.dir/framebuffer.cpp.o CMakeFiles/supervk_render_frame.dir/frame_resource.cpp.o CMakeFiles/supervk_render_frame.dir/sync.cpp.o
-/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_render_frame.a

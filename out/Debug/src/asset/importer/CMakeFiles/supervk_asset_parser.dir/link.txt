@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsupervk_asset_parser.a CMakeFiles/supervk_asset_parser.dir/importer_manager.cpp.o CMakeFiles/supervk_asset_parser.dir/obj/objparser.cpp.o CMakeFiles/supervk_asset_parser.dir/gltf/gltfparser.cpp.o CMakeFiles/supervk_asset_parser.dir/gltf/glbparser.cpp.o
-/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_asset_parser.a

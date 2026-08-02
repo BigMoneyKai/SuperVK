@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsupervk_render.a CMakeFiles/supervk_render.dir/renderer.cpp.o
-/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_render.a

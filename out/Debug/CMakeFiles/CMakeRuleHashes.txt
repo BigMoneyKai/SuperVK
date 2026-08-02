@@ -1,6 +1,0 @@
-# Hashes of file build rules.
-4904441488c17be4e6e062481ee2a8a8 /Users/gaodekai/Desktop/supervk/shaders/spv/basic.frag.spv
-94d4deac197d0e3e821bf271122656d6 /Users/gaodekai/Desktop/supervk/shaders/spv/basic.vert.spv
-1f24b7d8c9e07a8fb3fd08be29892b36 CMakeFiles/shaders
-7b9ff5615cdc8b63f060004a6b43a886 thirdparty/glfw/CMakeFiles/uninstall
-1795864af50d400f1e52fc58f14dd697 thirdparty/glfw/src/CMakeFiles/update_mappings
