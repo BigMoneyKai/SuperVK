@@ -7,3 +7,6 @@ cmake-build-debug/
 shaders/spv/
 .DS_Store
 AGENTS.md
+CLAUDE.md
+compile_commands.json
+out/
