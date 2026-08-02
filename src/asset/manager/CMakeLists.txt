@@ -24,7 +24,7 @@ target_link_libraries(supervk_asset_manager PRIVATE
     supervk_core_container_array
     supervk_core_container_string
     supervk_core_job
-    supervk_debug
+    supervk_core_debug
 
     Vulkan::Vulkan
     glm

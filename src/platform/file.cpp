@@ -1,25 +1,26 @@
 #include "file.h"
 
+// TODO: replace all "delete" with allocator
 #if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
 #include <sys/stat.h>
 #include <cstdio>
 
-struct File {
+struct FileHandle {
     FILE* fp;
 };
 
 static const char* mode_str(FileMode m) {
     switch (m) {
-        case FileMode::FILE_MODE_READ:       return "rb";
-        case FileMode::FILE_MODE_WRITE:      return "wb";
-        case FileMode::FILE_MODE_APPEND:     return "ab";
-        case FileMode::FILE_MODE_READ_WRITE: return "w+b";
-        default:                             return "rb";
+        case FileMode::Read:        return "rb";
+        case FileMode::Write:       return "wb";
+        case FileMode::Append:      return "ab";
+        case FileMode::ReadWrite:   return "w+b";
+        default:                    return "rb";
     }
 }
 
-File* file_open(const char* path, FileMode mode) {
-    File* f = new File{};
+FileHandle* file_open(const char* path, FileMode mode) {
+    FileHandle* f = new FileHandle{};
     f->fp   = fopen(path, mode_str(mode));
     if (!f->fp) {
         delete f;
@@ -28,7 +29,7 @@ File* file_open(const char* path, FileMode mode) {
     return f;
 }
 
-void file_close(File* f) {
+void file_close(FileHandle* f) {
     if (f) {
         if (f->fp)
             fclose(f->fp);
@@ -36,32 +37,32 @@ void file_close(File* f) {
     }
 }
 
-u64 file_read(File* f, void* buf, u64 size) {
+u64 file_read(FileHandle* f, void* buf, u64 size) {
     return f ? fread(buf, 1, size, f->fp) : 0;
 }
 
-u64 file_write(File* f, const void* data, u64 size) {
+u64 file_write(FileHandle* f, const void* data, u64 size) {
     return f ? fwrite(data, 1, size, f->fp) : 0;
 }
 
-i32 file_seek(File* f, i64 offset, FileSeekOrigin origin) {
+i32 file_seek(FileHandle* f, i64 offset, FileSeekOrigin origin) {
     if (!f) return -1;
     i32 whence;
     switch (origin) {
-        case FileSeekOrigin::FILE_SEEK_BEGIN:   whence = SEEK_SET; break;
-        case FileSeekOrigin::FILE_SEEK_CURRENT: whence = SEEK_CUR; break;
-        case FileSeekOrigin::FILE_SEEK_END:     whence = SEEK_END; break;
+        case FileSeekOrigin::Begin:   whence = SEEK_SET; break;
+        case FileSeekOrigin::Current: whence = SEEK_CUR; break;
+        case FileSeekOrigin::End:     whence = SEEK_END; break;
         default:                return -1;
     }
     return fseeko(f->fp, offset, whence) == 0 ? 0 : -1;
 }
 
-u64 file_tell(const File* f) {
+u64 file_tell(const FileHandle* f) {
     if (!f) return 0;
     return (u64)ftello(f->fp);
 }
 
-u64 file_size(const File* f) {
+u64 file_size(const FileHandle* f) {
     if (!f) return 0;
     struct stat st;
     if (fstat(fileno(f->fp), &st) != 0)
@@ -69,11 +70,11 @@ u64 file_size(const File* f) {
     return (u64)st.st_size;
 }
 
-i32 file_is_open(const File* f) {
+i32 file_is_open(const FileHandle* f) {
     return f && f->fp ? 1 : 0;
 }
 
-i32 file_is_eof(const File* f) {
+i32 file_is_eof(const FileHandle* f) {
     if (!f) return 1;
     return feof(f->fp) ? 1 : 0;
 }
@@ -128,6 +129,12 @@ u64 fs_file_size(const char* path) {
     return (u64)st.st_size;
 }
 
+u64 fs_file_modified(const char* path) {
+    struct stat st;
+    if (stat(path, &st) != 0) return 0;
+    return (u64)st.st_mtime;
+}
+
 i32 fs_file_delete(const char* path) {
     return remove(path) == 0 ? 0 : -1;
 }
@@ -145,32 +152,32 @@ i32 fs_directory_exists(const char* path) {
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-struct File {
+struct FileHandle {
     HANDLE h;
 };
 
 static DWORD win_access(FileMode m) {
     switch (m) {
-        case FileMode::FILE_MODE_READ:       return GENERIC_READ;
-        case FileMode::FILE_MODE_WRITE:      return GENERIC_WRITE;
-        case FileMode::FILE_MODE_APPEND:     return GENERIC_WRITE;
-        case FileMode::FILE_MODE_READ_WRITE: return GENERIC_READ | GENERIC_WRITE;
-        default:                             return GENERIC_READ;
+        case FileMode::Read:        return GENERIC_READ;
+        case FileMode::Write:       return GENERIC_WRITE;
+        case FileMode::Append:      return GENERIC_WRITE;
+        case FileMode::ReadWrite:   return GENERIC_READ | GENERIC_WRITE;
+        default:                    return GENERIC_READ;
     }
 }
 
 static DWORD win_creation(FileMode m) {
     switch (m) {
-        case FileMode::FILE_MODE_READ:       return OPEN_EXISTING;
-        case FileMode::FILE_MODE_WRITE:      return CREATE_ALWAYS;
-        case FileMode::FILE_MODE_APPEND:     return OPEN_ALWAYS;
-        case FileMode::FILE_MODE_READ_WRITE: return CREATE_ALWAYS;
-        default:                             return OPEN_EXISTING;
+        case FileMode::Read:        return OPEN_EXISTING;
+        case FileMode::Write:       return CREATE_ALWAYS;
+        case FileMode::Append:      return OPEN_ALWAYS;
+        case FileMode::ReadWrite:   return CREATE_ALWAYS;
+        default:                    return OPEN_EXISTING;
     }
 }
 
-File* file_open(const char* path, FileMode mode) {
-    File* f = new File{};
+FileHandle* file_open(const char* path, FileMode mode) {
+    FileHandle* f = new FileHandle{};
     f->h = CreateFileA(path, win_access(mode), FILE_SHARE_READ,
                        nullptr, win_creation(mode),
                        FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -178,8 +185,8 @@ File* file_open(const char* path, FileMode mode) {
         delete f;
         return nullptr;
     }
-    if (mode == FileMode::FILE_MODE_APPEND)
-        SetFilePoi32er(f->h, 0, nullptr, FILE_END);
+    if (mode == FileMode::Append)
+        SetFilePointer(f->h, 0, nullptr, FILE_END);
     return f;
 }
 
@@ -191,7 +198,7 @@ void file_close(File* f) {
     }
 }
 
-u64 file_read(File* f, void* buf, u64 size) {
+u64 file_read(FileHandle* f, void* buf, u64 size) {
     if (!f) return 0;
     DWORD read = 0;
     if (!ReadFile(f->h, buf, (DWORD)size, &read, nullptr))
@@ -199,7 +206,7 @@ u64 file_read(File* f, void* buf, u64 size) {
     return read;
 }
 
-u64 file_write(File* f, const void* data, u64 size) {
+u64 file_write(FileHandle* f, const void* data, u64 size) {
     if (!f) return 0;
     DWORD written = 0;
     if (!WriteFile(f->h, data, (DWORD)size, &written, nullptr))
@@ -207,40 +214,40 @@ u64 file_write(File* f, const void* data, u64 size) {
     return written;
 }
 
-i32 file_seek(File* f, i64 offset, FileSeekOrigin origin) {
+i32 file_seek(FileHandle* f, i64 offset, FileSeekOrigin origin) {
     if (!f) return -1;
     DWORD method;
     switch (origin) {
-        case FileSeekOrigin::FILE_SEEK_BEGIN:   method = FILE_BEGIN;   break;
-        case FileSeekOrigin::FILE_SEEK_CURRENT: method = FILE_CURRENT; break;
-        case FileSeekOrigin::FILE_SEEK_END:     method = FILE_END;     break;
+        case FileSeekOrigin::Begin:   method = FILE_BEGIN;   break;
+        case FileSeekOrigin::Current: method = FILE_CURRENT; break;
+        case FileSeekOrigin::End:     method = FILE_END;     break;
         default:    return -1;
     }
-    LARGE_i32EGER li;
+    LARGE_INTEGER li;
     li.QuadPart = offset;
-    return SetFilePoi32erEx(f->h, li, nullptr, method) ? 0 : -1;
+    return SetFilePointerEx(f->h, li, nullptr, method) ? 0 : -1;
 }
 
-u64 file_tell(const File* f) {
+u64 file_tell(const FileHandle* f) {
     if (!f) return 0;
-    LARGE_i32EGER li = {}, pos = {};
-    return SetFilePoi32erEx(f->h, li, &pos, FILE_CURRENT) ? (u64)pos.QuadPart : 0;
+    LARGE_INTEGER li = {}, pos = {};
+    return SetFilePointerEx(f->h, li, &pos, FILE_CURRENT) ? (u64)pos.QuadPart : 0;
 }
 
-u64 file_size(const File* f) {
+u64 file_size(const FileHandle* f) {
     if (!f) return 0;
-    LARGE_i32EGER sz;
+    LARGE_INTEGER sz;
     return GetFileSizeEx(f->h, &sz) ? (u64)sz.QuadPart : 0;
 }
 
-i32 file_is_open(const File* f) {
+i32 file_is_open(const FileHandle* f) {
     return f && f->h ? 1 : 0;
 }
 
-i32 file_is_eof(const File* f) {
+i32 file_is_eof(const FileHandle* f) {
     if (!f) return 1;
-    LARGE_i32EGER li = {}, pos = {}, sz = {};
-    if (!SetFilePoi32erEx(f->h, li, &pos, FILE_CURRENT)) return 1;
+    LARGE_INTEGER li = {}, pos = {}, sz = {};
+    if (!SetFilePointerEx(f->h, li, &pos, FILE_CURRENT)) return 1;
     if (!GetFileSizeEx(f->h, &sz)) return 1;
     return (u64)pos.QuadPart >= (u64)sz.QuadPart ? 1 : 0;
 }
@@ -255,7 +262,7 @@ i32 fs_read_file(const char* path, void** out_data, u64* out_size) {
                            FILE_ATTRIBUTE_NORMAL, nullptr);
     if (h == INVALID_HANDLE_VALUE) return -1;
 
-    LARGE_i32EGER li;
+    LARGE_INTEGER li;
     if (!GetFileSizeEx(h, &li)) { CloseHandle(h); return -1; }
 
     u64 sz    = (u64)li.QuadPart;
@@ -293,10 +300,18 @@ u64 fs_file_size(const char* path) {
     WIN32_FILE_ATTRIBUTE_DATA info;
     if (!GetFileAttributesExA(path, GetFileExInfoStandard, &info))
         return 0;
-    LARGE_i32EGER li;
+    LARGE_INTEGER li;
     li.LowPart  = info.nFileSizeLow;
     li.HighPart = info.nFileSizeHigh;
     return (u64)li.QuadPart;
+}
+
+u64 fs_file_modified(const char* path) {
+    WIN32_FILE_ATTRIBUTE_DATA info;
+    if (!GetFileAttributesExA(path, GetFileExInfoStandard, &info))
+        return 0;
+    return ((u64)info.ftLastWriteTime.dwHighDateTime << 32) |
+           info.ftLastWriteTime.dwLowDateTime;
 }
 
 i32 fs_file_delete(const char* path) {

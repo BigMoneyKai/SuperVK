@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_platform.a CMakeFiles/supervk_platform.dir/console.cpp.o CMakeFiles/supervk_platform.dir/file.cpp.o CMakeFiles/supervk_platform.dir/thread.cpp.o CMakeFiles/supervk_platform.dir/memory.cpp.o CMakeFiles/supervk_platform.dir/time.cpp.o CMakeFiles/supervk_platform.dir/socket.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_platform.a

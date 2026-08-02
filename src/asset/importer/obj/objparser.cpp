@@ -7,8 +7,8 @@ static FaceType scanFaceToken(const std::string& token, FaceIndex* f) {
     slashCount = std::count(token.begin(), token.end(), '/');
 
     if(slashCount > 2) {
-        ERROR("Slash count error");
-        ERROR("Unknown obj face format");
+        ERROR(LogCatag::Asset, "Slash count error");
+        ERROR(LogCatag::Asset, "Unknown obj face format");
         return FT_UNKNOWN_TYPE;
     }
     switch(slashCount) {
@@ -35,7 +35,7 @@ static FaceType scanFaceToken(const std::string& token, FaceIndex* f) {
                 return FT_VTN;
             }
         default:
-            ERROR("Unknown obj face format");
+            ERROR(LogCatag::Asset, "Unknown obj face format");
         return FT_UNKNOWN_TYPE;
     }
     return FT_UNKNOWN_TYPE;
@@ -49,7 +49,7 @@ void ObjParser::init() {
 void ObjParser::parse(const char* path, Mesh* pMesh) {
     m_objFile.open(path);
     if(!m_objFile.is_open()) {
-        ERROR("Failed to load obj file, go check the path");
+        ERROR(LogCatag::Asset, "Failed to load obj file, go check the path");
         return;
     } m_currMesh = pMesh;
 
@@ -58,7 +58,7 @@ void ObjParser::parse(const char* path, Mesh* pMesh) {
     m_currMesh->normals().clear();
     m_currMesh->vertices().clear();
     m_currMesh->indices().clear();
-    DEBUG("Cleared all previous data");
+    DEBUG(LogCatag::Asset, "Cleared all previous data");
 
     std::string line;
     while(std::getline(m_objFile, line)) {
@@ -91,7 +91,7 @@ void ObjParser::parse(const char* path, Mesh* pMesh) {
             parse_f(ss);
         }
     }
-    DEBUG(
+    DEBUG(LogCatag::Asset,
         "OBJ Loaded\n"
         "Positions : {}\n"
         "Normals   : {}\n"
@@ -164,7 +164,7 @@ void ObjParser::parse_f(std::stringstream& ss) {
     }
 
     if(faceIndices.size() < 3) {
-        ERROR("Wrong obj file format, the number of face vertex should be 3 at least");
+        ERROR(LogCatag::Asset, "Wrong obj file format, the number of face vertex should be 3 at least");
     }
 
     for(i32 i = 1; i < faceIndices.size() - 1; i++) {

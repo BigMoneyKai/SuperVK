@@ -1,0 +1,55 @@
+{
+	"abstract" : true,
+	"backtrace" : 3,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"find_package"
+		],
+		"files" : 
+		[
+			"/opt/homebrew/share/cmake/Modules/FindVulkan.cmake",
+			"src/core/container/hashmap/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 3,
+				"parent" : 0
+			},
+			{
+				"file" : 0,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 727,
+				"parent" : 2
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"id" : "Vulkan::Headers::@f11a76f5fb225da585bf",
+	"imported" : true,
+	"local" : true,
+	"name" : "Vulkan::Headers",
+	"paths" : 
+	{
+		"build" : "src/core/container/hashmap",
+		"source" : "src/core/container/hashmap"
+	},
+	"sources" : [],
+	"type" : "INTERFACE_LIBRARY"
+}

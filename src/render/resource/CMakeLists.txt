@@ -22,6 +22,7 @@ target_include_directories(supervk_render_resource PRIVATE
 target_link_libraries(supervk_render_resource PRIVATE
     supervk_render_base
     supervk_utils
+
     Vulkan::Vulkan
     glm
 )

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_scene.a CMakeFiles/supervk_scene.dir/camera.cpp.o CMakeFiles/supervk_scene.dir/light.cpp.o CMakeFiles/supervk_scene.dir/material.cpp.o CMakeFiles/supervk_scene.dir/mesh.cpp.o CMakeFiles/supervk_scene.dir/object.cpp.o CMakeFiles/supervk_scene.dir/scene.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_scene.a

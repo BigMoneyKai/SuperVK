@@ -15,21 +15,21 @@ void ImporterMan::parse(const char* path, Mesh* mesh) {
     // Determine file type from extension
     const char* ext = strrchr(path, '.');
     if(!ext) {
-        ERROR("Failed to determine file type");
+        ERROR(LogCatag::Asset, "Failed to determine file type");
         return;
     }
 
     if(strcmp(ext, ".obj") == 0) {
         m_objParser.parse(path, mesh);
-        DEBUG("Loaded OBJ file: {}", path);
+        DEBUG(LogCatag::Asset, "Loaded OBJ file: {}", path);
     } else if(strcmp(ext, ".gltf") == 0) {
         m_gltfParser.parse(path, mesh);
-        DEBUG("Loaded GLTF file: {}", path);
+        DEBUG(LogCatag::Asset, "Loaded GLTF file: {}", path);
     } else if(strcmp(ext, ".glb") == 0) {
         m_glbParser.parse(path, mesh);
-        DEBUG("Loaded GLB file: {}", path);
+        DEBUG(LogCatag::Asset, "Loaded GLB file: {}", path);
     } else {
-        ERROR("Unsupported file format: {}", ext);
+        ERROR(LogCatag::Asset, "Unsupported file format: {}", ext);
     }
 }
 

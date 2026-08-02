@@ -16,7 +16,7 @@ target_include_directories(supervk_asset_parser PRIVATE
 
 target_link_libraries(supervk_asset_parser PRIVATE
     supervk_scene
-    supervk_debug
+    supervk_core_debug
 
     Vulkan::Vulkan
     glm

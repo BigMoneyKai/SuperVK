@@ -32,17 +32,17 @@ u64 MemoryInputStream::position() const {
 
 b32 MemoryInputStream::seek(u64 offset, FileSeekOrigin origin) {
     switch (origin) {
-    case FileSeekOrigin::FILE_SEEK_BEGIN:
+    case FileSeekOrigin::Begin:
         if (offset > m_size) return SV_FALSE;
         m_pos = offset;
         return SV_TRUE;
-    case FileSeekOrigin::FILE_SEEK_CURRENT: {
+    case FileSeekOrigin::Current: {
         i64 new_pos = static_cast<i64>(m_pos) + static_cast<i64>(offset);
         if (new_pos < 0 || static_cast<u64>(new_pos) > m_size) return SV_FALSE;
         m_pos = static_cast<u64>(new_pos);
         return SV_TRUE;
     }
-    case FileSeekOrigin::FILE_SEEK_END: {
+    case FileSeekOrigin::End: {
         i64 new_pos = static_cast<i64>(m_size) + static_cast<i64>(offset);
         if (new_pos < 0 || static_cast<u64>(new_pos) > m_size) return SV_FALSE;
         m_pos = static_cast<u64>(new_pos);

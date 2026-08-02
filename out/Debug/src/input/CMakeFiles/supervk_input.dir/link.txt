@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_input.a CMakeFiles/supervk_input.dir/input_manager.cpp.o CMakeFiles/supervk_input.dir/mouse.cpp.o CMakeFiles/supervk_input.dir/keyboard.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_input.a

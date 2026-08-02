@@ -22,6 +22,7 @@ target_link_libraries(supervk_asset_assets PRIVATE
     supervk_scene
     supervk_core_container_string
     supervk_core_container_array
+
     Vulkan::Vulkan
     glm
 )

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_asset_manager.a CMakeFiles/supervk_asset_manager.dir/mesh_manager.cpp.o CMakeFiles/supervk_asset_manager.dir/texture_manager.cpp.o CMakeFiles/supervk_asset_manager.dir/material_manager.cpp.o CMakeFiles/supervk_asset_manager.dir/shader_manager.cpp.o CMakeFiles/supervk_asset_manager.dir/animation_manager.cpp.o CMakeFiles/supervk_asset_manager.dir/skeleton_manager.cpp.o CMakeFiles/supervk_asset_manager.dir/scene_manager.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_asset_manager.a

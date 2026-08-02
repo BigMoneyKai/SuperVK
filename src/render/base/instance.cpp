@@ -63,9 +63,9 @@ b32 Instance::enable_validation_layer() {
         }
     }
     if(!layerFound) {
-        WARNING("Validation layer not found in SDK, please install it or config it");
+        WARNING(LogCatag::Vulkan, "Validation layer not found in SDK, please install it or config it");
     } else {
-        DEBUG("Validation layer enabled");
+        DEBUG(LogCatag::Vulkan, "Validation layer enabled");
     }
     return layerFound;
 }

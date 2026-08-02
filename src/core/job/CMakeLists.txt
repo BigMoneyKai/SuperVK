@@ -18,7 +18,7 @@ target_link_libraries(supervk_core_job PRIVATE
     supervk_core_memory
     supervk_core_container_array
     supervk_core_container_queue
-    supervk_debug
+    supervk_core_debug
     supervk_utils
 
     Vulkan::Vulkan

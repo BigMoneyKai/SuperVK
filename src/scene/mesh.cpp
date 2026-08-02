@@ -3,7 +3,7 @@
 
 void Mesh::init(const VkDevice& device, const VkPhysicalDevice& physicalDevice) {
     if(m_vertices.empty() || m_indices.empty()) {
-        FATAL("Mesh data is empty");
+        FATAL(LogCatag::Scene, "Mesh data is empty");
     }
 
     m_vertexBuffer.init(

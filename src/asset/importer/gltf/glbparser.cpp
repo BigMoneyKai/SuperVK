@@ -18,7 +18,7 @@ u32 GlbParser::getComponentSize(u32 componentType) const {
     case 5125: return 4; // UNSIGNED_INT
     case 5126: return 4; // FLOAT
     default:
-        WARNING("Unknown glTF componentType: {} — assuming 4 bytes", componentType);
+        WARNING(LogCatag::Asset, "Unknown glTF componentType: {} — assuming 4 bytes", componentType);
         return 4;
     }
 }
@@ -31,7 +31,7 @@ u32 GlbParser::getTypeCount(const std::string& type) const {
     if (type == "MAT2")   return 4;
     if (type == "MAT3")   return 9;
     if (type == "MAT4")   return 16;
-    WARNING("Unknown glTF accessor type: {} — assuming 1", type.c_str());
+    WARNING(LogCatag::Asset, "Unknown glTF accessor type: {} — assuming 1", type.c_str());
     return 1;
 }
 
@@ -54,7 +54,7 @@ void GlbParser::destroy() {
 // =========================================================================
 void GlbParser::parse(const char* path, Mesh* pMesh) {
     if (!path || !pMesh) {
-        ERROR("GlbParser::parse — null path or mesh pointer");
+        ERROR(LogCatag::Asset, "GlbParser::parse — null path or mesh pointer");
         return;
     }
     m_currMesh = pMesh;
@@ -71,7 +71,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     // ---- read entire .glb file as binary -----------------------------------
     std::ifstream file(path, std::ios::in | std::ios::binary | std::ios::ate);
     if (!file.is_open()) {
-        ERROR("Failed to open GLB file: {}", path);
+        ERROR(LogCatag::Asset, "Failed to open GLB file: {}", path);
         return;
     }
 
@@ -80,14 +80,14 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
 
     std::vector<u8> rawFile(static_cast<size_t>(fileSize));
     if (!file.read(reinterpret_cast<char*>(rawFile.data()), fileSize)) {
-        ERROR("Failed to read GLB file: {}", path);
+        ERROR(LogCatag::Asset, "Failed to read GLB file: {}", path);
         return;
     }
     file.close();
 
     // ---- parse header (12 bytes) -------------------------------------------
     if (fileSize < 12) {
-        ERROR("GLB file too small for header: {} ({} bytes)", path, static_cast<long>(fileSize));
+        ERROR(LogCatag::Asset, "GLB file too small for header: {} ({} bytes)", path, static_cast<long>(fileSize));
         return;
     }
 
@@ -96,16 +96,16 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     u32 totalLength = *reinterpret_cast<u32*>(rawFile.data() + 8);
 
     if (magic != kGlbMagic) {
-        ERROR("GLB invalid magic: 0x%08X (expected 0x%08X)", magic, kGlbMagic);
+        ERROR(LogCatag::Asset, "GLB invalid magic: 0x%08X (expected 0x%08X)", magic, kGlbMagic);
         return;
     }
 
     if (version != 2) {
-        WARNING("GLB version {} — parser targets version 2", version);
+        WARNING(LogCatag::Asset, "GLB version {} — parser targets version 2", version);
     }
 
     if (static_cast<u64>(totalLength) != static_cast<u64>(fileSize)) {
-        WARNING("GLB header length {} != file size {}", totalLength, static_cast<long>(fileSize));
+        WARNING(LogCatag::Asset, "GLB header length {} != file size {}", totalLength, static_cast<long>(fileSize));
     }
 
     // ---- parse chunks -------------------------------------------------------
@@ -120,7 +120,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
         offset += 8;
 
         if (offset + chunkLength > rawFile.size()) {
-            ERROR("GLB chunk length {} exceeds file bounds at offset {}", chunkLength, offset);
+            ERROR(LogCatag::Asset, "GLB chunk length {} exceeds file bounds at offset {}", chunkLength, offset);
             return;
         }
 
@@ -133,21 +133,21 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
                 rawFile.data() + offset,
                 rawFile.data() + offset + chunkLength);
         } else {
-            WARNING("GLB unknown chunk type: 0x%08X — skipping", chunkType);
+            WARNING(LogCatag::Asset, "GLB unknown chunk type: 0x%08X — skipping", chunkType);
         }
 
         offset += chunkLength;
     }
 
     if (jsonStr.empty()) {
-        ERROR("GLB file contains no JSON chunk: {}", path);
+        ERROR(LogCatag::Asset, "GLB file contains no JSON chunk: {}", path);
         return;
     }
 
     // ---- parse JSON ---------------------------------------------------------
     gltf_json::JsonValue root = gltf_json::parse(jsonStr);
     if (!root.isObject()) {
-        ERROR("GLB JSON chunk is not a valid JSON object");
+        ERROR(LogCatag::Asset, "GLB JSON chunk is not a valid JSON object");
         return;
     }
     m_root = &root;
@@ -156,7 +156,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     if (root.has("asset") && root["asset"].has("version")) {
         const std::string& ver = root["asset"]["version"].getString();
         if (ver[0] != '2') {
-            WARNING("glTF version {} — parser targets 2.0", ver.c_str());
+            WARNING(LogCatag::Asset, "glTF version {} — parser targets 2.0", ver.c_str());
         }
     }
 
@@ -187,9 +187,9 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
                         // Use a simple static decode — we don't have GltfParser's method here
                         // but for GLB the BIN chunk is the primary data source
                     }
-                    WARNING("GLB buffer[{}] uses data URI — not fully supported in GLB mode", i);
+                    WARNING(LogCatag::Asset, "GLB buffer[{}] uses data URI — not fully supported in GLB mode", i);
                 } else {
-                    ERROR("GLB buffer[{}] references external file '{}' — "
+                    ERROR(LogCatag::Asset, "GLB buffer[{}] references external file '{}' — "
                           "GLB buffers should be embedded or use the BIN chunk",
                           i, uri.c_str());
                 }
@@ -199,17 +199,17 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
                     if (binData.size() >= byteLength) {
                         m_buffers[i] = std::move(binData);
                     } else {
-                        WARNING("GLB BIN chunk size {} < buffer[0].byteLength {}",
+                        WARNING(LogCatag::Asset, "GLB BIN chunk size {} < buffer[0].byteLength {}",
                                 binData.size(), byteLength);
                         m_buffers[i] = std::move(binData);
                     }
                 } else if (i == 0 && binData.empty()) {
-                    WARNING("GLB has buffer without URI but no BIN chunk present");
+                    WARNING(LogCatag::Asset, "GLB has buffer without URI but no BIN chunk present");
                     m_buffers[i].resize(static_cast<size_t>(byteLength), 0);
                 } else {
                     // buffer[1+] without URI — the spec allows all buffers to
                     // share the same BIN chunk with different byteOffsets
-                    WARNING("GLB buffer[{}] without URI — multiple-buffer GLB "
+                    WARNING(LogCatag::Asset, "GLB buffer[{}] without URI — multiple-buffer GLB "
                             "not fully supported", i);
                     m_buffers[i].resize(static_cast<size_t>(byteLength), 0);
                 }
@@ -219,7 +219,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
 
     // ---- traverse scene → nodes → meshes -----------------------------------
     if (!root.has("scenes") || !root.has("nodes") || !root.has("meshes")) {
-        ERROR("GLB missing required arrays (scenes/nodes/meshes)");
+        ERROR(LogCatag::Asset, "GLB missing required arrays (scenes/nodes/meshes)");
         return;
     }
 
@@ -233,13 +233,13 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     }
 
     if (sceneIdx < 0 || static_cast<size_t>(sceneIdx) >= scenes.size()) {
-        ERROR("GLB default scene index {} out of range", sceneIdx);
+        ERROR(LogCatag::Asset, "GLB default scene index {} out of range", sceneIdx);
         return;
     }
 
     const auto& scene = scenes[static_cast<size_t>(sceneIdx)];
     if (!scene.has("nodes")) {
-        ERROR("GLB scene[{}] has no nodes", sceneIdx);
+        ERROR(LogCatag::Asset, "GLB scene[{}] has no nodes", sceneIdx);
         return;
     }
 
@@ -248,7 +248,7 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
     for (size_t ni = 0; ni < sceneNodes.size(); ++ni) {
         int nodeIdx = sceneNodes[ni].getInt();
         if (nodeIdx < 0 || static_cast<size_t>(nodeIdx) >= nodes.size()) {
-            WARNING("GLB node index {} out of range", nodeIdx);
+            WARNING(LogCatag::Asset, "GLB node index {} out of range", nodeIdx);
             continue;
         }
 
@@ -257,14 +257,14 @@ void GlbParser::parse(const char* path, Mesh* pMesh) {
 
         int meshIdx = node["mesh"].getInt();
         if (meshIdx < 0 || static_cast<size_t>(meshIdx) >= meshes.size()) {
-            WARNING("GLB mesh index {} out of range", meshIdx);
+            WARNING(LogCatag::Asset, "GLB mesh index {} out of range", meshIdx);
             continue;
         }
 
         parseMesh(meshes[static_cast<size_t>(meshIdx)], pMesh);
     }
 
-    DEBUG(
+    DEBUG(LogCatag::Asset, 
         "GLB Loaded: {}\n"
         "  Positions : {}\n"
         "  Normals   : {}\n"
@@ -300,7 +300,7 @@ void GlbParser::parseMesh(const gltf_json::JsonValue& meshJson, Mesh* pMesh) {
 void GlbParser::parsePrimitive(const gltf_json::JsonValue& primitive,
                                 Mesh* pMesh) {
     if (!m_root || !m_root->has("accessors")) {
-        ERROR("No accessors in GLB JSON");
+        ERROR(LogCatag::Asset, "No accessors in GLB JSON");
         return;
     }
 
@@ -333,7 +333,7 @@ void GlbParser::parsePrimitive(const gltf_json::JsonValue& primitive,
 
     // ---- read attributes ----------------------------------------------------
     if (!primitive.has("attributes")) {
-        ERROR("GLB primitive has no attributes");
+        ERROR(LogCatag::Asset, "GLB primitive has no attributes");
         return;
     }
 
@@ -341,7 +341,7 @@ void GlbParser::parsePrimitive(const gltf_json::JsonValue& primitive,
 
     // --- POSITION (required) ---
     if (!attrs.has("POSITION")) {
-        ERROR("GLB primitive missing POSITION attribute");
+        ERROR(LogCatag::Asset, "GLB primitive missing POSITION attribute");
         return;
     }
 
@@ -425,27 +425,27 @@ void GlbParser::parsePrimitive(const gltf_json::JsonValue& primitive,
 // =========================================================================
 std::vector<u8> GlbParser::readAccessorData(const gltf_json::JsonValue& accessor) {
     if (!m_root || !m_root->has("bufferViews")) {
-        ERROR("GLB root missing bufferViews");
+        ERROR(LogCatag::Asset, "GLB root missing bufferViews");
         return {};
     }
 
     const auto& bufferViews = (*m_root)["bufferViews"];
 
     if (!accessor.has("bufferView") || !accessor.has("componentType") || !accessor.has("count")) {
-        ERROR("GLB accessor missing required fields");
+        ERROR(LogCatag::Asset, "GLB accessor missing required fields");
         return {};
     }
 
     int bvIndex = accessor["bufferView"].getInt();
     if (bvIndex < 0 || static_cast<size_t>(bvIndex) >= bufferViews.size()) {
-        ERROR("GLB accessor bufferView index {} out of range", bvIndex);
+        ERROR(LogCatag::Asset, "GLB accessor bufferView index {} out of range", bvIndex);
         return {};
     }
 
     const auto& bv = bufferViews[static_cast<size_t>(bvIndex)];
 
     if (!bv.has("buffer") || !bv.has("byteLength")) {
-        ERROR("GLB bufferView missing required fields");
+        ERROR(LogCatag::Asset, "GLB bufferView missing required fields");
         return {};
     }
 
@@ -457,7 +457,7 @@ std::vector<u8> GlbParser::readAccessorData(const gltf_json::JsonValue& accessor
     }
 
     if (bufferIdx >= m_buffers.size()) {
-        ERROR("GLB bufferView references buffer[{}] but only {} buffers loaded",
+        ERROR(LogCatag::Asset, "GLB bufferView references buffer[{}] but only {} buffers loaded",
               bufferIdx, m_buffers.size());
         return {};
     }
@@ -472,7 +472,7 @@ std::vector<u8> GlbParser::readAccessorData(const gltf_json::JsonValue& accessor
     u32 totalOffset = bvByteOffset + accessorByteOffset;
 
     if (totalOffset + bvByteLength > buffer.size()) {
-        ERROR("GLB accessor data out of bounds: offset={} length={} bufferSize={}",
+        ERROR(LogCatag::Asset, "GLB accessor data out of bounds: offset={} length={} bufferSize={}",
               totalOffset, bvByteLength, buffer.size());
         return {};
     }

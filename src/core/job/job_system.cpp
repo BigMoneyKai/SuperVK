@@ -34,7 +34,7 @@ void JobSystem::destroy() {
     for (u32 i = 0; i < m_thread_count; i++)
         m_workers[i].thread.join();
 
-    m_allocator->deallocate(m_workers, sizeof(Worker) * m_thread_count);
+    m_allocator->deallocate(m_workers);
     m_workers     = nullptr;
     m_thread_count = 0;
 }

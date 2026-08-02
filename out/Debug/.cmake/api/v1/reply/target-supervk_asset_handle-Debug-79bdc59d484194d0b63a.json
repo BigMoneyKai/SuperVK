@@ -1,0 +1,41 @@
+{
+	"abstract" : true,
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library"
+		],
+		"files" : 
+		[
+			"src/asset/handle/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"id" : "supervk_asset_handle::@dd602f827192011cc3c9",
+	"name" : "supervk_asset_handle",
+	"paths" : 
+	{
+		"build" : "src/asset/handle",
+		"source" : "src/asset/handle"
+	},
+	"sources" : [],
+	"type" : "INTERFACE_LIBRARY"
+}

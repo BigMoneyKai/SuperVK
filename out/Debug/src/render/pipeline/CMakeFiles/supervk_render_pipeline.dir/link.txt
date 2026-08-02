@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_render_pipeline.a CMakeFiles/supervk_render_pipeline.dir/shader.cpp.o CMakeFiles/supervk_render_pipeline.dir/pipeline.cpp.o CMakeFiles/supervk_render_pipeline.dir/pipeline_manager.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_render_pipeline.a

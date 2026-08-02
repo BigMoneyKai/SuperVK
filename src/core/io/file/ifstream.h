@@ -7,13 +7,13 @@
 
 class FileInputStream : public IStream {
 public:
-    File* open(const char* path, FileMode mode = FileMode::FILE_MODE_WRITE);
+    FileHandle* open(const char* path, FileMode mode = FileMode::Write);
     u64 read(void* buf, u64 size) override;
 
     b32 is_open() const override;
     u64 size() const override;
     u64 position() const override;
-    b32 seek(u64 offset, FileSeekOrigin origin = FileSeekOrigin::FILE_SEEK_CURRENT) override;
+    b32 seek(u64 offset, FileSeekOrigin origin = FileSeekOrigin::Current) override;
     void close() override;
 
     template<typename T>
@@ -22,5 +22,5 @@ public:
         return *this;
     }
 private:
-    File* m_file;
+    FileHandle* m_file;
 };

@@ -1,121 +1,108 @@
 #pragma once
 
+#include "log_tag.h"
+#include "logger.h"
+#include "logger_attrib.h"
+#include "platform/time.h"
 #include "utils/utils.h"
 
 #include <format>
 #include <print>
 #include <stdlib.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-#define COLOR_RESET     ""
-#define COLOR_ORANGE    ""
-#define COLOR_GREEN     ""
-#define COLOR_PURPLE    ""
-#define COLOR_RED       ""
-#define COLOR_DARK_RED  ""
-#define EMOJI_SMILE     ""
-#define EMOJI_WARNING   ""
-#define EMOJI_ERROR     ""
-#define EMOJI_FATAL     ""
-#define EMOJI_OK        ""
-#define EMOJI_DEBUG     ""
-#define EMOJI_LEXER     ""
-#define EMOJI_PARSER    ""
-#define EMOJI_TREE      ""
-#define EMOJI_IR        ""
-#define EMOJI_CODEGEN   ""
-#define EMOJI_LINKER    ""
-#define EMOJI_RUN       ""
-#define EMOJI_DEVIL     ""
-#define EMOJI_ALERT     ""
-#else
-#define COLOR_RESET     "\033[0m"
-#define COLOR_ORANGE    "\033[38;5;208m"
-#define COLOR_GREEN     "\033[32m"
-#define COLOR_PURPLE    "\033[35m"
-#define COLOR_RED       "\033[91m"
-#define COLOR_DARK_RED  "\033[31m"
-#define EMOJI_SMILE     "😄"
-#define EMOJI_WARNING   "⚠️"
-#define EMOJI_ERROR     "❌"
-#define EMOJI_FATAL     "💥"
-#define EMOJI_OK        "✅"
-#define EMOJI_DEBUG     "🐛"
-#define EMOJI_LEXER     "🔤"
-#define EMOJI_PARSER    "🧩"
-#define EMOJI_TREE      "🌳"
-#define EMOJI_IR        "🧠"
-#define EMOJI_CODEGEN   "⚙️"
-#define EMOJI_LINKER    "🔗"
-#define EMOJI_RUN       "🚀"
-#define EMOJI_DEVIL     "😈"
-#define EMOJI_ALERT     "🚨"
-#endif
-
-
 #ifdef TRACE_MODE
-#define TRACE(fmt, ...) \
-    do { \
-        std::print("{} {}[TRACE] in \"{}\" {}:{} [TRACE] {}\n", \
-            EMOJI_OK, COLOR_GREEN, __func__, __FILE__, __LINE__, COLOR_PURPLE, \
-            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
-    } while(0)
+#define TRACE(catag, fmt, ...)                                                 \
+  do {                                                                         \
+    LogMsg msg{                                                                \
+        LogLevel::Trace, catag,                                                \
+        Logger::id(),    std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),  \
+        __func__,        __FILE__,                                             \
+        __LINE__,        static_cast<u64>(timer_now_ms() * 1000.0)};           \
+    Logger::submit(std::move(msg));                                            \
+  } while (0)
 #else
-#define TRACE(...) ((void)0)
+#define TRACE(catag, fmt, ...) ((void)0)
 #endif
 
 #ifndef NDEBUG
-#define DEBUG(fmt, ...) \
-    do { \
-        std::print("{}{} {}[DEBUG]{} {}\n", \
-            EMOJI_RUN, EMOJI_CODEGEN, COLOR_ORANGE, COLOR_RESET, \
-            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
-    } while(0)
+#define DEBUG(catag, fmt, ...)                                                 \
+  do {                                                                         \
+    LogMsg msg{                                                                \
+        LogLevel::Debug, catag,                                                \
+        Logger::id(),    std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),  \
+        __func__,        __FILE__,                                             \
+        __LINE__,        static_cast<u64>(timer_now_ms() * 1000.0)};           \
+    Logger::submit(std::move(msg));                                            \
+  } while (0)
 #else
-#define DEBUG(...) ((void)0)
+#define DEBUG(catag, fmt, ...) ((void)0)
 #endif
 
-#define INFO(fmt, ...) \
-    do { \
-        std::print("{}{} {}[INFO]{} {}\n", \
-            EMOJI_OK, EMOJI_SMILE, COLOR_GREEN, COLOR_RESET, \
-            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
-    } while(0)
+#define INFO(catag, fmt, ...)                                                  \
+  do {                                                                         \
+    LogMsg msg{                                                                \
+        LogLevel::Info, catag,                                                 \
+        Logger::id(),   std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),   \
+        __func__,       __FILE__,                                              \
+        __LINE__,       static_cast<u64>(timer_now_ms() * 1000.0)};            \
+    Logger::submit(std::move(msg));                                            \
+  } while (0)
 
-#define WARNING(fmt, ...) \
-    do { \
-        std::print(stderr, "{}{} in \"{}\" {}:{} {}[WARNING]{} {}\n", \
-            EMOJI_DEVIL, EMOJI_WARNING, __func__, __FILE__, __LINE__, \
-            COLOR_PURPLE, COLOR_RESET, \
-            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
-    } while(0)
+#define WARNING(catag, fmt, ...)                                               \
+  do {                                                                         \
+    LogMsg msg{LogLevel::Warning,                                              \
+               catag,                                                          \
+               Logger::id(),                                                   \
+               std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),            \
+               __func__,                                                       \
+               __FILE__,                                                       \
+               __LINE__,                                                       \
+               static_cast<u64>(timer_now_ms() * 1000.0)};                     \
+    Logger::submit(std::move(msg));                                            \
+  } while (0)
 
-#define ERROR(fmt, ...) \
-    do { \
-        std::print(stderr, "{}{} in \"{}\" {}:{} {}[ERROR]{} {}\n", \
-            EMOJI_ERROR, EMOJI_DEBUG, __func__, __FILE__, __LINE__, \
-            COLOR_RED, COLOR_RESET, \
-            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
-    } while(0)
+#define ERROR(catag, fmt, ...)                                                 \
+  do {                                                                         \
+    LogMsg msg{                                                                \
+        LogLevel::Error, catag,                                                \
+        Logger::id(),    std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),  \
+        __func__,        __FILE__,                                             \
+        __LINE__,        static_cast<u64>(timer_now_ms() * 1000.0)};           \
+    Logger::submit(std::move(msg));                                            \
+  } while (0)
 
-#define FATAL(fmt, ...) \
-    do { \
-        std::print(stderr, "{}{} in \"{}\" {}:{} {}[FATAL]{} {}\n", \
-            EMOJI_ALERT, EMOJI_FATAL, __func__, __FILE__, __LINE__, \
-            COLOR_DARK_RED, COLOR_RESET, \
-            std::format(fmt __VA_OPT__(,) __VA_ARGS__)); \
-        failure_exit(); \
-    } while(0)
+#define FATAL(catag, fmt, ...)                                                 \
+  do {                                                                         \
+    LogMsg msg{                                                                \
+        LogLevel::Fatal, catag,                                                \
+        Logger::id(),    std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),  \
+        __func__,        __FILE__,                                             \
+        __LINE__,        static_cast<u64>(timer_now_ms() * 1000.0)};           \
+    Logger::submit(std::move(msg));                                            \
+    failure_exit();                                                            \
+  } while (0)
+// #define INFO(catag, fmt, ...)   (void(0)) \
+// #define WARNING(catag, fmt, ...) (void(0)) \
+// #define ERROR(catag, fmt, ...)   (void(0)) \
+// #define FATAL(catag, fmt, ...)   failure_exit(); \
 
+// Vulkan debug
 #ifndef NDEBUG
-#define VK_CHECK_RESULT(func)\
-    do { \
-        VkResult result = func; \
-        if(result != VK_SUCCESS) { \
-            FATAL("Failed to load " #func); \
-        } \
-        TRACE("Success to load " #func); \
-    } while(0)
+#define VK_CHECK_RESULT(expr)                                                  \
+  do {                                                                         \
+    VkResult result = (expr);                                                  \
+    if (result != VK_SUCCESS) {                                                \
+      LogMsg msg{.level = LogLevel::Fatal,                                     \
+                 .catag = LogCatag::Vulkan,                                    \
+                 .id = Logger::id(),                                           \
+                 .msg = "Vulkan error: ",                                      \
+                 .func = __func__,                                             \
+                 .file = __FILE__,                                             \
+                 .line = __LINE__,                                             \
+                 .timestamp = static_cast<u64>(timer_now_ms() * 1000.0)};      \
+      Logger::submit(std::move(msg));                                          \
+    }                                                                          \
+  } while (0)
 #else
 #define VK_CHECK_RESULT(func) (func)
 #endif

@@ -6,3 +6,4 @@ cmake-build-debug/
 .claude/
 shaders/spv/
 .DS_Store
+AGENTS.md

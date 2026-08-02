@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_core_job.a CMakeFiles/supervk_core_job.dir/job.cpp.o CMakeFiles/supervk_core_job.dir/job_queue.cpp.o CMakeFiles/supervk_core_job.dir/job_system.cpp.o CMakeFiles/supervk_core_job.dir/worker.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_core_job.a

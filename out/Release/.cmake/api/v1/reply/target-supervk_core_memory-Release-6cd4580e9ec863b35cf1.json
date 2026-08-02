@@ -1,0 +1,206 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "src/core/memory/libsupervk_core_memory.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_libraries",
+			"target_include_directories",
+			"target_sources"
+		],
+		"files" : 
+		[
+			"src/core/memory/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 17,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 13,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 3,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"compileDependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_platform::@fcacbf0dd79acbb6fcc2"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_debug::@d5b88a124f7f55756539"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "Vulkan::Vulkan::@cbe6382dd8d770d77c39"
+		}
+	],
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-O3 -DNDEBUG -std=c++23 -arch arm64"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/Users/gaodekai/Desktop/supervk/src"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "23"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"id" : "supervk_core_debug::@d5b88a124f7f55756539"
+		}
+	],
+	"id" : "supervk_core_memory::@cbe6382dd8d770d77c39",
+	"interfaceLinkLibraries" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_platform::@fcacbf0dd79acbb6fcc2"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_debug::@d5b88a124f7f55756539"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "Vulkan::Vulkan::@cbe6382dd8d770d77c39"
+		}
+	],
+	"linkLibraries" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_platform::@fcacbf0dd79acbb6fcc2"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_debug::@d5b88a124f7f55756539"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "Vulkan::Vulkan::@cbe6382dd8d770d77c39"
+		}
+	],
+	"name" : "supervk_core_memory",
+	"nameOnDisk" : "libsupervk_core_memory.a",
+	"paths" : 
+	{
+		"build" : "src/core/memory",
+		"source" : "src/core/memory"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "src/core/memory/linear_allocator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "src/core/memory/stack_allocator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "src/core/memory/pool_allocator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "src/core/memory/heap_allocator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "src/core/memory/allocator.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

@@ -50,7 +50,7 @@ void Renderer::init(const RendererDesc& desc) {
             m_swapchain.extent());
     }
 
-    DEBUG("Renderer initialized");
+    DEBUG(LogCatag::Render, "Renderer initialized");
 }
 
 void Renderer::render(Scene& scene) {
@@ -109,7 +109,7 @@ void Renderer::drawFrame(Scene& scene) {
         VK_NULL_HANDLE,
         &m_imageIndex);
     if (result != VK_SUCCESS) {
-        WARNING("Failed to acquire swapchain image");
+        WARNING(LogCatag::Render, "Failed to acquire swapchain image");
         return;
     }
     auto finishSem = m_frameResource.renderFinishedSemaphore(m_imageIndex);
@@ -125,7 +125,7 @@ void Renderer::drawFrame(Scene& scene) {
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
     if (vkBeginCommandBuffer(cmdBuf, &beginInfo) != VK_SUCCESS) {
-        FATAL("Failed to record command buffer");
+        FATAL(LogCatag::Render, "Failed to record command buffer");
     }
 
     VkRenderPassBeginInfo renderPassBeginInfo{};
@@ -189,7 +189,7 @@ void Renderer::drawFrame(Scene& scene) {
     vkCmdEndRenderPass(cmdBuf);
 
     if (vkEndCommandBuffer(cmdBuf) != VK_SUCCESS) {
-        FATAL("Failed to record command buffer");
+        FATAL(LogCatag::Render, "Failed to record command buffer");
     }
 
     // Submit command buffer
@@ -211,7 +211,7 @@ void Renderer::drawFrame(Scene& scene) {
             1,
             &submitInfo,
             fence) != VK_SUCCESS) {
-        FATAL("Failed to submit draw command buffer");
+        FATAL(LogCatag::Render, "Failed to submit draw command buffer");
     }
 
     // Present

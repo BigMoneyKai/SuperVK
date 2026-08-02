@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_asset_loader.a CMakeFiles/supervk_asset_loader.dir/loader.cpp.o CMakeFiles/supervk_asset_loader.dir/mesh_loader.cpp.o CMakeFiles/supervk_asset_loader.dir/texture_loader.cpp.o CMakeFiles/supervk_asset_loader.dir/material_loader.cpp.o CMakeFiles/supervk_asset_loader.dir/shader_loader.cpp.o CMakeFiles/supervk_asset_loader.dir/animation_loader.cpp.o CMakeFiles/supervk_asset_loader.dir/skeleton_loader.cpp.o CMakeFiles/supervk_asset_loader.dir/scene_loader.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_asset_loader.a

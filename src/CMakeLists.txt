@@ -14,6 +14,15 @@ add_executable(supervk
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_DEBUG_BINARY_DIR}/bin)
 
+# remove sanitizer when releasing
+set(CMAKE_CXX_FLAGS_DEBUG
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer"
+)
+
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address"
+)
+
 find_package(Vulkan REQUIRED)
 
 target_include_directories(supervk PRIVATE
@@ -26,7 +35,6 @@ target_include_directories(supervk PRIVATE
 
 target_link_libraries(supervk PRIVATE
     supervk_app
-    supervk_debug
     supervk_core
     supervk_scene
     supervk_render

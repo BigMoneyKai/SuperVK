@@ -1,71 +1,70 @@
 #include "heap_allocator.h"
+#include "alloc_counter.h"
+#include "allocator_type.h"
 #include "defines.h"
 #include "platform/memory.h"
 #include "utils/utils.h"
-#include "allocator_type.h"
-#include "alloc_counter.h"
 
-#ifndef NDEBUG
-HeapAllocator& HeapAllocator::instance() {
-    static HeapAllocator s_instance;
-    return s_instance;
+HeapAllocator &HeapAllocator::instance() {
+  static HeapAllocator s_instance;
+  return s_instance;
 }
 
-void* HeapAllocator::allocate(u64 size, u64 alignment) {
-    constexpr u64 headerAlignment = alignof(Header);
-    u64 headerSize = align_up(sizeof(Header), headerAlignment);
-    u64 allocAlignment = alignment > headerAlignment ? alignment : headerAlignment;
+void *HeapAllocator::allocate(u64 size, u64 alignment) {
+  u64 allocAlignment =
+      alignment > alignof(Header) ? alignment : alignof(Header);
+  u64 headerSize = align_up(sizeof(Header), alignof(Header));
+  u64 guardSize = sizeof(u32);
+  u64 userOffset = headerSize + guardSize;
 
-    u8* realPtr = static_cast<u8*>(platform_aligned_alloc(size + headerSize, allocAlignment));
-    if(!realPtr) {
-        return realPtr;
-    }
-    u8* userPtr = realPtr + headerSize;
-    Header* header = reinterpret_cast<Header*>(realPtr);
-    header->size = size;
-    header->alignment = alignment;
-    header->allocationId = AllocCounter::add();
-    header->allocatorId = AllocatorType::Heap;
-    header->state = HeaderState::Allocated;
-    header->magic = HeaderState::Magic;
+  u8 *realPtr = static_cast<u8 *>(platform_aligned_alloc(
+      userOffset + guardSize + size + guardSize, allocAlignment));
 
-    m_usedSize += size;
-    m_freeSize -= size;
-    return userPtr;
+  u8 *userPtr = realPtr + userOffset;
+
+  Header *header = reinterpret_cast<Header *>(realPtr);
+  header->size = size;
+  header->alignment = allocAlignment;
+  header->allocationId = AllocCounter::add();
+  header->allocatorId = AllocatorType::Heap;
+  header->state = HeaderState::Allocated;
+  header->magic = HeaderState::Magic;
+
+  HeaderState *frontGuard =
+      reinterpret_cast<HeaderState *>(realPtr + headerSize);
+  *frontGuard = HeaderState::FrontGuard;
+  HeaderState *backGuard =
+      reinterpret_cast<HeaderState *>(realPtr + headerSize + guardSize + size);
+  *backGuard = HeaderState::BackGuard;
+
+  m_usedSize += size;
+
+  return userPtr;
 }
 
-void HeapAllocator::deallocate(void* ptr, u64 size) {
-    if (!ptr) {
-        return;
-    }
-    constexpr u64 HeaderAlignment = alignof(Header);
-    const u64 headerSize = align_up(sizeof(Header), HeaderAlignment);
-    u8* realPtr = reinterpret_cast<u8*>(static_cast<u8*>(ptr) - headerSize);
-    Header* header = reinterpret_cast<Header*>(realPtr);
+void HeapAllocator::deallocate(void *ptr) {
+  if (!ptr) {
+    return;
+  }
+  u64 headerSize = align_up(sizeof(Header), alignof(Header));
+  u64 guardSize = sizeof(u32);
+  u64 userOffset = headerSize + guardSize;
 
-    header->state = HeaderState::Freed;
+  u8 *realPtr = reinterpret_cast<u8 *>(static_cast<u8 *>(ptr) - userOffset);
+  Header *header = reinterpret_cast<Header *>(realPtr);
+  SV_ASSERT(header->magic == HeaderState::Magic, "Invalid allocation");
 
-    m_usedSize -= size;
-    m_freeSize += size;
-    platform_aligned_free(realPtr);
+  HeaderState *frontGuard =
+      reinterpret_cast<HeaderState *>(realPtr + headerSize);
+  SV_ASSERT(static_cast<u32>(*frontGuard) == FRONT_GUARD,
+            "Front guard corrupted");
+  HeaderState *backGuard = reinterpret_cast<HeaderState *>(
+      realPtr + headerSize + guardSize + header->size);
+  SV_ASSERT(static_cast<u32>(*backGuard) == BACK_GUARD, "Back guard corrupted");
+
+  SV_ASSERT(header->state == HeaderState::Allocated, "Double free detected");
+  header->state = HeaderState::Freed;
+
+  m_usedSize -= header->size;
+  platform_aligned_free(realPtr);
 }
-#else 
-HeapAllocator& HeapAllocator::instance() {
-    static HeapAllocator s_instance;
-    return s_instance;
-}
-
-void* HeapAllocator::allocate(u64 size, u64 alignment) {
-    void* ptr = platform_aligned_alloc(size, alignment);
-
-    return ptr;
-}
-
-void HeapAllocator::deallocate(void* ptr, u64 size) {
-    if (!ptr) {
-        return;
-    }
-
-    platform_aligned_free(ptr);
-}
-#endif

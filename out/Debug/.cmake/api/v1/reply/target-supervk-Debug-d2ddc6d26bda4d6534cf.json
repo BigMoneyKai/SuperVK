@@ -1,0 +1,953 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "src/supervk"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"target_link_libraries",
+			"add_dependencies",
+			"include",
+			"add_custom_command",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"src/CMakeLists.txt",
+			"src/render/CMakeLists.txt",
+			"src/render/descriptor/CMakeLists.txt",
+			"src/render/frame/CMakeLists.txt",
+			"src/render/pipeline/CMakeLists.txt",
+			"src/asset/CMakeLists.txt",
+			"src/core/container/hashmap/CMakeLists.txt",
+			"src/asset/database/CMakeLists.txt",
+			"src/asset/manager/CMakeLists.txt",
+			"src/asset/importer/CMakeLists.txt",
+			"src/scene/CMakeLists.txt",
+			"src/render/base/CMakeLists.txt",
+			"src/render/resource/CMakeLists.txt",
+			"src/asset/assets/CMakeLists.txt",
+			"src/asset/loader/CMakeLists.txt",
+			"src/asset/cache/CMakeLists.txt",
+			"src/app/CMakeLists.txt",
+			"src/core/container/array/CMakeLists.txt",
+			"src/core/job/CMakeLists.txt",
+			"src/core/CMakeLists.txt",
+			"src/core/memory/CMakeLists.txt",
+			"src/core/io/CMakeLists.txt",
+			"thirdparty/glfw/src/CMakeLists.txt",
+			"src/utils/CMakeLists.txt",
+			"src/core/container/queue/CMakeLists.txt",
+			"src/window/CMakeLists.txt",
+			"cmake/shaders.cmake",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 11,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 36,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 23,
+				"parent" : 3
+			},
+			{
+				"file" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 2,
+				"line" : 19,
+				"parent" : 5
+			},
+			{
+				"file" : 3
+			},
+			{
+				"command" : 1,
+				"file" : 3,
+				"line" : 18,
+				"parent" : 7
+			},
+			{
+				"file" : 4
+			},
+			{
+				"command" : 1,
+				"file" : 4,
+				"line" : 17,
+				"parent" : 9
+			},
+			{
+				"file" : 5
+			},
+			{
+				"command" : 1,
+				"file" : 5,
+				"line" : 22,
+				"parent" : 11
+			},
+			{
+				"file" : 6
+			},
+			{
+				"command" : 1,
+				"file" : 6,
+				"line" : 9,
+				"parent" : 13
+			},
+			{
+				"file" : 7
+			},
+			{
+				"command" : 1,
+				"file" : 7,
+				"line" : 14,
+				"parent" : 15
+			},
+			{
+				"file" : 8
+			},
+			{
+				"command" : 1,
+				"file" : 8,
+				"line" : 21,
+				"parent" : 17
+			},
+			{
+				"file" : 9
+			},
+			{
+				"command" : 1,
+				"file" : 9,
+				"line" : 17,
+				"parent" : 19
+			},
+			{
+				"file" : 10
+			},
+			{
+				"command" : 1,
+				"file" : 10,
+				"line" : 19,
+				"parent" : 21
+			},
+			{
+				"file" : 11
+			},
+			{
+				"command" : 1,
+				"file" : 11,
+				"line" : 22,
+				"parent" : 23
+			},
+			{
+				"file" : 12
+			},
+			{
+				"command" : 1,
+				"file" : 12,
+				"line" : 22,
+				"parent" : 25
+			},
+			{
+				"file" : 13
+			},
+			{
+				"command" : 1,
+				"file" : 13,
+				"line" : 21,
+				"parent" : 27
+			},
+			{
+				"file" : 14
+			},
+			{
+				"command" : 1,
+				"file" : 14,
+				"line" : 22,
+				"parent" : 29
+			},
+			{
+				"file" : 15
+			},
+			{
+				"command" : 1,
+				"file" : 15,
+				"line" : 13,
+				"parent" : 31
+			},
+			{
+				"file" : 16
+			},
+			{
+				"command" : 1,
+				"file" : 16,
+				"line" : 16,
+				"parent" : 33
+			},
+			{
+				"file" : 17
+			},
+			{
+				"command" : 1,
+				"file" : 17,
+				"line" : 9,
+				"parent" : 35
+			},
+			{
+				"file" : 18
+			},
+			{
+				"command" : 1,
+				"file" : 18,
+				"line" : 16,
+				"parent" : 37
+			},
+			{
+				"file" : 19
+			},
+			{
+				"command" : 1,
+				"file" : 19,
+				"line" : 16,
+				"parent" : 39
+			},
+			{
+				"file" : 20
+			},
+			{
+				"command" : 1,
+				"file" : 20,
+				"line" : 17,
+				"parent" : 41
+			},
+			{
+				"file" : 21
+			},
+			{
+				"command" : 1,
+				"file" : 21,
+				"line" : 22,
+				"parent" : 43
+			},
+			{
+				"file" : 22
+			},
+			{
+				"command" : 1,
+				"file" : 22,
+				"line" : 146,
+				"parent" : 45
+			},
+			{
+				"command" : 1,
+				"file" : 22,
+				"line" : 238,
+				"parent" : 45
+			},
+			{
+				"file" : 23
+			},
+			{
+				"command" : 1,
+				"file" : 23,
+				"line" : 15,
+				"parent" : 48
+			},
+			{
+				"file" : 24
+			},
+			{
+				"command" : 1,
+				"file" : 24,
+				"line" : 9,
+				"parent" : 50
+			},
+			{
+				"file" : 25
+			},
+			{
+				"command" : 1,
+				"file" : 25,
+				"line" : 15,
+				"parent" : 52
+			},
+			{
+				"file" : 27
+			},
+			{
+				"command" : 3,
+				"file" : 27,
+				"line" : 27,
+				"parent" : 54
+			},
+			{
+				"file" : 26,
+				"parent" : 55
+			},
+			{
+				"command" : 2,
+				"file" : 26,
+				"line" : 40,
+				"parent" : 56
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 53,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 28,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"compileDependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_app::@ff93792cf40911dae1b8"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core::@0618756b1ff51bca1a0e"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_scene::@3bc89d2bd90dcf4297f5"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_render::@e50e1ac4f031f1d89846"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_input::@fbb2a56cb88dc49cea17"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_window::@804ce69db47ad937a18a"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_utils::@f1b38b22aeb65474a6c5"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_platform::@fcacbf0dd79acbb6fcc2"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset_parser::@2fae37a075992bd20d88"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset::@b28e4dbb404e1b01cbf8"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "Vulkan::Vulkan::@145eef247bfb46b6828c"
+		}
+	],
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -fsanitize=address -fno-omit-frame-pointer -std=c++23 -arch arm64"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 59,
+					"path" : "/Users/gaodekai/Desktop/supervk/src"
+				},
+				{
+					"backtrace" : 59,
+					"path" : "/Users/gaodekai/Desktop/supervk/thirdparty/glm"
+				},
+				{
+					"backtrace" : 59,
+					"path" : "/Users/gaodekai/Desktop/supervk/thirdparty/glfw/include"
+				},
+				{
+					"backtrace" : 59,
+					"path" : "/Users/gaodekai/Desktop/supervk/thirdparty/stb"
+				},
+				{
+					"backtrace" : 59,
+					"path" : "/Users/gaodekai/Desktop/supervk/thirdparty/benchmark"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/gaodekai/Desktop/supervk/src/core/container"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "23"
+			},
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_app::@ff93792cf40911dae1b8"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_memory::@cbe6382dd8d770d77c39"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_job::@d9a66d8e6b1bf0a618dc"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_scene::@3bc89d2bd90dcf4297f5"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_render::@e50e1ac4f031f1d89846"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_render_base::@18cd292a4e0238f58331"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_render_descriptor::@8ab4395eb6018b52857a"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_render_frame::@b72e6b716bab0346f929"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_render_pipeline::@25128b24e2f7f5f2f68e"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_render_resource::@567af7ba625b50da49bd"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_input::@fbb2a56cb88dc49cea17"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_window::@804ce69db47ad937a18a"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_platform::@fcacbf0dd79acbb6fcc2"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_utils::@f1b38b22aeb65474a6c5"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset::@b28e4dbb404e1b01cbf8"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset_database::@ad713c4af30f50fa0810"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset_parser::@2fae37a075992bd20d88"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset_assets::@72141b72e37f921ddc41"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset_manager::@16523b8c1f757383fc41"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset_loader::@1c76c9735b9b2e25bfcb"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset_cache::@6c6d388b4f58f32c22d5"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "glm::@f1b70c6d19f780db02f3"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "glfw::@66b0edeafaa5c4890854"
+		},
+		{
+			"backtrace" : 57,
+			"id" : "shaders::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "supervk::@145eef247bfb46b6828c",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-g -fsanitize=address -fno-omit-frame-pointer",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-Wl,-search_paths_first -Wl,-headerpad_max_install_names",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-fsanitize=address",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-Wl,-rpath,/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "app/libsupervk_app.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "scene/libsupervk_scene.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "render/libsupervk_render.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "input/libsupervk_input.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "window/libsupervk_window.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "utils/libsupervk_utils.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "platform/libsupervk_platform.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "asset/importer/libsupervk_asset_parser.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "asset/libsupervk_asset.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "render/descriptor/libsupervk_render_descriptor.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "render/frame/libsupervk_render_frame.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 8,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "render/pipeline/libsupervk_render_pipeline.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 10,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 12,
+				"fragment" : "asset/database/libsupervk_asset_database.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 14,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 16,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 12,
+				"fragment" : "asset/manager/libsupervk_asset_manager.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 18,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 12,
+				"fragment" : "asset/loader/libsupervk_asset_loader.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "asset/importer/libsupervk_asset_parser.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 20,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 12,
+				"fragment" : "asset/assets/libsupervk_asset_assets.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "scene/libsupervk_scene.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 22,
+				"fragment" : "render/resource/libsupervk_render_resource.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "render/base/libsupervk_render_base.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 24,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 26,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 22,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 28,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 30,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 12,
+				"fragment" : "asset/cache/libsupervk_asset_cache.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 32,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 12,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 34,
+				"fragment" : "core/job/libsupervk_core_job.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 36,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 38,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 34,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 40,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 40,
+				"fragment" : "core/memory/libsupervk_core_memory.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 40,
+				"fragment" : "core/io/libsupervk_core_io.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "core/debug/libsupervk_core_debug.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 40,
+				"fragment" : "core/memory/libsupervk_core_memory.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 40,
+				"fragment" : "core/io/libsupervk_core_io.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "core/debug/libsupervk_core_debug.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 42,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 44,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "utils/libsupervk_utils.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 34,
+				"fragment" : "../thirdparty/glm/glm/libglm.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 34,
+				"fragment" : "../thirdparty/glfw/src/libglfw3.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 46,
+				"fragment" : "-framework Cocoa",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 46,
+				"fragment" : "-framework IOKit",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 46,
+				"fragment" : "-framework QuartzCore",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 47,
+				"fragment" : "-framework CoreFoundation",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 49,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 51,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "platform/libsupervk_platform.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 53,
+				"fragment" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"linkLibraries" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_app::@ff93792cf40911dae1b8"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core::@0618756b1ff51bca1a0e"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_scene::@3bc89d2bd90dcf4297f5"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_render::@e50e1ac4f031f1d89846"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_input::@fbb2a56cb88dc49cea17"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_window::@804ce69db47ad937a18a"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_utils::@f1b38b22aeb65474a6c5"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_platform::@fcacbf0dd79acbb6fcc2"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset_parser::@2fae37a075992bd20d88"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_asset::@b28e4dbb404e1b01cbf8"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "Vulkan::Vulkan::@145eef247bfb46b6828c"
+		}
+	],
+	"name" : "supervk",
+	"nameOnDisk" : "supervk",
+	"orderDependencies" : 
+	[
+		{
+			"backtrace" : 57,
+			"id" : "shaders::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 58,
+			"id" : "supervk::@145eef247bfb46b6828c"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "src",
+		"source" : "src"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/main.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

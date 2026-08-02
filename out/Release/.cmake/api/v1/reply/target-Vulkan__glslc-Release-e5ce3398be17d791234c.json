@@ -1,0 +1,62 @@
+{
+	"abstract" : true,
+	"artifacts" : 
+	[
+		{
+			"path" : "/Users/gaodekai/VulkanSDK/1.4.350.0/macOS/bin/glslc"
+		}
+	],
+	"backtrace" : 3,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"find_package"
+		],
+		"files" : 
+		[
+			"/opt/homebrew/share/cmake/Modules/FindVulkan.cmake",
+			"src/render/base/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 14,
+				"parent" : 0
+			},
+			{
+				"file" : 0,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 733,
+				"parent" : 2
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"id" : "Vulkan::glslc::@18cd292a4e0238f58331",
+	"imported" : true,
+	"local" : true,
+	"name" : "Vulkan::glslc",
+	"nameOnDisk" : "glslc",
+	"paths" : 
+	{
+		"build" : "src/render/base",
+		"source" : "src/render/base"
+	},
+	"sources" : [],
+	"type" : "EXECUTABLE"
+}

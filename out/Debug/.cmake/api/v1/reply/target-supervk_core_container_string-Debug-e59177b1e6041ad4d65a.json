@@ -1,0 +1,78 @@
+{
+	"abstract" : true,
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_libraries"
+		],
+		"files" : 
+		[
+			"src/core/container/string/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 7,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"id" : "supervk_core_container_string::@c3f1d38d95345fee7452",
+	"interfaceCompileDependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_container_iterator::@6da2ca3920b078b40f33"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_platform::@fcacbf0dd79acbb6fcc2"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_memory::@cbe6382dd8d770d77c39"
+		}
+	],
+	"interfaceLinkLibraries" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_container_iterator::@6da2ca3920b078b40f33"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_platform::@fcacbf0dd79acbb6fcc2"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_memory::@cbe6382dd8d770d77c39"
+		}
+	],
+	"name" : "supervk_core_container_string",
+	"paths" : 
+	{
+		"build" : "src/core/container/string",
+		"source" : "src/core/container/string"
+	},
+	"sources" : [],
+	"type" : "INTERFACE_LIBRARY"
+}

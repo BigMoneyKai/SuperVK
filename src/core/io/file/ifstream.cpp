@@ -1,7 +1,7 @@
 #include "ifstream.h"
 #include "platform/file.h"
 
-File* FileInputStream::open(const char* path, FileMode mode) {
+FileHandle* FileInputStream::open(const char* path, FileMode mode) {
     return file_open(path, mode);
 }
 

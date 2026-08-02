@@ -11,7 +11,7 @@ public:
     b32 is_open() const override;
     u64 size() const override;
     u64 position() const override;
-    b32 seek(u64 offset, FileSeekOrigin origin = FileSeekOrigin::FILE_SEEK_CURRENT) override;
+    b32 seek(u64 offset, FileSeekOrigin origin = FileSeekOrigin::Current) override;
     void close() override;
 
     template<typename T>

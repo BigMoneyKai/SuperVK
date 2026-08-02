@@ -1,0 +1,41 @@
+{
+	"abstract" : true,
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library"
+		],
+		"files" : 
+		[
+			"src/core/container/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"id" : "supervk_core_container::@59d0c16d416c48703376",
+	"name" : "supervk_core_container",
+	"paths" : 
+	{
+		"build" : "src/core/container",
+		"source" : "src/core/container"
+	},
+	"sources" : [],
+	"type" : "INTERFACE_LIBRARY"
+}

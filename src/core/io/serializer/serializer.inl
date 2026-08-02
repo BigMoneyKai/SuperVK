@@ -1,35 +1,40 @@
 #pragma once
 
-#include "defines.h"
-#include "serializer.h"
 #include "core/io/stream/istream.h"
 #include "core/io/stream/ostream.h"
+#include "defines.h"
+#include "serializer.h"
 #include <type_traits>
 
-template<typename T>
-requires std::is_trivially_copyable_v<T>
-void serialize(OStream& os, const T& val) {
-    os.write(val);
+template <typename T>
+  requires std::is_trivially_copyable_v<T>
+void serialize(OStream &os, const T &val) {
+  os.write(val);
 }
 
-void serialize(OStream& os, const String& val) {
-    u64 size = val.size();
-    os.write(size);
-    if (size > 0)
-        os.write(val.data(), size);
+SV_FORCE_INLINE void serialize(OStream &os, const String &str) {
+  u64 size = str.size();
+  os.write(size);
+  if (size > 0)
+    os.write(str.data(), size);
 }
 
-template<typename T>
-requires std::is_trivially_copyable_v<T>
-void deserialize(IStream& is, T& val) {
-    is.read(val);
+SV_FORCE_INLINE void serialize(OStream &os, const char *str) {
+  u64 size = strlen(str);
+  os.write(size);
+  if (size > 0)
+    os.write(str, size);
 }
 
-void deserialize(IStream& is, String& val) {
-    u64 size = 0;
-    is.read(size);
-    if (size > 0) {
-        val.resize(size);
-        is.read(val.data(), size);
-    }
+template <typename T>
+  requires std::is_trivially_copyable_v<T>
+void deserialize(IStream &is, T &val) {
+  is.read(val);
+}
+
+SV_FORCE_INLINE void deserialize(IStream &is, String &str) {
+  is.read(str.data(), str.size());
+}
+SV_FORCE_INLINE void deserialize(IStream &is, char *str) {
+  is.read(str, strlen(str));
 }

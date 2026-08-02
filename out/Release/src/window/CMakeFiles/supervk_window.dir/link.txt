@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_window.a CMakeFiles/supervk_window.dir/window_manager.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_window.a

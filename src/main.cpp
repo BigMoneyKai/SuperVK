@@ -1,9 +1,3 @@
-#include "app/app.h"
+#include "entry.h"
 
-int main() {
-    App app;
-    app.init();
-    app.run();
-    app.destroy();
-    return 0;
-}
+MAIN_ENTRY();

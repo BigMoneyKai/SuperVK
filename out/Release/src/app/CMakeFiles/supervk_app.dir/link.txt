@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsupervk_app.a CMakeFiles/supervk_app.dir/app.cpp.o
+/opt/homebrew/opt/llvm/bin/llvm-ranlib libsupervk_app.a

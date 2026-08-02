@@ -20,6 +20,8 @@ target_include_directories(supervk_render_base PRIVATE
 )
 
 target_link_libraries(supervk_render_base PRIVATE
+    supervk_core_debug
+
     Vulkan::Vulkan
     glm
     glfw

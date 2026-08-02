@@ -13,7 +13,7 @@ target_include_directories(supervk_input PRIVATE
 )
 
 target_link_libraries(supervk_input PRIVATE
-    supervk_debug
+    supervk_core_debug
     glm
     glfw
 )

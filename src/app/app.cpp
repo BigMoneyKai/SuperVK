@@ -25,7 +25,7 @@ void App::init(const char* title, DisplayMode mode, u64 threadCount) {
     m_meshHandle = m_assetMan.loadMesh("resource/AlphaBlendModeTest/glTF-Binary/AlphaBlendModeTest.glb");
 
     if (!waitForMeshLoad(m_jobSystem, m_assetMan, m_meshHandle)) {
-        FATAL("App: failed to load initial mesh");
+        FATAL(LogCatag::Asset, "App: failed to load initial mesh");
     }
 
     mesh::Mesh& src = m_assetMan.mesh(m_meshHandle).mesh;

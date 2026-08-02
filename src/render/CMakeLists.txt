@@ -21,6 +21,8 @@ target_include_directories(supervk_render PRIVATE
 )
 
 target_link_libraries(supervk_render PRIVATE
+    supervk_core_debug
+
     supervk_render_base
     supervk_render_descriptor
     supervk_render_frame

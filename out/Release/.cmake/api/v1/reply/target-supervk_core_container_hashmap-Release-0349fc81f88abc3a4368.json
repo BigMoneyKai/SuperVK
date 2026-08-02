@@ -1,0 +1,86 @@
+{
+	"abstract" : true,
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_libraries"
+		],
+		"files" : 
+		[
+			"src/core/container/hashmap/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 9,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"id" : "supervk_core_container_hashmap::@f11a76f5fb225da585bf",
+	"interfaceCompileDependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_container_array::@ce222f56b6ccf7f57892"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_container_iterator::@6da2ca3920b078b40f33"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_container_string::@c3f1d38d95345fee7452"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "Vulkan::Vulkan::@f11a76f5fb225da585bf"
+		}
+	],
+	"interfaceLinkLibraries" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_container_array::@ce222f56b6ccf7f57892"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_container_iterator::@6da2ca3920b078b40f33"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "supervk_core_container_string::@c3f1d38d95345fee7452"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "Vulkan::Vulkan::@f11a76f5fb225da585bf"
+		}
+	],
+	"name" : "supervk_core_container_hashmap",
+	"paths" : 
+	{
+		"build" : "src/core/container/hashmap",
+		"source" : "src/core/container/hashmap"
+	},
+	"sources" : [],
+	"type" : "INTERFACE_LIBRARY"
+}
