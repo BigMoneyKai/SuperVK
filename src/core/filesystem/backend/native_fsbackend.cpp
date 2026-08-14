@@ -16,13 +16,13 @@ b32 NativeFsBackend::open(const FilePath &path, FileState *outState) {
     return SV_FALSE;
   }
   if (fs_directory_exists(path.c_str())) {
-    outState->kind = FileKind::Directory;
+    outState->kind = FileKind::directory;
     outState->size = 0;
     outState->modified = fs_file_modified(path.c_str());
     return SV_TRUE;
   }
   if (fs_file_exists(path.c_str())) {
-    outState->kind = FileKind::File;
+    outState->kind = FileKind::file;
     outState->size = fs_file_size(path.c_str());
     outState->modified = fs_file_modified(path.c_str());
     return SV_TRUE;
@@ -39,7 +39,7 @@ b32 NativeFsBackend::readFile(const FilePath &path, Allocator *a,
   if (!out) {
     return SV_FALSE;
   }
-  FileHandle *f = file_open(path.c_str(), FileMode::Read);
+  FileHandle *f = file_open(path.c_str(), FileMode::read);
   if (!f) {
     return SV_FALSE;
   }

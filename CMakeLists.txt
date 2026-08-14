@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1...3.6)
+cmake_minimum_required(VERSION 3.14)
 
 if(APPLE)
     set(CMAKE_C_COMPILER clang)
@@ -18,13 +18,26 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(BENCHMARK_ENABLE_TESTING OFF)
 
+# Enable CTest at the top level so `ctest` works from the build root.
+# test/ is added before benchmark/, so a plain serial `ctest` runs all
+# unit tests first, then all benchmarks.
+enable_testing()
+
+# remove sanitizer when releasing
+set(CMAKE_CXX_FLAGS_DEBUG
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer"
+)
+
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address"
+)
+
 add_subdirectory(src)
-#add_subdirectory(benchmark)
-add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/glfw)
-add_subdirectory(thirdparty/benchmark)
 
 include(cmake/shaders.cmake)
 include(cmake/install.cmake)
 include(cmake/packaging.cmake)
 
+add_subdirectory(test)
+add_subdirectory(benchmark)

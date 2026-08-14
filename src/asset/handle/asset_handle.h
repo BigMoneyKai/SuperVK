@@ -1,25 +1,15 @@
 #pragma once
 
-#include "defines.h"
-
 #include "asset/asset_type.h"
 
-template<AssetType T>
-struct AssetHandle;
+template <AssetType T> struct AssetHandle;
 
-template<>
-struct AssetHandle<AssetType::Mesh>;
-template<>
-struct AssetHandle<AssetType::Material>;
-template<>
-struct AssetHandle<AssetType::Texture>;
-template<>
-struct AssetHandle<AssetType::Shader>;
-template<>
-struct AssetHandle<AssetType::Animation>;
-template<>
-struct AssetHandle<AssetType::Scene>;
-template<>
-struct AssetHandle<AssetType::Skeleton>;
+template <> struct AssetHandle<AssetType::mesh>;
+template <> struct AssetHandle<AssetType::material>;
+template <> struct AssetHandle<AssetType::texture>;
+template <> struct AssetHandle<AssetType::shader>;
+template <> struct AssetHandle<AssetType::animation>;
+template <> struct AssetHandle<AssetType::scene>;
+template <> struct AssetHandle<AssetType::skeleton>;
 
 #include "asset_handle.inl"

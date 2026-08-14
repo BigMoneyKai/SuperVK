@@ -1,7 +1,6 @@
 #include "heap_allocator.h"
 #include "alloc_counter.h"
 #include "allocator_type.h"
-#include "defines.h"
 #include "platform/memory.h"
 #include "utils/utils.h"
 
@@ -26,16 +25,16 @@ void *HeapAllocator::allocate(u64 size, u64 alignment) {
   header->size = size;
   header->alignment = allocAlignment;
   header->allocationId = AllocCounter::add();
-  header->allocatorId = AllocatorType::Heap;
-  header->state = HeaderState::Allocated;
-  header->magic = HeaderState::Magic;
+  header->allocatorId = AllocatorType::heap;
+  header->state = HeaderState::allocated;
+  header->magic = HeaderState::magic;
 
   HeaderState *frontGuard =
       reinterpret_cast<HeaderState *>(realPtr + headerSize);
-  *frontGuard = HeaderState::FrontGuard;
+  *frontGuard = HeaderState::frontGuard;
   HeaderState *backGuard =
       reinterpret_cast<HeaderState *>(realPtr + headerSize + guardSize + size);
-  *backGuard = HeaderState::BackGuard;
+  *backGuard = HeaderState::backGuard;
 
   m_usedSize += size;
 
@@ -52,7 +51,7 @@ void HeapAllocator::deallocate(void *ptr) {
 
   u8 *realPtr = reinterpret_cast<u8 *>(static_cast<u8 *>(ptr) - userOffset);
   Header *header = reinterpret_cast<Header *>(realPtr);
-  SV_ASSERT(header->magic == HeaderState::Magic, "Invalid allocation");
+  SV_ASSERT(header->magic == HeaderState::magic, "Invalid allocation");
 
   HeaderState *frontGuard =
       reinterpret_cast<HeaderState *>(realPtr + headerSize);
@@ -62,8 +61,8 @@ void HeapAllocator::deallocate(void *ptr) {
       realPtr + headerSize + guardSize + header->size);
   SV_ASSERT(static_cast<u32>(*backGuard) == BACK_GUARD, "Back guard corrupted");
 
-  SV_ASSERT(header->state == HeaderState::Allocated, "Double free detected");
-  header->state = HeaderState::Freed;
+  SV_ASSERT(header->state == HeaderState::allocated, "Double free detected");
+  header->state = HeaderState::freed;
 
   m_usedSize -= header->size;
   platform_aligned_free(realPtr);

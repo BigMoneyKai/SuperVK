@@ -1,13 +1,14 @@
 #include "frame_resource.h"
 #include "core/debug/debugger.h"
-#include "render/base/device.h"
+#include <vulkan/vulkan_core.h>
 
 void FrameResource::init(const VkDevice &device, u32 swapchainImageCount) {
   m_device = device;
   m_swapchainImageCount = swapchainImageCount;
   m_imageAvailableSemaphores.resize(m_framebufferCount);
-  m_renderFinishedSemaphores.resize(m_swapchainImageCount);
+  m_renderFinishedSemaphores.resize(m_framebufferCount);
   m_inFlightFences.resize(m_framebufferCount);
+  m_imagesInFlight.resize(m_swapchainImageCount, VK_NULL_HANDLE);
 }
 
 void FrameResource::createSyncPrimitives() {
@@ -21,18 +22,16 @@ void FrameResource::createSyncPrimitives() {
   for (u32 i = 0; i < m_framebufferCount; ++i) {
     if (vkCreateSemaphore(m_device, &semaphoreInfo, nullptr,
                           &m_imageAvailableSemaphores[i]) != VK_SUCCESS) {
-      FATAL(LogCatag::Vulkan, "Failed to create image available semaphore");
+      FATAL(LogCatag::vulkan, "Failed to create image available semaphore");
     }
 
     if (vkCreateFence(m_device, &fenceInfo, nullptr, &m_inFlightFences[i]) !=
         VK_SUCCESS) {
-      FATAL(LogCatag::Vulkan, "Failed to create in-flight fence");
+      FATAL(LogCatag::vulkan, "Failed to create in-flight fence");
     }
-  }
-  for (u32 i = 0; i < m_swapchainImageCount; ++i) {
     if (vkCreateSemaphore(m_device, &semaphoreInfo, nullptr,
                           &m_renderFinishedSemaphores[i]) != VK_SUCCESS) {
-      FATAL(LogCatag::Vulkan, "Failed to create render finished semaphore");
+      FATAL(LogCatag::vulkan, "Failed to create render finished semaphore");
     }
   }
 }

@@ -55,16 +55,16 @@ void *LinearAllocator::allocate(u64 size, u64 alignment) {
   header->size = size;
   header->alignment = alignment;
   header->allocationId = AllocCounter::add();
-  header->allocatorId = AllocatorType::Linear;
-  header->state = HeaderState::Allocated;
-  header->magic = HeaderState::Magic;
+  header->allocatorId = AllocatorType::linear;
+  header->state = HeaderState::allocated;
+  header->magic = HeaderState::magic;
 
   HeaderState *frontGuard =
       reinterpret_cast<HeaderState *>(headerPtr + headerSize);
-  *frontGuard = HeaderState::FrontGuard;
+  *frontGuard = HeaderState::frontGuard;
   HeaderState *backGuard =
       reinterpret_cast<HeaderState *>(headerPtr + userOffset + size);
-  *backGuard = HeaderState::BackGuard;
+  *backGuard = HeaderState::backGuard;
 
   m_usedSize += size;
   m_cursor = userDataEnd;

@@ -1,9 +1,11 @@
 #pragma once
 
+#include "core/define/compiler.h"
+#include "core/define/types.h"
 #include "core/io/stream/istream.h"
 #include "core/io/stream/ostream.h"
-#include "defines.h"
 #include "serializer.h"
+
 #include <type_traits>
 
 template <typename T>

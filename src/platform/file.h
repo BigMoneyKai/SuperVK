@@ -1,17 +1,17 @@
 #pragma once
 
-#include "defines.h"
+#include "core/define/types.h"
 
 struct FileHandle;
 
 enum class FileMode : u16 {
-  Read = 1 << 0,
-  Write = 1 << 1,
-  Append = 1 << 2,
-  ReadWrite = (1 << 0) | (1 << 1),
+  read = 1 << 0,
+  write = 1 << 1,
+  append = 1 << 2,
+  readWrite = (1 << 0) | (1 << 1),
 };
 
-enum class FileSeekOrigin : u16 { Begin, Current, End };
+enum class FileSeekOrigin : u16 { begin, current, end };
 
 FileHandle *file_open(const char *path, FileMode mode);
 void file_close(FileHandle *f);

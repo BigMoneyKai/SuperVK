@@ -3,7 +3,6 @@
 #include "array.hpp"
 
 #include "core/memory/allocator.h"
-#include "defines.h"
 #include "platform/memory.h"
 
 #include <algorithm>
@@ -33,7 +32,7 @@ Array<T>::Array(u64 size, const T &value, Allocator *a)
 template <typename T>
 Array<T>::Array(void *data, u64 size, Allocator *a) : m_allocator(a) {
   resize(size);
-  memcpy(m_data, data, size);
+  memcpy(m_data, data, size * sizeof(T));
 }
 
 template <typename T>
@@ -127,8 +126,9 @@ template <typename T> void Array<T>::reserve(u64 newCapacity) {
 template <typename T> void Array<T>::resize(u64 newSize, const T &value) {
   if (newSize <= m_capacity) {
     if (newSize > m_size) {
-      for (u64 i = m_size; i < newSize; i++)
+      for (u64 i = m_size; i < newSize; i++) {
         new (m_data + i) T(value);
+      }
     } else {
       if constexpr (!std::is_trivially_destructible_v<T>) {
         for (u64 i = newSize; i < m_size; i++)
@@ -144,16 +144,18 @@ template <typename T> void Array<T>::resize(u64 newSize, const T &value) {
   }
 
   T *newData = nullptr;
+  u64 newCapacity = newSize + (newSize >> 1); // 1.5x, integer
   if (m_allocator) {
-    newData = static_cast<T *>(m_allocator->allocate(newSize * sizeof(T)));
+    newData = static_cast<T *>(m_allocator->allocate(newCapacity * sizeof(T)));
   } else {
     newData = static_cast<T *>(
-        platform_aligned_alloc(newSize * sizeof(T), ALIGNMENT));
+        platform_aligned_alloc(newCapacity * sizeof(T), ALIGNMENT));
   }
 
   u64 copyCount = std::min(m_size, newSize);
   for (u64 i = 0; i < copyCount; i++) {
     new (newData + i) T(std::move_if_noexcept(m_data[i]));
+    m_data[i].~T();
   }
   for (u64 i = copyCount; i < newSize; i++) {
     new (newData + i) T(value);
@@ -170,8 +172,7 @@ template <typename T> void Array<T>::resize(u64 newSize, const T &value) {
   } else {
     platform_aligned_free(m_data);
   }
-
-  m_capacity = newSize + (newSize >> 1); // 1.5x, integer
+  m_capacity = newCapacity;
   m_size = newSize;
   m_data = newData;
 }
@@ -194,6 +195,16 @@ template <typename T> T &Array<T>::operator[](u64 i) {
 }
 
 template <typename T> const T &Array<T>::operator[](u64 i) const {
+  SV_ASSERT(i < m_size, "Index {} out of bound", i);
+  return m_data[i];
+}
+
+template <typename T> T &Array<T>::at(u64 i) {
+  SV_ASSERT(i < m_size, "Index {} out of bound", i);
+  return m_data[i];
+}
+
+template <typename T> const T &Array<T>::at(u64 i) const {
   SV_ASSERT(i < m_size, "Index {} out of bound", i);
   return m_data[i];
 }
@@ -265,7 +276,7 @@ template <typename T> void Array<T>::pop_back() {
 }
 
 template <typename T> void Array<T>::insert(u64 index, const T &value) {
-  SV_ASSERT(index > m_size, "Index {} out of bound", index);
+  SV_ASSERT(index <= m_size, "Index {} out of bound", index);
 
   if (m_size == m_capacity) {
     u64 newCap = m_capacity == 0 ? 2 : m_capacity + (m_capacity >> 1);

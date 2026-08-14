@@ -16,7 +16,6 @@ target_include_directories(supervk_app PRIVATE
 target_link_libraries(supervk_app PRIVATE
     supervk_render
     supervk_core_job
-    supervk_asset_parser
     supervk_asset
 
     Vulkan::Vulkan

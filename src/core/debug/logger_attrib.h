@@ -1,32 +1,33 @@
 #pragma once
 
 #include "core/container/string/string.hpp"
-#include "defines.h"
+#include "core/define/assert.h"
+#include "core/define/types.h"
 
-enum class LogLevel : u32 { Trace, Debug, Info, Warning, Error, Fatal };
+enum class LogLevel : u32 { trace, debug, info, warning, error, fatal };
 
 enum class LogCatag : u32 {
-  Container = 1 << 0,
-  Memory = 1 << 1,
-  Render = 1 << 2,
-  IO = 1 << 2,
-  Input = 1 << 3,
-  Scene = 1 << 4,
-  Vulkan = 1 << 5,
-  Asset = 1 << 6,
-  JobSystem = 1 << 7,
-  FileSystem = 1 << 8,
-  ECS = 1 << 9,
-  Window = 1 << 10,
-  Platform = 1 << 11,
+  container = 0,
+  memory,
+  render,
+  inputOutput,
+  input,
+  scene,
+  vulkan,
+  asset,
+  jobSystem,
+  fileSystem,
+  entityComponentSystem,
+  window,
+  platform,
 
-  Unknown,
+  unknown,
 
 };
 
 struct alignas(32) LogMsg {
   LogLevel level;
-  LogCatag catag{LogCatag::Unknown};
+  LogCatag catag{LogCatag::unknown};
 
   u64 id{UINT32_MAX};
 

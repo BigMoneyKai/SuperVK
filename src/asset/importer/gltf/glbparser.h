@@ -1,6 +1,5 @@
 #pragma once
 
-#include "defines.h"
 #include "scene/mesh.h"
 
 #include "json_parser.hpp"
@@ -21,28 +20,28 @@
 // ---------------------------------------------------------------------------
 class GlbParser {
 public:
-    void init();
-    void parse(const char* path, Mesh* pMesh);
-    void destroy();
+  void init();
+  void parse(const char *path, Mesh *pMesh);
+  void destroy();
 
 private:
-    // ---- GLB binary header constants ----------------------------------------
-    static constexpr u32 kGlbMagic   = 0x46546C67; // "glTF" little-endian
-    static constexpr u32 kChunkJson  = 0x4E4F534A; // "JSON"
-    static constexpr u32 kChunkBin   = 0x004E4942; // "BIN\0"
+  // ---- GLB binary header constants ----------------------------------------
+  static constexpr u32 kGlbMagic = 0x46546C67;  // "glTF" little-endian
+  static constexpr u32 kChunkJson = 0x4E4F534A; // "JSON"
+  static constexpr u32 kChunkBin = 0x004E4942;  // "BIN\0"
 
-    // ---- mesh / primitive traversal (same logic as glTF) --------------------
-    void parseMesh(const gltf_json::JsonValue& meshJson, Mesh* pMesh);
-    void parsePrimitive(const gltf_json::JsonValue& primitive, Mesh* pMesh);
+  // ---- mesh / primitive traversal (same logic as glTF) --------------------
+  void parseMesh(const gltf_json::JsonValue &meshJson, Mesh *pMesh);
+  void parsePrimitive(const gltf_json::JsonValue &primitive, Mesh *pMesh);
 
-    // ---- accessor reading ---------------------------------------------------
-    std::vector<u8>  readAccessorData(const gltf_json::JsonValue& accessor);
-    u32              getComponentSize(u32 componentType) const;
-    u32              getTypeCount(const std::string& type) const;
+  // ---- accessor reading ---------------------------------------------------
+  std::vector<u8> readAccessorData(const gltf_json::JsonValue &accessor);
+  u32 getComponentSize(u32 componentType) const;
+  u32 getTypeCount(const std::string &type) const;
 
 private:
-    // Per-file state — reset on each parse() call
-    const gltf_json::JsonValue* m_root = nullptr;
-    std::vector<std::vector<u8>> m_buffers;   // raw binary data per buffer index
-    Mesh*                        m_currMesh = nullptr;
+  // Per-file state — reset on each parse() call
+  const gltf_json::JsonValue *m_root = nullptr;
+  std::vector<std::vector<u8>> m_buffers; // raw binary data per buffer index
+  Mesh *m_currMesh = nullptr;
 };

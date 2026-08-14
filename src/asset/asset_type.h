@@ -1,14 +1,14 @@
 #pragma once
 
-#include "defines.h"
+#include "core/define/types.h"
 
 enum class AssetType : u8 {
-    Mesh,
-    Material,
-    Texture,
-    Shader,
-    Animation,
-    Skeleton,
-    Scene
+  mesh,
+  material,
+  texture,
+  shader,
+  animation,
+  skeleton,
+  scene
 
 };

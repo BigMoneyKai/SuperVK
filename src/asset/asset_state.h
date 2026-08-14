@@ -1,20 +1,20 @@
 #pragma once
 
-#include "defines.h"
+#include "core/define/types.h"
 
 enum class AssetState : u8 {
-    // in static resource
-    Unloaded,
+  // in static resource
+  unloaded,
 
-    // cpu operation
-    Uploading,
-    Uploaded,
+  // cpu operation
+  uploading,
+  uploaded,
 
-    // gpu operation
-    Loading,
-    Loaded,
+  // gpu operation
+  loading,
+  loaded,
 
-    Unloading,
-    Failed
-    
+  unloading,
+  failed
+
 };

@@ -3,7 +3,6 @@
 #include "utils/utils.h"
 
 #include <cstring>
-#include <vector>
 
 static const char *bufferTypes[6] = {
     "vertex buffer",  "index buffer",   "staging buffer",
@@ -17,7 +16,7 @@ void Buffer::init(BufferType type, const VkDevice &device,
   m_type = type;
   m_data = data;
   if (m_data == nullptr) {
-    WARNING(LogCatag::Vulkan, "No data in this address");
+    TRACE(LogCatag::vulkan, "No data in this address");
   }
   m_size = size;
   createBuffer();
@@ -38,22 +37,22 @@ void Buffer::destroy() {
 void Buffer::createBuffer() {
   VkBufferUsageFlags usage;
   switch (m_type) {
-  case BT_VERTEX_BUFFER:
+  case BufferType::vertexBuffer:
     usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
     break;
-  case BT_INDEX_BUFFER:
+  case BufferType::indexBuffer:
     usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
     break;
-  case BT_STAGING_BUFFER:
+  case BufferType::stagingBuffer:
     usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     break;
-  case BT_UNIFORM_BUFFER:
+  case BufferType::uniformBuffer:
     usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
     break;
-  case BT_STORAGE_BUFFER:
+  case BufferType::storageBuffer:
     usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     break;
-  case BT_MAX_NUM:
+  case BufferType::maxNum:
     break;
   }
   m_bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -70,27 +69,27 @@ void Buffer::allocateMemory(const VkPhysicalDevice &physicalDevice) {
   m_memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   m_memoryAllocateInfo.allocationSize = m_memoryRequirements.size;
   switch (m_type) {
-  case BT_VERTEX_BUFFER:
-  case BT_INDEX_BUFFER:
-  case BT_STAGING_BUFFER:
+  case BufferType::vertexBuffer:
+  case BufferType::indexBuffer:
+  case BufferType::stagingBuffer:
     m_memoryAllocateInfo.memoryTypeIndex =
         findMemoryType(physicalDevice, m_memoryRequirements.memoryTypeBits,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     break;
-  case BT_UNIFORM_BUFFER:
+  case BufferType::uniformBuffer:
     m_memoryAllocateInfo.memoryTypeIndex =
         findMemoryType(physicalDevice, m_memoryRequirements.memoryTypeBits,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     break;
-  case BT_STORAGE_BUFFER:
+  case BufferType::storageBuffer:
     m_memoryAllocateInfo.memoryTypeIndex =
         findMemoryType(physicalDevice, m_memoryRequirements.memoryTypeBits,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     break;
-  case BT_MAX_NUM:
+  case BufferType::maxNum:
   default:
     break;
   }
@@ -107,10 +106,11 @@ void Buffer::allocateMemory(const VkPhysicalDevice &physicalDevice) {
 }
 
 void Buffer::printDebugInfo() {
-  DEBUG(LogCatag::Render, "Buffer type: {}", bufferTypes[m_type]);
-  DEBUG(LogCatag::Render, "Buffer Size = {}", m_size);
-  DEBUG(LogCatag::Render, "Usage = {}", m_bufferCreateInfo.usage);
-  DEBUG(LogCatag::Render, "MemorySize = {} ",
+  DEBUG(LogCatag::render, "Buffer type: {}",
+        bufferTypes[static_cast<u32>(m_type)]);
+  DEBUG(LogCatag::render, "Buffer Size = {}", m_size);
+  DEBUG(LogCatag::render, "Usage = {}", m_bufferCreateInfo.usage);
+  DEBUG(LogCatag::render, "MemorySize = {}",
         m_memoryAllocateInfo.allocationSize);
 }
 

@@ -3,8 +3,8 @@
 MaterialManager::Handle MaterialManager::load(const String& path) {
     Handle handle = m_assets.size();
     m_assets.emplace_back();
-    m_assets[handle].type   = AssetType::Material;
-    m_assets[handle].state  = AssetState::Loaded;
+    m_assets[handle].type   = AssetType::material;
+    m_assets[handle].state  = AssetState::loaded;
     m_assets[handle].path   = path;
     return handle;
 }

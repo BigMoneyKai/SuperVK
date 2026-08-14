@@ -3,7 +3,6 @@
 #include "core/container/iterator/iterator.hpp"
 #include "core/container/iterator/reverse_iterator.hpp"
 #include "core/container/string/string.hpp"
-#include "defines.h"
 
 class StringView {
 public:
@@ -46,6 +45,7 @@ public:
   const char &operator[](u64 i) const;
   const char &front() const;
   const char &back() const;
+  const char &at(u64 i) const;
 
   b32 empty() const;
 

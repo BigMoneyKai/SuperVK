@@ -2,6 +2,7 @@
 
 #include "string.hpp"
 
+#include "core/define/assert.h"
 #include "platform/memory.h"
 
 #include <cstring>

@@ -15,11 +15,11 @@ void Texture::init(const VkDevice &device,
   m_pixels =
       stbi_load(path, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
   if (!m_pixels) {
-    FATAL(LogCatag::Vulkan, "Failed to load texture image");
+    FATAL(LogCatag::vulkan, "Failed to load texture image");
   }
   u64 pixelDataSize =
       static_cast<u64>(texWidth) * static_cast<u64>(texHeight) * 4; // RGBA
-  m_stagingBuffer.init(BT_STAGING_BUFFER, m_device, m_physicalDevice, m_pixels,
+  m_stagingBuffer.init(BufferType::stagingBuffer, m_device, m_physicalDevice, m_pixels,
                        pixelDataSize);
   ImageDesc imageDesc{};
   imageDesc.width = static_cast<u32>(texWidth);

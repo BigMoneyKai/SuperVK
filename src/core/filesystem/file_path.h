@@ -1,9 +1,10 @@
 #pragma once
 
 #include "core/container/string/string.hpp"
-#include "core/memory/allocator.h"
-#include "defines.h"
 #include "core/container/string/string_view.hpp"
+#include "core/define/compiler.h"
+#include "core/define/types.h"
+#include "core/memory/allocator.h"
 
 class FilePath {
 public:

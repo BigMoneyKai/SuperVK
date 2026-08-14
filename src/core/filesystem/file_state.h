@@ -1,8 +1,8 @@
 #pragma once
 
-#include "defines.h"
+#include "core/define/types.h"
 
-enum class FileKind { File, Directory };
+enum class FileKind { file, directory };
 
 struct FileState {
   u64 size;

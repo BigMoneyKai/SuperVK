@@ -5,7 +5,7 @@ void Surface::init(const VkInstance& instance, GLFWwindow* window) {
     m_instance = instance;
     VK_CHECK_RESULT(glfwCreateWindowSurface(instance, window, nullptr, &m_surface));
 
-    DEBUG(LogCatag::Vulkan, "Surface created");
+    DEBUG(LogCatag::vulkan, "Surface created");
 }
 
 void Surface::destroy() {

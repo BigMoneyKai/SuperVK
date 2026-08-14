@@ -20,20 +20,20 @@ void Shader::init(const VkDevice &device, const char *path, ShaderType type) {
                                        nullptr, &m_shaderModule));
   VkShaderStageFlagBits stage;
   switch (m_type) {
-  case ST_VERTEX_SHADER:
+  case ShaderType::vertexShader:
     stage = VK_SHADER_STAGE_VERTEX_BIT;
     break;
-  case ST_FRAGMENT_SHADER:
+  case ShaderType::fragmentShader:
     stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     break;
-  case ST_COMPUTE_SHADER:
+  case ShaderType::computeShader:
     stage = VK_SHADER_STAGE_COMPUTE_BIT;
     break;
-  case ST_GEOMETRY_SHADER:
+  case ShaderType::geometryShader:
     stage = VK_SHADER_STAGE_GEOMETRY_BIT;
     break;
   default:
-    FATAL(LogCatag::Vulkan, "Unknown shader type");
+    FATAL(LogCatag::vulkan, "Unknown shader type");
     failure_exit();
   }
   m_shaderStageCreateInfo.sType =
@@ -55,15 +55,15 @@ void Shader::destroy() {
 void Shader::readShader(const char *path) {
   std::ifstream file(path, std::ios::binary | std::ios::ate);
   if (!file.is_open()) {
-    FATAL(LogCatag::Vulkan, "Failed to open shader file: {}", path);
+    FATAL(LogCatag::vulkan, "Failed to open shader file: {}", path);
   }
 
   const std::streamsize size = file.tellg();
   if (size <= 0) {
-    FATAL(LogCatag::Vulkan, "Failed to read shader file size: {}", path);
+    FATAL(LogCatag::vulkan, "Failed to read shader file size: {}", path);
   }
   if (size % 4 != 0) {
-    FATAL(LogCatag::Vulkan,
+    FATAL(LogCatag::vulkan,
           "The size of spir-v file should be aligned in 4 bytes");
   }
 
@@ -72,6 +72,6 @@ void Shader::readShader(const char *path) {
   file.seekg(0);
   file.read(reinterpret_cast<char *>(m_code.data()), size);
   if (!file) {
-    FATAL(LogCatag::Vulkan, "Failed to read shader file: {}", path);
+    FATAL(LogCatag::vulkan, "Failed to read shader file: {}", path);
   }
 }

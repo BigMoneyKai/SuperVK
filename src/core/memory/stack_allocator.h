@@ -1,6 +1,8 @@
 #pragma once
 
 #include "allocator.h"
+#include "core/define/compiler.h"
+#include "core/define/types.h"
 
 struct Marker {
   u64 cursor;

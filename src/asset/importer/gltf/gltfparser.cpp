@@ -77,7 +77,7 @@ u32 GltfParser::getComponentSize(u32 componentType) const {
     case 5125: return 4; // UNSIGNED_INT
     case 5126: return 4; // FLOAT
     default:
-        WARNING(LogCatag::Asset, "Unknown glTF componentType: {} — assuming 4 bytes", componentType);
+        WARNING(LogCatag::asset, "Unknown glTF componentType: {} — assuming 4 bytes", componentType);
         return 4;
     }
 }
@@ -93,7 +93,7 @@ u32 GltfParser::getTypeCount(const std::string& type) const {
     if (type == "MAT2")   return 4;
     if (type == "MAT3")   return 9;
     if (type == "MAT4")   return 16;
-    WARNING(LogCatag::Asset, "Unknown glTF accessor type: {} — assuming 1", type.c_str());
+    WARNING(LogCatag::asset, "Unknown glTF accessor type: {} — assuming 1", type.c_str());
     return 1;
 }
 
@@ -116,7 +116,7 @@ void GltfParser::destroy() {
 // =========================================================================
 void GltfParser::parse(const char* path, Mesh* pMesh) {
     if (!path || !pMesh) {
-        ERROR(LogCatag::Asset, "GltfParser::parse — null path or mesh pointer");
+        ERROR(LogCatag::asset, "GltfParser::parse — null path or mesh pointer");
         return;
     }
     m_currMesh = pMesh;
@@ -133,7 +133,7 @@ void GltfParser::parse(const char* path, Mesh* pMesh) {
     // ---- read file ----------------------------------------------------------
     std::ifstream file(path, std::ios::in | std::ios::binary);
     if (!file.is_open()) {
-        ERROR(LogCatag::Asset, "Failed to open glTF file: {}", path);
+        ERROR(LogCatag::asset, "Failed to open glTF file: {}", path);
         return;
     }
     std::stringstream ss;
@@ -144,7 +144,7 @@ void GltfParser::parse(const char* path, Mesh* pMesh) {
     // ---- parse JSON ---------------------------------------------------------
     gltf_json::JsonValue root = gltf_json::parse(jsonStr);
     if (!root.isObject()) {
-        ERROR(LogCatag::Asset, "glTF root is not a JSON object");
+        ERROR(LogCatag::asset, "glTF root is not a JSON object");
         return;
     }
     m_root = &root;
@@ -155,7 +155,7 @@ void GltfParser::parse(const char* path, Mesh* pMesh) {
         if (asset.has("version")) {
             const std::string& ver = asset["version"].getString();
             if (ver[0] != '2') {
-                WARNING(LogCatag::Asset, "glTF version {} — parser targets 2.0, may be incompatible", ver.c_str());
+                WARNING(LogCatag::asset, "glTF version {} — parser targets 2.0, may be incompatible", ver.c_str());
             }
         }
     }
@@ -166,7 +166,7 @@ void GltfParser::parse(const char* path, Mesh* pMesh) {
 
     // ---- traverse scene → nodes → meshes -----------------------------------
     if (!root.has("scenes") || !root.has("nodes") || !root.has("meshes")) {
-        ERROR(LogCatag::Asset, "glTF file missing required top-level arrays (scenes/nodes/meshes)");
+        ERROR(LogCatag::asset, "glTF file missing required top-level arrays (scenes/nodes/meshes)");
         return;
     }
 
@@ -181,13 +181,13 @@ void GltfParser::parse(const char* path, Mesh* pMesh) {
     }
 
     if (sceneIdx < 0 || static_cast<size_t>(sceneIdx) >= scenes.size()) {
-        ERROR(LogCatag::Asset, "glTF default scene index {} out of range (0..{})", sceneIdx, scenes.size() - 1);
+        ERROR(LogCatag::asset, "glTF default scene index {} out of range (0..{})", sceneIdx, scenes.size() - 1);
         return;
     }
 
     const auto& scene = scenes[static_cast<size_t>(sceneIdx)];
     if (!scene.has("nodes")) {
-        ERROR(LogCatag::Asset, "glTF scene[{}] has no nodes array", sceneIdx);
+        ERROR(LogCatag::asset, "glTF scene[{}] has no nodes array", sceneIdx);
         return;
     }
 
@@ -198,7 +198,7 @@ void GltfParser::parse(const char* path, Mesh* pMesh) {
         int nodeIdx = sceneNodes[static_cast<size_t>(ni)].getInt();
 
         if (nodeIdx < 0 || static_cast<size_t>(nodeIdx) >= nodes.size()) {
-            WARNING(LogCatag::Asset, "glTF node index {} out of range, skipping", nodeIdx);
+            WARNING(LogCatag::asset, "glTF node index {} out of range, skipping", nodeIdx);
             continue;
         }
 
@@ -208,14 +208,14 @@ void GltfParser::parse(const char* path, Mesh* pMesh) {
 
         int meshIdx = node["mesh"].getInt();
         if (meshIdx < 0 || static_cast<size_t>(meshIdx) >= meshes.size()) {
-            WARNING(LogCatag::Asset, "glTF mesh index {} out of range, skipping", meshIdx);
+            WARNING(LogCatag::asset, "glTF mesh index {} out of range, skipping", meshIdx);
             continue;
         }
 
         parseMesh(meshes[static_cast<size_t>(meshIdx)], pMesh);
     }
 
-    DEBUG(LogCatag::Asset, 
+    DEBUG(LogCatag::asset, 
         "glTF Loaded: {}\n"
         "  Positions : {}\n"
         "  Normals   : {}\n"
@@ -247,7 +247,7 @@ void GltfParser::loadBuffers(const std::string& gltfDir,
         const auto& buf = buffers[i];
 
         if (!buf.has("byteLength")) {
-            WARNING(LogCatag::Asset, "glTF buffer[{}] missing byteLength, skipping", i);
+            WARNING(LogCatag::asset, "glTF buffer[{}] missing byteLength, skipping", i);
             continue;
         }
 
@@ -262,7 +262,7 @@ void GltfParser::loadBuffers(const std::string& gltfDir,
                 //         or "data:application/gltf-buffer;base64,<data>"
                 size_t commaPos = uri.find(',');
                 if (commaPos == std::string::npos) {
-                    ERROR(LogCatag::Asset, "Malformed data URI in buffer[{}]", i);
+                    ERROR(LogCatag::asset, "Malformed data URI in buffer[{}]", i);
                     continue;
                 }
                 std::string b64 = uri.substr(commaPos + 1);
@@ -273,7 +273,7 @@ void GltfParser::loadBuffers(const std::string& gltfDir,
                 std::string binPath = gltfDir + "/" + uri;
                 std::ifstream binFile(binPath, std::ios::in | std::ios::binary);
                 if (!binFile.is_open()) {
-                    ERROR(LogCatag::Asset, "Failed to open external buffer: {}", binPath.c_str());
+                    ERROR(LogCatag::asset, "Failed to open external buffer: {}", binPath.c_str());
                     continue;
                 }
                 m_buffers[i].resize(static_cast<size_t>(byteLength));
@@ -288,7 +288,7 @@ void GltfParser::loadBuffers(const std::string& gltfDir,
         }
 
         if (m_buffers[i].size() < byteLength) {
-            WARNING(LogCatag::Asset, "glTF buffer[{}]: expected {} bytes, got {}",
+            WARNING(LogCatag::asset, "glTF buffer[{}]: expected {} bytes, got {}",
                     i, byteLength, m_buffers[i].size());
         }
     }
@@ -313,7 +313,7 @@ void GltfParser::parseMesh(const gltf_json::JsonValue& meshJson, Mesh* pMesh) {
 void GltfParser::parsePrimitive(const gltf_json::JsonValue& primitive,
                                  Mesh* pMesh) {
     if (!m_root || !m_root->has("accessors")) {
-        ERROR(LogCatag::Asset, "No accessors in glTF root");
+        ERROR(LogCatag::asset, "No accessors in glTF root");
         return;
     }
 
@@ -346,7 +346,7 @@ void GltfParser::parsePrimitive(const gltf_json::JsonValue& primitive,
 
     // ---- read attributes ----------------------------------------------------
     if (!primitive.has("attributes")) {
-        ERROR(LogCatag::Asset, "glTF primitive has no attributes");
+        ERROR(LogCatag::asset, "glTF primitive has no attributes");
         return;
     }
 
@@ -354,7 +354,7 @@ void GltfParser::parsePrimitive(const gltf_json::JsonValue& primitive,
 
     // --- POSITION (required) ---
     if (!attrs.has("POSITION")) {
-        ERROR(LogCatag::Asset, "glTF primitive missing POSITION attribute — required by spec");
+        ERROR(LogCatag::asset, "glTF primitive missing POSITION attribute — required by spec");
         return;
     }
 
@@ -365,7 +365,7 @@ void GltfParser::parsePrimitive(const gltf_json::JsonValue& primitive,
 
     // validate POSITION type — must be VEC3 / FLOAT
     if (posAcc.has("type") && posAcc["type"].getString() != "VEC3") {
-        WARNING(LogCatag::Asset, "POSITION accessor type is {}, expected VEC3", posAcc["type"].getString().c_str());
+        WARNING(LogCatag::asset, "POSITION accessor type is {}, expected VEC3", posAcc["type"].getString().c_str());
     }
 
     const float* posData = reinterpret_cast<const float*>(rawPos.data());
@@ -453,27 +453,27 @@ void GltfParser::parsePrimitive(const gltf_json::JsonValue& primitive,
 // =========================================================================
 std::vector<u8> GltfParser::readAccessorData(const gltf_json::JsonValue& accessor) {
     if (!m_root || !m_root->has("bufferViews")) {
-        ERROR(LogCatag::Asset, "glTF root missing bufferViews");
+        ERROR(LogCatag::asset, "glTF root missing bufferViews");
         return {};
     }
 
     const auto& bufferViews = (*m_root)["bufferViews"];
 
     if (!accessor.has("bufferView") || !accessor.has("componentType") || !accessor.has("count")) {
-        ERROR(LogCatag::Asset, "glTF accessor missing required fields");
+        ERROR(LogCatag::asset, "glTF accessor missing required fields");
         return {};
     }
 
     int bvIndex = accessor["bufferView"].getInt();
     if (bvIndex < 0 || static_cast<size_t>(bvIndex) >= bufferViews.size()) {
-        ERROR(LogCatag::Asset, "glTF accessor bufferView index {} out of range", bvIndex);
+        ERROR(LogCatag::asset, "glTF accessor bufferView index {} out of range", bvIndex);
         return {};
     }
 
     const auto& bv = bufferViews[static_cast<size_t>(bvIndex)];
 
     if (!bv.has("buffer") || !bv.has("byteLength")) {
-        ERROR(LogCatag::Asset, "glTF bufferView missing required fields");
+        ERROR(LogCatag::asset, "glTF bufferView missing required fields");
         return {};
     }
 
@@ -485,7 +485,7 @@ std::vector<u8> GltfParser::readAccessorData(const gltf_json::JsonValue& accesso
     }
 
     if (bufferIdx >= m_buffers.size()) {
-        ERROR(LogCatag::Asset, "glTF bufferView references buffer[{}] but only {} buffers loaded",
+        ERROR(LogCatag::asset, "glTF bufferView references buffer[{}] but only {} buffers loaded",
               bufferIdx, m_buffers.size());
         return {};
     }
@@ -500,7 +500,7 @@ std::vector<u8> GltfParser::readAccessorData(const gltf_json::JsonValue& accesso
     u32 totalOffset = bvByteOffset + accessorByteOffset;
 
     if (totalOffset + bvByteLength > buffer.size()) {
-        ERROR(LogCatag::Asset, "glTF accessor data out of bounds: offset={} length={} bufferSize={}",
+        ERROR(LogCatag::asset, "glTF accessor data out of bounds: offset={} length={} bufferSize={}",
               totalOffset, bvByteLength, buffer.size());
         return {};
     }
@@ -516,7 +516,7 @@ std::vector<u8> GltfParser::readAccessorData(const gltf_json::JsonValue& accesso
 
     u32 dataSize = count * compSize * typeCount;
     if (dataSize > bvByteLength) {
-        WARNING(LogCatag::Asset, "accessor data size {} exceeds bufferView length {} — clamping",
+        WARNING(LogCatag::asset, "accessor data size {} exceeds bufferView length {} — clamping",
                 dataSize, bvByteLength);
         dataSize = bvByteLength;
     }

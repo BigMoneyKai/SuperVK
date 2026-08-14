@@ -2,7 +2,7 @@ add_library(supervk_core_container INTERFACE)
 
 add_subdirectory(array)
 add_subdirectory(hashmap)
-add_subdirectory(queue)
+add_subdirectory(ring_buffer)
 add_subdirectory(iterator)
 add_subdirectory(string)
 

@@ -5,18 +5,18 @@
 template<AssetType T> struct AssetData;
 
 template<>
-struct AssetData<AssetType::Mesh>;
+struct AssetData<AssetType::mesh>;
 template<>
-struct AssetData<AssetType::Material>;
+struct AssetData<AssetType::material>;
 template<>
-struct AssetData<AssetType::Texture>;
+struct AssetData<AssetType::texture>;
 template<>
-struct AssetData<AssetType::Shader>;
+struct AssetData<AssetType::shader>;
 template<>
-struct AssetData<AssetType::Animation>;
+struct AssetData<AssetType::animation>;
 template<>
-struct AssetData<AssetType::Scene>;
+struct AssetData<AssetType::scene>;
 template<>
-struct AssetData<AssetType::Skeleton>;
+struct AssetData<AssetType::skeleton>;
 
 #include "asset_data.inl"

@@ -1,3 +1,6 @@
+#pragma once
+
+#include "core/define/assert.h"
 #include "string_view.hpp"
 
 template <typename T> static SV_FORCE_INLINE T max_(T a, T b) {
@@ -61,6 +64,7 @@ SV_FORCE_INLINE const char &StringView::front() const { return m_data[0]; }
 SV_FORCE_INLINE const char &StringView::back() const {
   return m_data[m_size - 1];
 }
+SV_FORCE_INLINE const char &StringView::at(u64 i) const { return m_data[i]; }
 
 SV_FORCE_INLINE b32 StringView::empty() const { return m_size == 0; }
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "app/app.h"
+#include "core/debug/debugger.h"
 #include "core/debug/logger.h"
+#include "core/define/types.h"
 
 #include <iostream>
-
-#include "defines.h"
 
 inline void safeExitSignal() { std::cout << "Exited safely" << std::endl; }
 
@@ -16,7 +16,7 @@ inline void safeExitSignal() { std::cout << "Exited safely" << std::endl; }
     app.init();                                                                \
     app.run();                                                                 \
     app.destroy();                                                             \
-    Logger::print_all();                                                       \
+    Logger::write_all(String());                                               \
     safeExitSignal();                                                          \
   }
 #elif defined(SV_PLATFORM_APPLE) || defined(SV_PLATFORM_LINUX)
@@ -32,7 +32,8 @@ inline void safeExitSignal() { std::cout << "Exited safely" << std::endl; }
 #else
 #define MAIN_ENTRY()                                                           \
   int main(i32 argc, const char *argv[]) {                                     \
-    FATAL(LogCatag::Platform,                                                  \
+    FATAL(LogCatag::platform,                                                  \
           "Unsupported platform, please choose Windows, Linux or MacOS");      \
   }
+
 #endif

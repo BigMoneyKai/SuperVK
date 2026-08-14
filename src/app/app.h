@@ -1,8 +1,8 @@
 #pragma once
 
 #include "asset/asset_manager.h"
+#include "core/define/types.h"
 #include "core/job/job_system.h"
-#include "defines.h"
 #include "input/input_manager.h"
 #include "render/renderer.h"
 #include "scene/scene.h"
@@ -12,7 +12,7 @@
 
 SV_INLINE constexpr u64 defaultThreadCount = 8;
 SV_INLINE constexpr const char *defaultTitle = "SuperVK";
-SV_INLINE constexpr DisplayMode defaultDisplayMode = WINDOWED;
+SV_INLINE constexpr DisplayMode defaultDisplayMode = DisplayMode::windowed;
 
 struct AppInfo {
   const char *version{"1.0.0"};

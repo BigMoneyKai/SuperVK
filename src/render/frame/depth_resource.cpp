@@ -22,7 +22,7 @@ void DepthResource::init(const VkDevice &device,
   imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
   if (vkCreateImage(device, &imageInfo, nullptr, &m_depthImage) != VK_SUCCESS) {
-    FATAL(LogCatag::Vulkan, "Failed to create depth image");
+    FATAL(LogCatag::vulkan, "Failed to create depth image");
   }
 
   // Allocate memory for depth image
@@ -43,7 +43,7 @@ void DepthResource::init(const VkDevice &device,
   }
 
   if (memoryTypeIndex == UINT32_MAX) {
-    FATAL(LogCatag::Vulkan,
+    FATAL(LogCatag::vulkan,
           "Failed to find suitable memory type for depth image");
   }
 
@@ -54,7 +54,7 @@ void DepthResource::init(const VkDevice &device,
 
   if (vkAllocateMemory(device, &allocInfo, nullptr, &m_depthImageMemory) !=
       VK_SUCCESS) {
-    FATAL(LogCatag::Vulkan, "Failed to allocate memory for depth image");
+    FATAL(LogCatag::vulkan, "Failed to allocate memory for depth image");
   }
 
   vkBindImageMemory(device, m_depthImage, m_depthImageMemory, 0);
@@ -73,7 +73,7 @@ void DepthResource::init(const VkDevice &device,
 
   if (vkCreateImageView(device, &viewInfo, nullptr, &m_depthImageView) !=
       VK_SUCCESS) {
-    FATAL(LogCatag::Vulkan, "Failed to create depth image view");
+    FATAL(LogCatag::vulkan, "Failed to create depth image view");
   }
 }
 

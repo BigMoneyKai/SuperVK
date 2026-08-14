@@ -28,7 +28,7 @@ target_link_libraries(supervk_asset PRIVATE
     supervk_asset_cache
     supervk_asset_data
     supervk_asset_handle
-    supervk_core_container_queue
+    supervk_core_container_ringbuffer
     supervk_core_container_string
     supervk_core_job
 

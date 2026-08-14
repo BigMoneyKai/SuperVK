@@ -51,16 +51,16 @@ void *StackAllocator::allocate(u64 size, u64 alignment) {
   header->size = size;
   header->alignment = alignment;
   header->allocationId = AllocCounter::add();
-  header->allocatorId = AllocatorType::Stack;
-  header->state = HeaderState::Allocated;
-  header->magic = HeaderState::Magic;
+  header->allocatorId = AllocatorType::stack;
+  header->state = HeaderState::allocated;
+  header->magic = HeaderState::magic;
 
   HeaderState *frontGuard =
       reinterpret_cast<HeaderState *>(headerPtr + headerSize);
-  *frontGuard = HeaderState::FrontGuard;
+  *frontGuard = HeaderState::frontGuard;
   HeaderState *backGuard =
       reinterpret_cast<HeaderState *>(headerPtr + userOffset + size);
-  *backGuard = HeaderState::BackGuard;
+  *backGuard = HeaderState::backGuard;
 
   m_usedSize += size;
   m_cursor = userDataEnd;
@@ -81,7 +81,7 @@ void StackAllocator::deallocate(void *ptr) {
   u8 *headerPtr = userPtr - userOffset;
   Header *header = reinterpret_cast<Header *>(headerPtr);
 
-  SV_ASSERT(header->magic == HeaderState::Magic, "Invalid allocation");
+  SV_ASSERT(header->magic == HeaderState::magic, "Invalid allocation");
 
   HeaderState *frontGuard =
       reinterpret_cast<HeaderState *>(headerPtr + headerSize);
@@ -92,8 +92,8 @@ void StackAllocator::deallocate(void *ptr) {
   SV_ASSERT(static_cast<u32>(*backGuard) == BACK_GUARD,
             "Back guard corrupted");
 
-  SV_ASSERT(header->state == HeaderState::Allocated, "Double free detected");
-  header->state = HeaderState::Freed;
+  SV_ASSERT(header->state == HeaderState::allocated, "Double free detected");
+  header->state = HeaderState::freed;
 
   u64 headerOffset =
       static_cast<u64>(headerPtr - static_cast<u8 *>(m_buffer));

@@ -1,7 +1,6 @@
 #include "window/window_manager.h"
 #include "core/debug/debugger.h"
 #include "core/debug/logger_attrib.h"
-#include "utils/utils.h"
 
 WinMan::WinMan() {
   m_window = nullptr;
@@ -14,7 +13,7 @@ WinMan::WinMan() {
 
 void WinMan::init(const char *title, DisplayMode displayMode) {
   if (!glfwInit()) {
-    FATAL(LogCatag::Window, "Failed to initialize GLFW");
+    FATAL(LogCatag::window, "Failed to initialize GLFW");
   }
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 #if defined(__linux__)
@@ -26,12 +25,12 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
 #endif
   m_monitor = glfwGetPrimaryMonitor();
   m_mode = glfwGetVideoMode(m_monitor);
-  if ((!m_monitor || !m_mode) && displayMode != WINDOWED) {
-    FATAL(LogCatag::Window, "Failed to get monitor or mode");
+  if ((!m_monitor || !m_mode) && displayMode != DisplayMode::windowed) {
+    FATAL(LogCatag::window, "Failed to get monitor or mode");
   }
 
   switch (displayMode) {
-  case FULLSCREEN:
+  case DisplayMode::fullscreen:
     m_width = m_mode->width;
     m_height = m_mode->height;
     m_window =
@@ -39,7 +38,7 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
                          title, m_monitor, nullptr);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     break;
-  case BORDERLESS:
+  case DisplayMode::borderless:
     m_width = m_mode->width;
     m_height = m_mode->height;
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
@@ -49,7 +48,7 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
                          title, nullptr, nullptr);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     break;
-  case WINDOWED:
+  case DisplayMode::windowed:
     m_width = default_width;
     m_height = default_height;
     m_window =
@@ -58,10 +57,10 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     break;
   default:
-    FATAL(LogCatag::Window, "Failed to load window");
+    FATAL(LogCatag::window, "Failed to load window");
   }
   if (!m_window) {
-    FATAL(LogCatag::Window, "Failed to create window");
+    FATAL(LogCatag::window, "Failed to create window");
   }
 }
 

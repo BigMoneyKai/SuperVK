@@ -9,8 +9,8 @@ void ShaderManager::init(JobSystem* js) {
 ShaderManager::Handle ShaderManager::load(const String& path) {
     Handle handle = m_assets.size();
     m_assets.emplace_back();
-    m_assets[handle].type   = AssetType::Shader;
-    m_assets[handle].state  = AssetState::Uploading;
+    m_assets[handle].type   = AssetType::shader;
+    m_assets[handle].state  = AssetState::uploading;
     m_assets[handle].path   = path;
 
     auto* jd         = new LoadJobData;
@@ -37,8 +37,8 @@ const ShaderAsset& ShaderManager::get(Handle handle) const {
 
 void ShaderManager::update() {
     for (auto& a : m_assets)
-        if (a.state == AssetState::Uploaded)
-            a.state = AssetState::Loaded;
+        if (a.state == AssetState::uploaded)
+            a.state = AssetState::loaded;
 }
 
 void ShaderManager::destroy() {
@@ -50,7 +50,7 @@ void ShaderManager::jobFunc(void* data) {
     auto& out = jd->self->m_assets[jd->handle];
     ShaderLoader loader;
     out.state = loader.load(jd->path, out)
-                   ? AssetState::Uploaded
-                   : AssetState::Failed;
+                   ? AssetState::uploaded
+                   : AssetState::failed;
     delete jd;
 }

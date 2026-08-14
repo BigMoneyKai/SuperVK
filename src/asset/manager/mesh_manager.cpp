@@ -10,8 +10,8 @@ void MeshManager::init(JobSystem* js, ImporterMan* imp) {
 MeshManager::Handle MeshManager::load(const String& path) {
     Handle handle = m_assets.size();
     m_assets.emplace_back();
-    m_assets[handle].type   = AssetType::Mesh;
-    m_assets[handle].state  = AssetState::Uploading;
+    m_assets[handle].type   = AssetType::mesh;
+    m_assets[handle].state  = AssetState::uploading;
     m_assets[handle].path   = path;
 
     auto* jd         = new LoadJobData;
@@ -38,8 +38,8 @@ const MeshAsset& MeshManager::get(Handle handle) const {
 
 void MeshManager::update() {
     for (auto& a : m_assets)
-        if (a.state == AssetState::Uploaded)
-            a.state = AssetState::Loaded;
+        if (a.state == AssetState::uploaded)
+            a.state = AssetState::loaded;
 }
 
 void MeshManager::destroy() {
@@ -51,7 +51,7 @@ void MeshManager::jobFunc(void* data) {
     auto& out = jd->self->m_assets[jd->handle];
     MeshLoader loader;
     out.state = loader.load(*jd->self->m_importer, jd->path, out)
-                    ? AssetState::Uploaded
-                    : AssetState::Failed;
+                    ? AssetState::uploaded
+                    : AssetState::failed;
     delete jd;
 }

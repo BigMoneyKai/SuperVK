@@ -9,8 +9,8 @@ void TextureManager::init(JobSystem* js) {
 TextureManager::Handle TextureManager::load(const String& path) {
     Handle handle = m_assets.size();
     m_assets.emplace_back();
-    m_assets[handle].type   = AssetType::Texture;
-    m_assets[handle].state  = AssetState::Uploading;
+    m_assets[handle].type   = AssetType::texture;
+    m_assets[handle].state  = AssetState::uploading;
     m_assets[handle].path   = path;
 
     auto* jd         = new LoadJobData;
@@ -37,8 +37,8 @@ const TextureAsset& TextureManager::get(Handle handle) const {
 
 void TextureManager::update() {
     for (auto& a : m_assets)
-        if (a.state == AssetState::Uploaded)
-            a.state = AssetState::Loaded;
+        if (a.state == AssetState::uploaded)
+            a.state = AssetState::loaded;
 }
 
 void TextureManager::destroy() {
@@ -50,7 +50,7 @@ void TextureManager::jobFunc(void* data) {
     auto& out = jd->self->m_assets[jd->handle];
     TextureLoader loader;
     out.state = loader.load(jd->path, out)
-                   ? AssetState::Uploaded
-                   : AssetState::Failed;
+                   ? AssetState::uploaded
+                   : AssetState::failed;
     delete jd;
 }

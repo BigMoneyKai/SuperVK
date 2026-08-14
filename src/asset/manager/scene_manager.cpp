@@ -3,8 +3,8 @@
 SceneManager::Handle SceneManager::load(const String& path) {
     Handle handle = m_assets.size();
     m_assets.emplace_back();
-    m_assets[handle].type   = AssetType::Scene;
-    m_assets[handle].state  = AssetState::Loaded;
+    m_assets[handle].type   = AssetType::scene;
+    m_assets[handle].state  = AssetState::loaded;
     m_assets[handle].path   = path;
     return handle;
 }

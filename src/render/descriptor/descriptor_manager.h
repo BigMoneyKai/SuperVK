@@ -1,14 +1,17 @@
 #pragma once
 
-#include "defines.h"
+#include "core/define/compiler.h"
+#include "core/define/types.h"
 
 #include "descriptor_pool.h"
 #include "descriptor_set.h"
 #include "descriptor_set_layout.h"
+#include "render/frame/sync.h"
 
 #include "render/resource/buffer.h"
 #include "render/resource/sampler.h"
 
+#include <array>
 #include <vulkan/vulkan.h>
 
 // ---------------------------------------------------------------------------
@@ -24,36 +27,43 @@
 // ---------------------------------------------------------------------------
 class DescriptorMan {
 public:
-    void init(const VkDevice& device, const VkPhysicalDevice& physicalDevice);
-    void destroy();
+  void init(const VkDevice &device, const VkPhysicalDevice &physicalDevice);
+  void destroy();
 
-    // per-frame UBO upload (delegates to Buffer::update)
-    void updateCameraUBO(const void* data, u64 size);
-    void updateObjectUBO(const void* data, u64 size);
-    void updateLightUBO(const void* data, u64 size);
-    void updateMaterialUBO(const void* data, u64 size);
+  // per-frame UBO upload (delegates to Buffer::update)
+  void updateCameraUBO(u32 frame, const void *data, u64 size);
+  void updateObjectUBO(u32 frame, const void *data, u64 size);
+  void updateLightUBO(u32 frame, const void *data, u64 size);
+  void updateMaterialUBO(u32 frame, const void *data, u64 size);
 
-    void writeBufferDescriptorSet();
-    void writeImageDescriptorSet(const VkImageView& imageView, const VkImageLayout& layout);
+  void writeBufferDescriptorSet();
+  void writeImageDescriptorSet(u32 frame, const VkImageView &imageView,
+                               const VkImageLayout &layout);
 
-    SV_FORCE_INLINE VkDescriptorSetLayout layout() const { return m_setLayout.layout(); }
-    SV_FORCE_INLINE VkDescriptorSet descriptorSet() const { return m_set.set(); }
+  SV_FORCE_INLINE VkDescriptorSetLayout layout() const {
+    return m_setLayout.layout();
+  }
+  SV_FORCE_INLINE VkDescriptorSet descriptorSet(u32 frame) const {
+    return m_sets[frame].set();
+  }
 
 private:
-    void createLayout();
-    void createPool();
-    void allocateSet();
-    void createBuffers(const VkPhysicalDevice& physicalDevice);
+  void createLayout();
+  void createPool();
+  void allocateSet();
+  void createBuffers(const VkPhysicalDevice &physicalDevice);
 
-    VkDevice m_device{VK_NULL_HANDLE};
+  VkDevice m_device{VK_NULL_HANDLE};
 
-    DescriptorSetLayout m_setLayout;
-    DescriptorPool      m_pool;
-    DescriptorSet       m_set;
+  static constexpr u32 kFrames = MAX_FRAMES_IN_FLIGHT;
+  DescriptorSetLayout m_setLayout;
+  DescriptorPool m_pool;
 
-    Buffer m_cameraUBO;
-    Buffer m_objectUBO;
-    Buffer m_lightUBO;
-    Buffer m_materialUBO;
-    Sampler m_texSampler2D;
+  std::array<DescriptorSet, kFrames> m_sets;
+
+  std::array<Buffer, kFrames> m_cameraUBOs;
+  std::array<Buffer, kFrames> m_objectUBOs;
+  std::array<Buffer, kFrames> m_lightUBOs;
+  std::array<Buffer, kFrames> m_materialUBOs;
+  Sampler m_texSampler2D;
 };

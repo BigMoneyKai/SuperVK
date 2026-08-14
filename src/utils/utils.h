@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/debug/debugger.h"
-#include "defines.h"
 
 #include <stdlib.h>
 #include <vulkan/vulkan.h>
@@ -14,19 +13,19 @@ SV_INLINE void except_exit_impl() {}
 
 #define success_exit()                                                         \
   do {                                                                         \
-    TRACE(LogCatag::Unknown, "Exit success");                                  \
+    TRACE(LogCatag::unknown, "Exit success");                                  \
     success_exit_impl();                                                       \
   } while (0)
 
 #define failure_exit()                                                         \
   do {                                                                         \
-    TRACE(LogCatag::Unknown, "Exit failure");                                  \
+    TRACE(LogCatag::unknown, "Exit failure");                                  \
     failure_exit_impl();                                                       \
   } while (0)
 
 #define except_exit(code)                                                      \
   do {                                                                         \
-    TRACE(LogCatag::Unknown, "Exit exception: %d", code);                      \
+    TRACE(LogCatag::unknown, "Exit exception: %d", code);                      \
     except_exit_impl(code);                                                    \
   } while (0)
 

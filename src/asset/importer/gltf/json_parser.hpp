@@ -16,14 +16,14 @@ namespace gltf_json {
 // ---------------------------------------------------------------------------
 // JsonType
 // ---------------------------------------------------------------------------
-enum class JsonType { NIL, BOOL, NUMBER, STRING, ARRAY, OBJECT };
+enum class JsonType { nil, boolean, number, string, array, object };
 
 // ---------------------------------------------------------------------------
 // JsonValue — a node in the JSON DOM tree
 // ---------------------------------------------------------------------------
 class JsonValue {
 public:
-    JsonType type = JsonType::NIL;
+    JsonType type = JsonType::nil;
 
     // scalar storage
     double      numValue  = 0.0;
@@ -37,20 +37,20 @@ public:
     // ---- constructors -------------------------------------------------------
     JsonValue() = default;
 
-    static JsonValue makeNil()    { JsonValue v; v.type = JsonType::NIL;    return v; }
-    static JsonValue makeBool(bool b)   { JsonValue v; v.type = JsonType::BOOL;   v.boolValue = b; return v; }
-    static JsonValue makeNumber(double n) { JsonValue v; v.type = JsonType::NUMBER; v.numValue = n; return v; }
-    static JsonValue makeString(const std::string& s) { JsonValue v; v.type = JsonType::STRING; v.strValue = s; return v; }
-    static JsonValue makeArray()  { JsonValue v; v.type = JsonType::ARRAY;  return v; }
-    static JsonValue makeObject() { JsonValue v; v.type = JsonType::OBJECT; return v; }
+    static JsonValue makeNil()    { JsonValue v; v.type = JsonType::nil;    return v; }
+    static JsonValue makeBool(bool b)   { JsonValue v; v.type = JsonType::boolean;   v.boolValue = b; return v; }
+    static JsonValue makeNumber(double n) { JsonValue v; v.type = JsonType::number; v.numValue = n; return v; }
+    static JsonValue makeString(const std::string& s) { JsonValue v; v.type = JsonType::string; v.strValue = s; return v; }
+    static JsonValue makeArray()  { JsonValue v; v.type = JsonType::array;  return v; }
+    static JsonValue makeObject() { JsonValue v; v.type = JsonType::object; return v; }
 
     // ---- type queries -------------------------------------------------------
-    bool isNil()    const { return type == JsonType::NIL; }
-    bool isBool()   const { return type == JsonType::BOOL; }
-    bool isNumber() const { return type == JsonType::NUMBER; }
-    bool isString() const { return type == JsonType::STRING; }
-    bool isArray()  const { return type == JsonType::ARRAY; }
-    bool isObject() const { return type == JsonType::OBJECT; }
+    bool isNil()    const { return type == JsonType::nil; }
+    bool isBool()   const { return type == JsonType::boolean; }
+    bool isNumber() const { return type == JsonType::number; }
+    bool isString() const { return type == JsonType::string; }
+    bool isArray()  const { return type == JsonType::array; }
+    bool isObject() const { return type == JsonType::object; }
 
     // ---- value access (caller must ensure correct type) ---------------------
     double      getDouble() const { return numValue; }

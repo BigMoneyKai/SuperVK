@@ -17,7 +17,7 @@ target_link_libraries(supervk_core_job PRIVATE
     supervk_platform
     supervk_core_memory
     supervk_core_container_array
-    supervk_core_container_queue
+    supervk_core_container_ringbuffer
     supervk_core_debug
     supervk_utils
 

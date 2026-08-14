@@ -1,8 +1,6 @@
 #include "device.h"
 #include "core/debug/debugger.h"
 #include "core/debug/logger_attrib.h"
-#include "instance.h"
-#include "utils/utils.h"
 
 #include <stdlib.h>
 
@@ -57,11 +55,11 @@ void Device::initDevice(const VkInstance &instance,
   std::vector<VkPhysicalDevice> devices(deviceCount);
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
   if (deviceCount == 0) {
-    FATAL(LogCatag::Vulkan, "No physical device available");
+    FATAL(LogCatag::vulkan, "No physical device available");
   } else if (deviceCount == 1) {
-    DEBUG(LogCatag::Vulkan, "1 physical device found");
+    DEBUG(LogCatag::vulkan, "1 physical device found");
   } else {
-    DEBUG(LogCatag::Vulkan, "{} physical device found", deviceCount);
+    DEBUG(LogCatag::vulkan, "{} physical device found", deviceCount);
   }
 
   b32 found = SV_FALSE;
@@ -72,9 +70,9 @@ void Device::initDevice(const VkInstance &instance,
     }
   }
   if (!found) {
-    FATAL(LogCatag::Vulkan, "No suitable physical device found");
+    FATAL(LogCatag::vulkan, "No suitable physical device found");
   }
-  DEBUG(LogCatag::Vulkan, "Selected GPU: {}",
+  DEBUG(LogCatag::vulkan, "Selected GPU: {}",
         device_type_to_string(m_physicalDeviceProperties.deviceType));
 }
 void Device::initQueue(const VkSurfaceKHR &surface) {
@@ -98,10 +96,10 @@ void Device::initQueue(const VkSurfaceKHR &surface) {
     }
   }
   if (m_graphicsQueueFamilyIndex == UINT32_MAX) {
-    FATAL(LogCatag::Vulkan,
+    FATAL(LogCatag::vulkan,
           "Failed to find graphics queue family to present and render");
   }
-  DEBUG(LogCatag::Vulkan, "Graphics queue family found, index: {}",
+  DEBUG(LogCatag::vulkan, "Graphics queue family found, index: {}",
         m_graphicsQueueFamilyIndex);
 }
 
@@ -175,7 +173,7 @@ void Device::createDevice() {
                                  &m_device));
   vkGetDeviceQueue(m_device, m_graphicsQueueFamilyIndex, 0, &m_graphicsQueue);
   m_presentQueue = m_graphicsQueue;
-  DEBUG(LogCatag::Vulkan, "Logical device created");
+  DEBUG(LogCatag::vulkan, "Logical device created");
 }
 
 VkFormat Device::findSupportedFormat(const std::vector<VkFormat> &candidates,
@@ -195,7 +193,7 @@ VkFormat Device::findSupportedFormat(const std::vector<VkFormat> &candidates,
       return format;
     }
   }
-  FATAL(LogCatag::Vulkan, "No supported depth format");
+  FATAL(LogCatag::vulkan, "No supported depth format");
   return VK_FORMAT_UNDEFINED;
 }
 

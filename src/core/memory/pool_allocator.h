@@ -1,7 +1,6 @@
 #pragma once
 
 #include "allocator.h"
-#include "defines.h"
 
 class PoolAllocator : public Allocator {
 public:

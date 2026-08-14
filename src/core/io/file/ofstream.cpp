@@ -2,7 +2,8 @@
 #include "platform/file.h"
 
 FileHandle* FileOutputStream::open(const char* path, FileMode mode) {
-    return file_open(path, mode);
+    m_file = file_open(path, mode);
+    return m_file;
 }
 
 b32 FileOutputStream::write(const void* buf, u64 size) {
@@ -26,5 +27,8 @@ b32 FileOutputStream::seek(u64 offset, FileSeekOrigin origin) {
 }
 
 void FileOutputStream::close() {
-    file_close(m_file);
+    if (m_file) {
+        file_close(m_file);
+        m_file = nullptr;
+    }
 }

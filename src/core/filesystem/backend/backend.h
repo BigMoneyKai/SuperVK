@@ -1,10 +1,11 @@
 #pragma once
 
+#include "core/define/types.h"
 #include "core/filesystem/file_path.h"
 #include "core/filesystem/file_state.h"
 #include "core/io/buffer/obstream.h"
-#include "defines.h"
 #include "platform/file.h"
+
 class FsBackend {
 public:
   virtual ~FsBackend() = default;

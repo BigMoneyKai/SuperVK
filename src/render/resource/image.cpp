@@ -96,7 +96,7 @@ void Image::transitionLayout(VkImageLayout newLayout) {
     barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
   } else {
-    FATAL(LogCatag::Vulkan, "Unsupported image layout transition");
+    FATAL(LogCatag::vulkan, "Unsupported image layout transition");
   }
 
   vkCmdPipelineBarrier(cmd,

@@ -7,38 +7,38 @@ static FaceType scanFaceToken(const std::string& token, FaceIndex* f) {
     slashCount = std::count(token.begin(), token.end(), '/');
 
     if(slashCount > 2) {
-        ERROR(LogCatag::Asset, "Slash count error");
-        ERROR(LogCatag::Asset, "Unknown obj face format");
-        return FT_UNKNOWN_TYPE;
+        ERROR(LogCatag::asset, "Slash count error");
+        ERROR(LogCatag::asset, "Unknown obj face format");
+        return FaceType::unknown;
     }
     switch(slashCount) {
         // v
         case 0:
             sscanf(token.c_str(), "%u", &f->vi);
-            return FT_V;
+            return FaceType::position;
 
         // v/t
         case 1:
             sscanf(token.c_str(), "%u/%u", &f->vi, &f->ti);
-            return FT_VT;
+            return FaceType::positionTexcoord;
 
         // v//n and v/t/n
         case 2:
             // v//n
             if(token.find("//") != std::string::npos) {
                 sscanf(token.c_str(), "%u//%u", &f->vi, &f->ni);
-                return FT_VN;
+                return FaceType::positionNormal;
             }
             // v/t/n
             else {
                 sscanf(token.c_str(), "%u/%u/%u", &f->vi, &f->ti, &f->ni);
-                return FT_VTN;
+                return FaceType::positionTexcoordNormal;
             }
         default:
-            ERROR(LogCatag::Asset, "Unknown obj face format");
-        return FT_UNKNOWN_TYPE;
+            ERROR(LogCatag::asset, "Unknown obj face format");
+        return FaceType::unknown;
     }
-    return FT_UNKNOWN_TYPE;
+    return FaceType::unknown;
 }
 
 void ObjParser::init() {
@@ -49,7 +49,7 @@ void ObjParser::init() {
 void ObjParser::parse(const char* path, Mesh* pMesh) {
     m_objFile.open(path);
     if(!m_objFile.is_open()) {
-        ERROR(LogCatag::Asset, "Failed to load obj file, go check the path");
+        ERROR(LogCatag::asset, "Failed to load obj file, go check the path");
         return;
     } m_currMesh = pMesh;
 
@@ -58,7 +58,7 @@ void ObjParser::parse(const char* path, Mesh* pMesh) {
     m_currMesh->normals().clear();
     m_currMesh->vertices().clear();
     m_currMesh->indices().clear();
-    DEBUG(LogCatag::Asset, "Cleared all previous data");
+    DEBUG(LogCatag::asset, "Cleared all previous data");
 
     std::string line;
     while(std::getline(m_objFile, line)) {
@@ -91,7 +91,7 @@ void ObjParser::parse(const char* path, Mesh* pMesh) {
             parse_f(ss);
         }
     }
-    DEBUG(LogCatag::Asset,
+    DEBUG(LogCatag::asset,
         "OBJ Loaded\n"
         "Positions : {}\n"
         "Normals   : {}\n"
@@ -164,7 +164,7 @@ void ObjParser::parse_f(std::stringstream& ss) {
     }
 
     if(faceIndices.size() < 3) {
-        ERROR(LogCatag::Asset, "Wrong obj file format, the number of face vertex should be 3 at least");
+        ERROR(LogCatag::asset, "Wrong obj file format, the number of face vertex should be 3 at least");
     }
 
     for(i32 i = 1; i < faceIndices.size() - 1; i++) {
@@ -178,24 +178,24 @@ void ObjParser::parse_f(std::stringstream& ss) {
             Vertex vertex;
 
             switch(fType) {
-                case FT_V:
+                case FaceType::position:
                     vertex.pos = m_currMesh->positions().at(triangle[j].vi - 1);
                     break;
-                case FT_VT:
+                case FaceType::positionTexcoord:
                     vertex.pos = m_currMesh->positions().at(triangle[j].vi - 1);
                     vertex.uv = m_currMesh->texcoords().at(triangle[j].ti - 1);
                     break;
-                case FT_VN:
+                case FaceType::positionNormal:
                     vertex.pos = m_currMesh->positions().at(triangle[j].vi - 1);
                     vertex.normal = m_currMesh->normals().at(triangle[j].ni - 1);
                     break;
-                case FT_VTN:
+                case FaceType::positionTexcoordNormal:
                     vertex.pos = m_currMesh->positions().at(triangle[j].vi - 1);
                     vertex.uv = m_currMesh->texcoords().at(triangle[j].ti - 1);
                     vertex.normal = m_currMesh->normals().at(triangle[j].ni - 1);
                     break;
-                case FT_UNKNOWN_TYPE:
-                case FT_MAX_NUM:
+                case FaceType::unknown:
+                case FaceType::maxNum:
                 default:
                     // Handle unknown types - skip
                     break;

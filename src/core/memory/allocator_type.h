@@ -1,11 +1,11 @@
 #pragma once
 
-#include "defines.h"
+#include "core/define/types.h"
 
 enum class AllocatorType : u32 {
-    Heap,
-    Linear,
-    Pool,
-    Stack,
+  heap,
+  linear,
+  pool,
+  stack,
 
 };
