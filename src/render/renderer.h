@@ -12,6 +12,7 @@
 #include "frame/frame_resource.h"
 #include "frame/framebuffer.h"
 #include "pipeline/pipeline_manager.h"
+#include "render/graph/render_graph.h"
 #include "resource/buffer_manager.h"
 #include "resource/texture_manager.h"
 #include "window/window_manager.h"
@@ -46,7 +47,6 @@ private:
   Device m_device;
   Surface m_surface;
   Swapchain m_swapchain;
-  RenderPass m_renderPass;
 
   CommandPool m_commandPool;
   CommandBuffer m_commandBuffer;
@@ -58,9 +58,10 @@ private:
 
   FrameResource m_frameResource;
   DepthResource m_depthResource;
-  std::vector<Framebuffer> m_framebuffers;
+  RenderGraph m_renderGraph;
 
   RendererDesc m_desc;
+  Scene *m_scene{nullptr};
   u32 m_currFrame{0};
   u32 m_imageIndex{0};
 };

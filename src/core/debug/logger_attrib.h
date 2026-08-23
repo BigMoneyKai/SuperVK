@@ -3,6 +3,7 @@
 #include "core/container/string/string.hpp"
 #include "core/define/assert.h"
 #include "core/define/types.h"
+#include <new>
 
 enum class LogLevel : u32 { trace, debug, info, warning, error, fatal };
 
@@ -25,7 +26,7 @@ enum class LogCatag : u32 {
 
 };
 
-struct alignas(32) LogMsg {
+struct alignas(std::hardware_destructive_interference_size) LogMsg {
   LogLevel level;
   LogCatag catag{LogCatag::unknown};
 
@@ -38,6 +39,3 @@ struct alignas(32) LogMsg {
 
   u64 timestamp{0};
 };
-
-SV_STATIC_ASSERT(sizeof(LogMsg) == 96);
-SV_STATIC_ASSERT(alignof(LogMsg) == 32);

@@ -3,6 +3,7 @@ add_library(supervk_render STATIC)
 add_subdirectory(base)
 add_subdirectory(descriptor)
 add_subdirectory(frame)
+add_subdirectory(graph)
 add_subdirectory(pipeline)
 add_subdirectory(resource)
 
@@ -26,6 +27,7 @@ target_link_libraries(supervk_render PRIVATE
     supervk_render_base
     supervk_render_descriptor
     supervk_render_frame
+    supervk_render_graph
     supervk_render_resource
     supervk_render_pipeline
 

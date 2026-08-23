@@ -10,19 +10,89 @@ void Renderer::init(const RendererDesc &desc) {
   m_swapchain.init(m_device.device(), m_device.physicalDevice(),
                    m_surface.surface(),
                    {desc.pWinMan->width(), desc.pWinMan->height()});
-  m_renderPass.init(m_device.device(), m_swapchain.colorFormat(),
-                    m_device.depthFormat());
+
+  // 渲染图：声明唯一的 pass（交换链颜色 + 深度），绘制细节放进 drawList
+  m_renderGraph.init(m_device.device(), m_swapchain.extent());
+  m_renderGraph.setPresentTarget(m_swapchain.swapchainImages()[0],
+                                 m_swapchain.swapchainImageViews()[0],
+                                 m_swapchain.colorFormat());
 
   // DescriptorMan must init BEFORE PipelineMan (pipeline needs the layout)
   m_descriptorMan.init(m_device.device(), m_device.physicalDevice());
-  m_pipelineMan.init(m_device.device(), m_renderPass.renderPass(),
-                     m_descriptorMan.layout());
-  m_bufferMan.init();
 
   m_frameResource.init(m_device.device(), m_swapchain.imageCount());
   m_frameResource.createSyncPrimitives();
   m_depthResource.init(m_device.device(), m_device.physicalDevice(),
                        m_device.depthFormat(), m_swapchain.extent());
+
+  auto depthRT = m_renderGraph.registerExternal(
+      m_depthResource.depthImage(), m_depthResource.depthImageView(),
+      m_device.depthFormat(), VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+
+  m_renderGraph.addPass(
+      "Main",
+      {.colorAttachments = {{m_renderGraph.presentTarget(), LoadOp::clear,
+                             StoreOp::store}},
+       .depthAttachment = {depthRT, LoadOp::clear, StoreOp::store},
+       .drawList = [this](VkCommandBuffer cmd) {
+         if (m_scene == nullptr)
+           return;
+         Scene *scene = m_scene;
+
+         // ---- update UBOs from scene data ----
+         m_descriptorMan.updateCameraUBO(m_currFrame, &scene->camera().ubo(),
+                                         sizeof(CameraUBO));
+         m_descriptorMan.updateObjectUBO(m_currFrame, &scene->object().ubo(),
+                                         sizeof(ObjectUBO));
+         m_descriptorMan.updateLightUBO(m_currFrame, &scene->light().ubo(),
+                                        sizeof(LightUBO));
+         m_descriptorMan.updateMaterialUBO(
+             m_currFrame, &scene->material().ubo(), sizeof(MaterialUBO));
+
+         // ---- bind pipeline ----
+         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                           m_pipelineMan.graphicsPipeline());
+
+         // ---- bind descriptor set ----
+         VkDescriptorSet ds = m_descriptorMan.descriptorSet(m_currFrame);
+         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                 m_pipelineMan.graphicsPipelineLayout(), 0, 1,
+                                 &ds, 0, nullptr);
+
+         // ---- dynamic viewport + scissor ----
+         VkViewport viewport{};
+         viewport.x = 0.0f;
+         viewport.y = 0.0f;
+         viewport.width = static_cast<f32>(m_swapchain.extent().width);
+         viewport.height = static_cast<f32>(m_swapchain.extent().height);
+         viewport.minDepth = 0.0f;
+         viewport.maxDepth = 1.0f;
+         vkCmdSetViewport(cmd, 0, 1, &viewport);
+
+         VkRect2D scissor{};
+         scissor.offset = {0, 0};
+         scissor.extent = m_swapchain.extent();
+         vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+         // ---- bind vertex + index buffers ----
+         VkBuffer vb = scene->mesh().vertexBuffer().buffer();
+         VkDeviceSize vbOffsets[1] = {0};
+         vkCmdBindVertexBuffers(cmd, 0, 1, &vb, vbOffsets);
+         vkCmdBindIndexBuffer(cmd, scene->mesh().indexBuffer().buffer(), 0,
+                              VK_INDEX_TYPE_UINT32);
+
+         // ---- draw ----
+         u32 indexCount = static_cast<u32>(scene->mesh().indices().size());
+         vkCmdDrawIndexed(cmd, indexCount, 1, 0, 0, 0);
+       }});
+
+  // 先生成 render pass，管线创建时需要它
+  m_renderGraph.process();
+
+  m_pipelineMan.init(m_device.device(), m_renderGraph.renderPassOf(0),
+                     m_descriptorMan.layout());
+  m_bufferMan.init();
 
   m_commandPool.init(m_device.device(), m_device.graphicsQueueFamilyIndex());
   m_commandBuffer.init(m_device.device(), m_commandPool.pool(),
@@ -37,28 +107,19 @@ void Renderer::init(const RendererDesc &desc) {
       m_currFrame, m_textureMan.texture(texIndex).imageView(),
       m_textureMan.texture(texIndex).imageLayout());
 
-  const auto &swapchainImageViews = m_swapchain.swapchainImageViews();
-  m_framebuffers.resize(swapchainImageViews.size());
-
-  for (size_t i = 0; i < swapchainImageViews.size(); ++i) {
-    m_framebuffers[i].init(
-        m_device.device(), m_renderPass.renderPass(), swapchainImageViews[i],
-        m_depthResource.depthImageView(), m_swapchain.extent());
-  }
-
   DEBUG(LogCatag::render, "Renderer initialized");
 }
 
-void Renderer::render(Scene &scene) { drawFrame(scene); }
+void Renderer::render(Scene &scene) {
+  m_scene = &scene;
+  drawFrame(scene);
+}
 
 void Renderer::waitIdle() { vkDeviceWaitIdle(m_device.device()); }
 
 void Renderer::destroy() {
-  // framebuffers
-  for (auto &fb : m_framebuffers) {
-    fb.destroy();
-  }
-  m_framebuffers.clear();
+  // 渲染图（render pass / framebuffer）
+  m_renderGraph.destroy();
 
   // sync, depth, commands
   m_frameResource.destroy();
@@ -72,8 +133,7 @@ void Renderer::destroy() {
   m_pipelineMan.destroy();
   m_descriptorMan.destroy();
 
-  // render pass, swapchain, surface, device, instance
-  m_renderPass.destroy();
+  // swapchain, surface, device, instance
   m_swapchain.destroy();
   m_surface.destroy();
   m_device.destroy();
@@ -109,69 +169,14 @@ void Renderer::drawFrame(Scene &scene) {
     FATAL(LogCatag::render, "Failed to record command buffer");
   }
 
-  VkRenderPassBeginInfo renderPassBeginInfo{};
-  renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-  renderPassBeginInfo.renderPass = m_renderPass.renderPass();
-  renderPassBeginInfo.framebuffer = m_framebuffers[m_imageIndex].framebuffer();
-  renderPassBeginInfo.renderArea.offset = {0, 0};
-  renderPassBeginInfo.renderArea.extent = m_swapchain.extent();
+  // 这一帧画到哪张交换链图上
+  m_renderGraph.setPresentTarget(
+      m_swapchain.swapchainImages()[m_imageIndex],
+      m_swapchain.swapchainImageViews()[m_imageIndex],
+      m_swapchain.colorFormat());
 
-  VkClearValue clearValues[2]{};
-  clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-  clearValues[1].depthStencil = {1.0f, 0};
-  renderPassBeginInfo.clearValueCount = 2;
-  renderPassBeginInfo.pClearValues = clearValues;
-
-  vkCmdBeginRenderPass(cmdBuf, &renderPassBeginInfo,
-                       VK_SUBPASS_CONTENTS_INLINE);
-
-  // ---- update UBOs from scene data ----
-  m_descriptorMan.updateCameraUBO(m_currFrame, &scene.camera().ubo(),
-                                  sizeof(CameraUBO));
-  m_descriptorMan.updateObjectUBO(m_currFrame, &scene.object().ubo(),
-                                  sizeof(ObjectUBO));
-  m_descriptorMan.updateLightUBO(m_currFrame, &scene.light().ubo(),
-                                 sizeof(LightUBO));
-  m_descriptorMan.updateMaterialUBO(m_currFrame, &scene.material().ubo(),
-                                    sizeof(MaterialUBO));
-
-  // ---- bind pipeline ----
-  vkCmdBindPipeline(cmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    m_pipelineMan.graphicsPipeline());
-
-  // ---- bind descriptor set ----
-  VkDescriptorSet ds = m_descriptorMan.descriptorSet(m_currFrame);
-  vkCmdBindDescriptorSets(cmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                          m_pipelineMan.graphicsPipelineLayout(), 0, 1, &ds, 0,
-                          nullptr);
-
-  // ---- dynamic viewport + scissor ----
-  VkViewport viewport{};
-  viewport.x = 0.0f;
-  viewport.y = 0.0f;
-  viewport.width = static_cast<f32>(m_swapchain.extent().width);
-  viewport.height = static_cast<f32>(m_swapchain.extent().height);
-  viewport.minDepth = 0.0f;
-  viewport.maxDepth = 1.0f;
-  vkCmdSetViewport(cmdBuf, 0, 1, &viewport);
-
-  VkRect2D scissor{};
-  scissor.offset = {0, 0};
-  scissor.extent = m_swapchain.extent();
-  vkCmdSetScissor(cmdBuf, 0, 1, &scissor);
-
-  // ---- bind vertex + index buffers ----
-  VkBuffer vb = scene.mesh().vertexBuffer().buffer();
-  VkDeviceSize vbOffsets[1] = {0};
-  vkCmdBindVertexBuffers(cmdBuf, 0, 1, &vb, vbOffsets);
-  vkCmdBindIndexBuffer(cmdBuf, scene.mesh().indexBuffer().buffer(), 0,
-                       VK_INDEX_TYPE_UINT32);
-
-  // ---- draw ----
-  u32 indexCount = static_cast<u32>(scene.mesh().indices().size());
-  vkCmdDrawIndexed(cmdBuf, indexCount, 1, 0, 0, 0);
-
-  vkCmdEndRenderPass(cmdBuf);
+  m_renderGraph.process();
+  m_renderGraph.execute(cmdBuf);
 
   if (vkEndCommandBuffer(cmdBuf) != VK_SUCCESS) {
     FATAL(LogCatag::render, "Failed to record command buffer");

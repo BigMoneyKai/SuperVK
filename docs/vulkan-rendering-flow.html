@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>vulkan-rendering-flow.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/*
+
+Arduino® Light Theme - Stefania Mellai <s.mellai@arduino.cc>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: #FFFFFF;
+}
+
+.hljs,
+.hljs-subst {
+  color: #434f54;
+}
+
+.hljs-keyword,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-doctag,
+.hljs-name {
+  color: #00979D;
+}
+
+.hljs-built_in,
+.hljs-literal,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #D35400;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #00979D;
+}
+
+.hljs-type,
+.hljs-string,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: #005C5F;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #880000;
+  font-weight: bold;
+}
+
+.hljs-comment {
+  color: rgba(149,165,166,.8);
+}
+
+.hljs-meta-keyword {
+  color: #728E00;
+}
+
+.hljs-meta {
+  color: #434f54;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-function {
+  color: #728E00;
+}
+
+.hljs-number {
+  color: #8A7B52;  
+}
+
+</style>
+
+<style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family:   "HelveticaNeue-Light", sans-serif, "宋体","Segoe WPC", "Segoe UI", "SFUIText-Light","Droid Sans Fallback";
+	font-size: 18px;
+	padding: 0 12px;
+	line-height: 1.6;
+	word-wrap: break-word;
+	color: #333333;
+}
+
+.content-wrapper{
+	max-width: 860px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom: 1px solid #eee;
+}
+
+
+h2{
+	padding-bottom: .3em;
+    font-size: 2em;
+    line-height: 1.225;
+    border-bottom: 1px solid #eee;
+}
+
+h3{
+	font-size: 1.75em;
+    line-height: 1.225;
+}
+
+h1, h2, h3 {
+	font-weight: bold;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+</style>
+
+<style>
+/* Obsidian syntax defaults for legacy export (PDF / HTML / DOCX) */
+
+.callout {
+	--callout-accent: #0969da;
+	margin: 12px 0;
+	border-radius: 6px;
+	border-left: 4px solid var(--callout-accent);
+	background: rgba(9, 105, 218, 0.08);
+	color: #333333;
+	overflow: hidden;
+}
+
+.callout[data-callout="note"],
+.callout[data-callout="abstract"],
+.callout[data-callout="info"],
+.callout[data-callout="todo"],
+.callout[data-subtype="note"],
+.callout[data-subtype="abstract"],
+.callout[data-subtype="info"],
+.callout[data-subtype="todo"],
+.callout[data-callout="note" i],
+.callout[data-callout="abstract" i],
+.callout[data-callout="info" i],
+.callout[data-callout="todo" i],
+.callout[data-subtype="note" i],
+.callout[data-subtype="abstract" i],
+.callout[data-subtype="info" i],
+.callout[data-subtype="todo" i] {
+	--callout-accent: #0969da;
+	border-left-color: #0969da;
+	background: rgba(9, 105, 218, 0.08);
+}
+
+.callout[data-callout="tip"],
+.callout[data-callout="hint"],
+.callout[data-subtype="tip"],
+.callout[data-subtype="hint"],
+.callout[data-callout="tip" i],
+.callout[data-callout="hint" i],
+.callout[data-subtype="tip" i],
+.callout[data-subtype="hint" i] {
+	--callout-accent: #116329;
+	border-left-color: #116329;
+	background: rgba(17, 99, 41, 0.08);
+}
+
+.callout[data-callout="important"],
+.callout[data-subtype="important"],
+.callout[data-callout="important" i],
+.callout[data-subtype="important" i] {
+	--callout-accent: #8250df;
+	border-left-color: #8250df;
+	background: rgba(130, 80, 223, 0.08);
+}
+
+.callout[data-callout="warning"],
+.callout[data-subtype="warning"],
+.callout[data-callout="warning" i],
+.callout[data-subtype="warning" i] {
+	--callout-accent: #bc4c00;
+	border-left-color: #bc4c00;
+	background: rgba(188, 76, 0, 0.08);
+}
+
+.callout[data-callout="caution"],
+.callout[data-callout="danger"],
+.callout[data-callout="error"],
+.callout[data-callout="bug"],
+.callout[data-callout="fail"],
+.callout[data-subtype="caution"],
+.callout[data-subtype="danger"],
+.callout[data-subtype="error"],
+.callout[data-subtype="bug"],
+.callout[data-subtype="fail"],
+.callout[data-callout="caution" i],
+.callout[data-callout="danger" i],
+.callout[data-callout="error" i],
+.callout[data-callout="bug" i],
+.callout[data-callout="fail" i],
+.callout[data-subtype="caution" i],
+.callout[data-subtype="danger" i],
+.callout[data-subtype="error" i],
+.callout[data-subtype="bug" i],
+.callout[data-subtype="fail" i] {
+	--callout-accent: #cf222e;
+	border-left-color: #cf222e;
+	background: rgba(207, 34, 46, 0.08);
+}
+
+.callout[data-callout="question"],
+.callout[data-callout="help"],
+.callout[data-callout="faq"],
+.callout[data-subtype="question"],
+.callout[data-subtype="help"],
+.callout[data-subtype="faq"],
+.callout[data-callout="question" i],
+.callout[data-callout="help" i],
+.callout[data-callout="faq" i],
+.callout[data-subtype="question" i],
+.callout[data-subtype="help" i],
+.callout[data-subtype="faq" i] {
+	--callout-accent: #9a6700;
+	border-left-color: #9a6700;
+	background: rgba(154, 103, 0, 0.08);
+}
+
+.callout .callout-title,
+.callout .callout-info {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 14px 0;
+	margin-bottom: 10px;
+	color: var(--callout-accent);
+}
+
+.callout .callout-title-icon,
+.callout .callout-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+	color: var(--callout-accent);
+}
+
+.callout .callout-title-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.callout .callout-title-inner,
+.callout .callout-info > .callout-title {
+	font-weight: 700;
+	font-size: 0.95em;
+	line-height: 1.35;
+	color: var(--callout-accent);
+}
+
+.callout .callout-content {
+	padding: 6px 14px 12px;
+	color: #333333;
+}
+
+.callout .callout-content > :first-child {
+	margin-top: 0;
+}
+
+.callout .callout-content > :last-child {
+	margin-bottom: 0;
+}
+
+.obsidian-wikilink {
+	color: #7c3aed;
+	text-decoration: underline;
+}
+
+.obsidian-wikilink-embed {
+	display: inline-block;
+	padding: 2px 8px;
+	border: 1px dashed #d0d7de;
+	border-radius: 4px;
+	color: #7c3aed;
+}
+
+.obsidian-tag {
+	color: #7c3aed;
+	background: rgba(124, 58, 237, 0.12);
+	border-radius: 4px;
+	padding: 0 4px;
+}
+
+mark {
+	background: rgba(154, 103, 0, 0.35);
+	color: inherit;
+	padding: 0 2px;
+	border-radius: 2px;
+}
+
+[data-type="yaml-front-matter"] {
+	margin: 0 0 16px;
+}
+
+.vditor-properties {
+	border: 1px solid #d0d7de;
+	border-radius: 8px;
+	background: #f6f8fa;
+	overflow: hidden;
+}
+
+.vditor-properties__heading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-bottom: 1px solid #d0d7de;
+	background: #f3f4f6;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: #6b7280;
+}
+
+.vditor-properties__heading-icon::before {
+	content: "☰";
+	opacity: 0.75;
+}
+
+.vditor-properties__table {
+	display: flex;
+	flex-direction: column;
+}
+
+.vditor-properties__row {
+	display: grid;
+	grid-template-columns: minmax(120px, 34%) 1fr;
+	gap: 8px 12px;
+	align-items: start;
+	padding: 8px 12px;
+	border-top: 1px solid rgba(208, 215, 222, 0.45);
+}
+
+.vditor-properties__row:first-child {
+	border-top: none;
+}
+
+.vditor-properties__key {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	color: #6b7280;
+	font-size: 0.85rem;
+}
+
+.vditor-properties__key-icon {
+	flex-shrink: 0;
+	width: 14px;
+	height: 14px;
+	opacity: 0.72;
+	text-align: center;
+}
+
+.vditor-properties__key-icon[data-icon="tag"]::before { content: "#"; }
+.vditor-properties__key-icon[data-icon="alias"]::before { content: "⛓"; }
+.vditor-properties__key-icon[data-icon="date"]::before { content: "📅"; }
+.vditor-properties__key-icon[data-icon="toggle"]::before { content: "◉"; }
+.vditor-properties__key-icon[data-icon="number"]::before { content: "#"; }
+.vditor-properties__key-icon[data-icon="list"]::before { content: "≡"; }
+.vditor-properties__key-icon[data-icon="text"]::before { content: "T"; }
+
+.vditor-properties__key-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.vditor-properties__value {
+	min-width: 0;
+	font-size: 0.92rem;
+	color: #333333;
+	word-break: break-word;
+}
+
+.vditor-properties__value--tags,
+.vditor-properties__value--aliases {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.vditor-properties__value--aliases {
+	gap: 6px;
+}
+
+.vditor-properties__list {
+	margin: 0;
+	padding-left: 1.1rem;
+}
+
+.vditor-properties__checkbox {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	margin-right: 6px;
+	border: 1px solid #d0d7de;
+	border-radius: 3px;
+	vertical-align: -2px;
+	background: #ffffff;
+}
+
+.vditor-properties__checkbox[is-checked="true"] {
+	background: #7c3aed;
+	border-color: #7c3aed;
+	box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+.vditor-properties__empty {
+	opacity: 0.45;
+}
+
+</style>
+
+<style>
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+.table-of-contents li{
+	list-style-type: initial;
+}
+
+</style>
+
+<style>
+@font-face{font-display:block;font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_AMS-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_AMS-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_AMS-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Caligraphic-Bold.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Caligraphic-Bold.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Caligraphic-Bold.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Caligraphic-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Caligraphic-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Caligraphic-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Fraktur-Bold.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Fraktur-Bold.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Fraktur-Bold.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Fraktur-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Fraktur-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Fraktur-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Bold.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Bold.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Bold.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-BoldItalic.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-BoldItalic.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-BoldItalic.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Italic.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Italic.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Italic.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Main-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Math-BoldItalic.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Math-BoldItalic.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Math-BoldItalic.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Math-Italic.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Math-Italic.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Math-Italic.ttf") format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Bold.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Bold.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Bold.ttf") format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Italic.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Italic.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Italic.ttf") format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_SansSerif-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Script-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Script-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Script-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size1-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size1-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size1-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size2-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size2-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size2-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size3-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size3-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size3-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size4-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size4-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Size4-Regular.ttf") format("truetype")}@font-face{font-display:block;font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Typewriter-Regular.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Typewriter-Regular.woff") format("woff"),url("https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/fonts/KaTeX_Typewriter-Regular.ttf") format("truetype")}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;position:relative;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.47"}.katex .katex-mathml{border:0;-webkit-clip-path:inset(50%);clip-path:inset(50%);height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .mathsfit,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .smash{display:inline;line-height:0}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex svg{fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+</style>
+<style>
+body {
+    padding-top: 25px;
+}
+</style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <h1 id="vulkan-%E4%B8%8E-supervk-%E6%B8%B2%E6%9F%93%E6%9E%B6%E6%9E%84%E6%B5%81%E7%A8%8B%E5%9B%BE" tabindex="-1">Vulkan 与 SuperVK 渲染架构流程图</h1>
+<blockquote>
+<p>本文档配套 render graph 学习使用：上半是 Vulkan 从创建到销毁的完整流程，下半是你仓库（SuperVK）现在的分层与每帧的实际调用链，最后是一帧的逐步走查。</p>
+</blockquote>
+<h2 id="%E4%B8%80%E3%80%81vulkan-%E5%AE%8C%E6%95%B4%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F" tabindex="-1">一、Vulkan 完整生命周期</h2>
+<div class="mermaid">flowchart TD
+    subgraph INIT["① 初始化：只做一次，按依赖顺序创建全部对象"]
+        I1["Instance：与驱动握手，指定应用名，加载验证层"]
+        I2["Surface：连接窗口系统（GLFW），拿到可绘制表面"]
+        I3["Physical Device：枚举 GPU，查特性、队列族"]
+        I4["Logical Device：创建逻辑设备，拿 graphics + present 队列"]
+        I5["Swapchain：创建 N 张交换链图像（颜色缓冲）+ ImageView"]
+        I6["RenderPass：声明附件（color/depth）和 Load/Store 语义"]
+        I7["Pipeline：编译 shader + 顶点布局 + 光栅化/混合/深度状态"]
+        I8["Framebuffer：RenderPass × 具体图像，每张交换链图一个"]
+        I9["资源：Buffer（顶点/UBO）、Image/Texture、DescriptorSet"]
+        I10["同步：Fence（CPU等GPU）、Semaphore（GPU内部接力）"]
+        I1 --> I2 --> I3 --> I4 --> I5
+        I5 --> I6 --> I7
+        I5 --> I8
+        I4 --> I9
+        I9 --> I10
+        I6 --> I8
+    end
+
+    subgraph FRAME["② 帧循环：每帧重复同一套五步"]
+        F1["等本帧槽位的 Fence：上一帧同一槽位画完了吗"]
+        F2["Acquire：拿一张交换链图，信号 imageAvailable"]
+        F3["Record：begin → barrier → BeginRenderPass → 绑管线/描述符 → draw → End → end"]
+        F4["Submit：等 imageAvailable 才开始画，画完信号 renderFinished + Fence"]
+        F5["Present：等 renderFinished，把图像交给屏幕"]
+        F1 --> F2 --> F3 --> F4 --> F5
+        F2 -.->|"N 张图轮着用，MAX_FRAMES_IN_FLIGHT 套资源"| F3
+    end
+
+    DESTROY["③ 销毁：严格逆序<br/>Framebuffer → RenderPass → Pipeline → 资源 → Command → Swapchain → Device → Surface → Instance"]
+
+    INIT --> FRAME --> DESTROY</div><p><strong>要点</strong>：创建顺序就是依赖顺序，销毁顺序就是它的逆序；帧循环只是中间那段五步舞曲的无限重复。所有&quot;释放复杂&quot;的焦虑，本质都是想把第三段做好。</p>
+<h2 id="%E4%BA%8C%E3%80%81supervk-%E7%8E%B0%E5%9C%A8%E7%9A%84%E6%9E%B6%E6%9E%84%E4%B8%8E%E4%B8%80%E5%B8%A7%E7%9A%84%E8%BF%90%E8%A1%8C" tabindex="-1">二、SuperVK 现在的架构与一帧的运行</h2>
+<div class="mermaid">flowchart TD
+    subgraph APP["App（app/app.cpp）"]
+        A1["JobSystem：异步资产线程池"]
+        A2["WinMan：GLFW 窗口"]
+        A3["AssetMan：加载 GLB → 顶点/索引搬到 Scene"]
+        A5["Scene：Camera / Object / Light / Material / Mesh"]
+    end
+
+    subgraph REN["Renderer（render/renderer.h）"]
+        R0["Instance / Device / Surface / Swapchain"]
+        R1["CommandPool + CommandBuffer（每帧槽位一个）"]
+        R2["PipelineMan：用 graph 的 renderPassOf(0) 创建管线"]
+        R3["DescriptorMan：Camera/Object/Light/Material UBO + 纹理"]
+        R4["BufferMan / TextureMan"]
+        R5["FrameResource：Fence ×1 + Semaphore ×2 + 帧计数"]
+        R6["DepthResource：深度图 / 内存 / 视图"]
+        R7["RenderGraph"]
+    end
+
+    subgraph GRAPH["RenderGraph 内部（render/graph）"]
+        G1["addPass 声明：color/depth/input 附件 + drawList 回调"]
+        G2["process()：登记资源用途 → 依赖边 → 拓扑排序 → 推导 barrier → 缓存 RenderPass"]
+        G3["execute(cmd)：按序 barrier → BeginRenderPass → drawList() → End → 呈现目标切 PRESENT_SRC"]
+        G1 --> G2 --> G3
+    end
+
+    subgraph DRAW["Main pass 的 drawList 回调"]
+        D1["更新 4 个 UBO（读 Scene + 写帧缓冲）"]
+        D2["绑 Pipeline + DescriptorSet"]
+        D3["设 Viewport / Scissor"]
+        D4["绑顶点/索引缓冲 → vkCmdDrawIndexed"]
+    end
+
+    subgraph LOOP["drawFrame 每帧"]
+        L1["等 Fence → Acquire → 重置 Fence"]
+        L2["setPresentTarget：喂这一帧的交换链图/视图"]
+        L3["begin cmd → process() → execute() → end cmd"]
+        L4["Submit（等 imageAvailable，信号 renderFinished）→ Present"]
+        L5["m_currFrame = (m_currFrame + 1) % MAX_FRAMES_IN_FLIGHT"]
+    end
+
+    APP --> REN
+    A5 --> DRAW
+    R2 --> DRAW
+    R3 --> DRAW
+    R4 --> DRAW
+    R7 --> GRAPH
+    G2 -->|"renderPassOf(0)"| R2
+    GRAPH --> LOOP
+    L3 --> G2
+    L3 --> G3
+    G3 --> DRAW</div><p><strong>三个容易看漏的细节</strong>：</p>
+<ol>
+<li><strong>管线挂在图的 render pass 上</strong>（<code>G2 → R2</code> 那条边）：init 里必须先 <code>addPass</code> + <code>process()</code>，管线才能拿到 <code>renderPassOf(0)</code> 创建。</li>
+<li><strong>process 和 execute 的分工就是 render graph 模型</strong>：<code>process()</code> = 声明变成排序和 barrier，<code>execute()</code> = 真正录制。两者都在 <code>drawFrame</code> 里每帧被调用，中间夹着 <code>setPresentTarget</code>。</li>
+<li><strong>三件同步工具的职责</strong>：Fence 管&quot;同一槽位的上一帧&quot;；<code>imageAvailable</code> semaphore 管&quot;acquire 的图可以开始画了&quot;；<code>renderFinished</code> semaphore 管&quot;画完才能 present&quot;。两个帧槽位轮换，所以 CPU 录第 N+1 帧时 GPU 正在画第 N 帧。</li>
+</ol>
+<h2 id="%E4%B8%89%E3%80%81%E4%B8%80%E5%B8%A7%E7%9A%84%E9%80%90%E6%AD%A5%E8%B5%B0%E6%9F%A5%EF%BC%88cpu-%2F-gpu-%E6%8E%A5%E5%8A%9B%EF%BC%89" tabindex="-1">三、一帧的逐步走查（CPU / GPU 接力）</h2>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>侧</th>
+<th>动作</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>CPU</td>
+<td>等 Fence</td>
+<td>等上一帧同一槽位画完，确认 GPU 已用完这套 FrameResource，CPU 才能安全写入</td>
+</tr>
+<tr>
+<td>2</td>
+<td>CPU</td>
+<td>Acquire 交换链图</td>
+<td><code>vkAcquireNextImageKHR</code> 拿一张交换链图；GPU 准备好后信号 <code>imageAvailable</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>CPU</td>
+<td>录制命令</td>
+<td>begin → 图已算好的 barrier → BeginRenderPass → 绑管线/描述符 → draw → EndRenderPass → end</td>
+</tr>
+<tr>
+<td>4</td>
+<td>CPU</td>
+<td>Submit</td>
+<td><code>vkQueueSubmit</code>：等 <code>imageAvailable</code> 才开始执行；完成时信号 <code>renderFinished</code> + Fence</td>
+</tr>
+<tr>
+<td>5</td>
+<td>GPU</td>
+<td>执行绘制</td>
+<td>顶点 → 着色器 → 光栅化 → 片元，写入交换链图</td>
+</tr>
+<tr>
+<td>6</td>
+<td>GPU</td>
+<td>完成</td>
+<td>信号<code>renderFinished</code>（Present 等它）和 Fence（下一轮 CPU 等它）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>CPU</td>
+<td>Present</td>
+<td><code>vkQueuePresentKHR</code>：等 <code>renderFinished</code>，把图交给屏幕</td>
+</tr>
+<tr>
+<td>8</td>
+<td>CPU</td>
+<td>下一帧</td>
+<td>帧槽位 +1 取模；CPU 录下一帧时，GPU 可能还在画这一帧——这就是双缓冲</td>
+</tr>
+</tbody>
+</table>
+<h2 id="%E5%9B%9B%E3%80%81%E8%BF%98%E9%9C%80%E8%A6%81%E7%9F%A5%E9%81%93%E7%9A%84%E7%BB%86%E8%8A%82" tabindex="-1">四、还需要知道的细节</h2>
+<ul>
+<li>shader 由 <code>glslangValidator</code> 预编译成 SPIR-V，构建时复制到可执行目录，因此<strong>必须从仓库根运行</strong>引擎。</li>
+<li>Debug 构建开着 ASan；<code>VK_CHECK_RESULT</code> 失败会打印全部缓冲日志后退出（Release 里是 no-op，所以验证要在 Debug）。</li>
+<li>窗口缩放目前没有 swapchain 重建处理，<code>VK_ERROR_OUT_OF_DATE_KHR</code> 会直接退出——这是下一步要补的。</li>
+<li>framebuffer 目前按呈现图每帧重建（MVP 偷懒）；下一步应改为按 <code>(pass, imageIndex)</code> 缓存，把创建次数从&quot;每帧 N 次&quot;降到&quot;总共 N 次&quot;。</li>
+<li>render graph 的 barrier 目前用&quot;全命令 + 内存写&quot;做 src（过度同步但正确），跑通后再按附件槽位收紧。</li>
+</ul>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    </body>
+</html>

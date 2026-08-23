@@ -12,6 +12,7 @@ public:
   SV_FORCE_INLINE const VkImageView &depthImageView() const {
     return m_depthImageView;
   }
+  SV_FORCE_INLINE const VkImage &depthImage() const { return m_depthImage; }
 
 private:
   VkDevice m_device{VK_NULL_HANDLE};
