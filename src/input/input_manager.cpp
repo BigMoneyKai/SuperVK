@@ -1,5 +1,5 @@
 #include "input_manager.h"
-#include "core/debug/debugger.h"
+#include "GLFW/glfw3.h"
 
 static InputMan *g_inputMan = nullptr;
 
@@ -26,6 +26,21 @@ static void keyCallback(GLFWwindow *window, i32 key, i32, i32 action, i32) {
     g_inputMan->getKeyboard().press(Key::keyD);
   else if (key == GLFW_KEY_D && action == GLFW_RELEASE)
     g_inputMan->getKeyboard().release(Key::keyD);
+
+  if (key == GLFW_KEY_SPACE && action != GLFW_RELEASE)
+    g_inputMan->getKeyboard().press(Key::keySpace);
+  else if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
+    g_inputMan->getKeyboard().release(Key::keySpace);
+
+  if (key == GLFW_KEY_LEFT_SHIFT && action != GLFW_RELEASE)
+    g_inputMan->getKeyboard().press(Key::keyLShift);
+  else if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE)
+    g_inputMan->getKeyboard().release(Key::keyLShift);
+
+  if (key == GLFW_KEY_ESCAPE && action != GLFW_RELEASE)
+    g_inputMan->getKeyboard().press(Key::keyEsc);
+  else if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+    g_inputMan->getKeyboard().release(Key::keyEsc);
 }
 
 static void buttonCallback(GLFWwindow *window, i32 button, i32 action, i32) {
@@ -59,11 +74,7 @@ static void buttonCallback(GLFWwindow *window, i32 button, i32 action, i32) {
 static void cursorPosCallback(GLFWwindow *window, f64 x, f64 y) {
   if (!g_inputMan)
     return;
-  // Debug: log cursor movement to help diagnose lost mouse input
-  DEBUG(LogCatag::input,
-        "cursorPosCallback: x={} y={} focused={} mode={}",
-        x, y, glfwGetWindowAttrib(window, GLFW_FOCUSED),
-        glfwGetInputMode(window, GLFW_CURSOR));
+
   g_inputMan->getMouse().move(static_cast<f32>(x), static_cast<f32>(y));
 }
 

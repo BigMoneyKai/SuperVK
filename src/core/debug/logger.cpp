@@ -36,7 +36,7 @@ void Logger::printComplexMsg(const LogMsg &msg) {
 
 void Logger::printSimpleMsg(const LogMsg &msg) {
   std::string line =
-      std::format("{}:{} {}\n", logLevelTags[static_cast<u32>(msg.level)],
+      std::format("{}{} {}\n", logLevelTags[static_cast<u32>(msg.level)],
                   logCatagTags[static_cast<u32>(msg.catag)], msg.msg.c_str());
   s_cout.write(line.data(), line.size());
 }

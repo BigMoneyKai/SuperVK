@@ -19,11 +19,13 @@ SV_INLINE constexpr f32 defaultPitch = 0.f;
 
 SV_INLINE constexpr glm::vec2 defaultMouseDelta = {0.f, 0.f};
 SV_INLINE constexpr f32 defaultScrollWheel = 0.f;
-SV_INLINE constexpr b32 defaultOrbitEnabled = SV_FALSE;
+// SV_INLINE constexpr b32 defaultOrbitEnabled = SV_FALSE;
 SV_INLINE constexpr b32 defaultMoveForward = SV_FALSE;
 SV_INLINE constexpr b32 defaultMoveBackward = SV_FALSE;
 SV_INLINE constexpr b32 defaultMoveLeft = SV_FALSE;
 SV_INLINE constexpr b32 defaultMoveRight = SV_FALSE;
+SV_INLINE constexpr b32 defaultMoveUp = SV_FALSE;
+SV_INLINE constexpr b32 defaultMoveDown = SV_FALSE;
 
 struct CameraUBO {
   glm::mat4 view{};
@@ -33,19 +35,20 @@ struct CameraUBO {
 
 // ---- Input bundle passed from App::update() to Camera::update() ----
 struct CameraInput {
-  glm::vec2 mouseDelta{defaultMouseDelta};
-  f32 scrollWheel{defaultScrollWheel};
-  b32 orbitEnabled{defaultOrbitEnabled}; // right mouse button held
-  b32 moveForward{defaultMoveForward};   // W
-  b32 moveBackward{defaultMoveBackward}; // S
-  b32 moveLeft{defaultMoveLeft};         // A
-  b32 moveRight{defaultMoveRight};       // D
+  glm::vec2 mouseDelta{defaultMouseDelta}; // Mouse move
+  f32 scrollWheel{defaultScrollWheel};     // Mouse Scroll
+  b32 moveForward{defaultMoveForward};     // W
+  b32 moveBackward{defaultMoveBackward};   // S
+  b32 moveLeft{defaultMoveLeft};           // A
+  b32 moveRight{defaultMoveRight};         // D
+  b32 moveUp{defaultMoveUp};               // Space
+  b32 moveDown{defaultMoveDown};           // LShift
 };
 
 class Camera {
 public:
   void init(f32 aspect);
-  void update(const CameraInput &input);
+  void update(const CameraInput &input = CameraInput{});
   void destroy();
 
   SV_FORCE_INLINE const CameraUBO &ubo() const { return m_ubo; }

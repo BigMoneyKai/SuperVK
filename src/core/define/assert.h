@@ -1,36 +1,26 @@
 #pragma once
 
-#include <iostream>
+#include <cstdlib>
 #include <format>
+#include <iostream>
+#include <utility>
 
-#if defined(_MSC_VER)
+namespace sv_assert_detail {
+template <typename... Args>
+[[noreturn]] inline void assert_fail(const char *file, int line,
+                                     std::format_string<Args...> fmt,
+                                     Args &&...args) {
+  std::cerr << "Abort: [" << std::format(fmt, std::forward<Args>(args)...)
+            << "] at " << file << ":" << line << std::endl;
+  abort();
+}
+} // namespace sv_assert_detail
+
 #define SV_STATIC_ASSERT static_assert
-#define SV_ASSERT(cond, fmt, ...)                                              \
+
+#define SV_ASSERT(cond, ...)                                                   \
   do {                                                                         \
     if (!(cond)) {                                                             \
-      std::cerr << "Abort: [" << std::format(fmt, __VA_ARGS__)                 \
-                << "] at " << __FILE__ << ":" << __LINE__ << std::endl;        \
-      abort();                                                                 \
+      sv_assert_detail::assert_fail(__FILE__, __LINE__, __VA_ARGS__);          \
     }                                                                          \
   } while (0)
-#elif defined(__clang__)
-#define SV_STATIC_ASSERT static_assert
-#define SV_ASSERT(cond, fmt, ...)                                              \
-  do {                                                                         \
-    if (!(cond)) {                                                             \
-      std::cerr << "Abort: [" << std::format(fmt __VA_OPT__(, ) __VA_ARGS__)   \
-                << "] at " << __FILE__ << ":" << __LINE__ << std::endl;        \
-      abort();                                                                 \
-    }                                                                          \
-  } while (0)
-#elif defined(__GNUC__)
-#define SV_STATIC_ASSERT static_assert
-#define SV_ASSERT(cond, fmt, ...)                                              \
-  do {                                                                         \
-    if (!(cond)) {                                                             \
-      std::cerr << "Abort: [" << std::format(fmt __VA_OPT__(, ) __VA_ARGS__)   \
-                << "] at " << __FILE__ << ":" << __LINE__ << std::endl;        \
-      abort();                                                                 \
-    }                                                                          \
-  } while (0)
-#endif

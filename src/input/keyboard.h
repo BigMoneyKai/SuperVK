@@ -7,6 +7,9 @@ enum class Key {
   keyS,
   keyA,
   keyD,
+  keySpace,
+  keyLShift,
+  keyEsc,
 
   keyMaxNum
 };

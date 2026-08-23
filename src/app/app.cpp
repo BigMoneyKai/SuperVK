@@ -2,6 +2,8 @@
 #include "core/debug/debugger.h"
 #include "scene/camera.h"
 
+#include <cstdio>
+
 static b32 waitForMeshLoad(JobSystem &js, AssetMan &am,
                            AssetMan::MeshHandle handle) {
   while (true) {
@@ -71,11 +73,12 @@ void App::update() {
 
   camInput.mouseDelta = mouse.delta();
   camInput.scrollWheel = mouse.wheel();
-  camInput.orbitEnabled = mouse.isDown(Button::button2);
   camInput.moveForward = kb.isDown(Key::keyW);
   camInput.moveBackward = kb.isDown(Key::keyS);
   camInput.moveLeft = kb.isDown(Key::keyA);
   camInput.moveRight = kb.isDown(Key::keyD);
+  camInput.moveUp = kb.isDown(Key::keySpace);
+  camInput.moveDown = kb.isDown(Key::keyLShift);
 
   m_scene.camera().update(camInput);
 }
