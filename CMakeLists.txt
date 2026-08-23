@@ -4,6 +4,8 @@ if(APPLE)
     set(CMAKE_C_COMPILER clang)
     set(CMAKE_CXX_COMPILER clang++)
 elseif(WIN32)
+    set(CMAKE_C_COMPILER cl)
+    set(CMAKE_CXX_COMPILER cl)
 elseif(UNIX)
     set(CMAKE_C_COMPILER gcc)
     set(CMAKE_CXX_COMPILER g++)
@@ -12,21 +14,31 @@ endif()
 
 project(SuperVK VERSION 1.0.0)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(BENCHMARK_ENABLE_TESTING OFF)
 
+# Set up environment variables for Vulkan
+if(NOT DEFINED VULKAN_SDK)
+    if(DEFINED ENV{VULKAN_SDK})
+        set(VULKAN_SDK $ENV{VULKAN_SDK})
+    endif()
+endif()
+
+# Find Vulkan before adding subdirectories
+find_package(Vulkan REQUIRED)
+
+# Add Vulkan include directories globally to ensure all modules can find headers
+if(VULKAN_SDK)
+    include_directories("${VULKAN_SDK}/include")
+endif()
+
 # Enable CTest at the top level so `ctest` works from the build root.
 # test/ is added before benchmark/, so a plain serial `ctest` runs all
 # unit tests first, then all benchmarks.
 enable_testing()
-
-# remove sanitizer when releasing
-set(CMAKE_CXX_FLAGS_DEBUG
-    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer"
-)
 
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG
     "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address"

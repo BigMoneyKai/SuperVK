@@ -1,6 +1,7 @@
 #include "asset/importer/obj/objparser.h"
 #include "core/debug/debugger.h"
 #include <algorithm>
+#include <cstdio>
 
 static FaceType scanFaceToken(const std::string& token, FaceIndex* f) {
     u64 slashCount = 0;
@@ -12,28 +13,51 @@ static FaceType scanFaceToken(const std::string& token, FaceIndex* f) {
         return FaceType::unknown;
     }
     switch(slashCount) {
-        // v
-        case 0:
-            sscanf(token.c_str(), "%u", &f->vi);
-            return FaceType::position;
+    // v
+    case 0:
+    {
+        i32 ret = std::sscanf(token.c_str(), "%u", &f->vi);
+        if (ret != 1) {
+            ERROR(LogCatag::asset, "Failed to parse face position index");
+            return FaceType::unknown;
+        }
+        return FaceType::position;
+    }
+
 
         // v/t
         case 1:
-            sscanf(token.c_str(), "%u/%u", &f->vi, &f->ti);
+        {
+            i32 ret = std::sscanf(token.c_str(), "%u/%u", &f->vi, &f->ti);
+            if (ret != 2) {
+                ERROR(LogCatag::asset, "Failed to parse face position/texcoord indices");
+                return FaceType::unknown;
+            }
             return FaceType::positionTexcoord;
+        }
 
         // v//n and v/t/n
         case 2:
+        {
             // v//n
-            if(token.find("//") != std::string::npos) {
-                sscanf(token.c_str(), "%u//%u", &f->vi, &f->ni);
+            if (token.find("//") != std::string::npos) {
+                i32 ret = std::sscanf(token.c_str(), "%u//%u", &f->vi, &f->ni);
+                if (ret != 2) {
+                    ERROR(LogCatag::asset, "Failed to parse face position//normal indices");
+                    return FaceType::unknown;
+                }
                 return FaceType::positionNormal;
             }
             // v/t/n
             else {
-                sscanf(token.c_str(), "%u/%u/%u", &f->vi, &f->ti, &f->ni);
+                i32 ret = std::sscanf(token.c_str(), "%u/%u/%u", &f->vi, &f->ti, &f->ni);
+                if (ret != 3) {
+                    ERROR(LogCatag::asset, "Failed to parse face position/texcoord/normal indices");
+                    return FaceType::unknown;
+                }
                 return FaceType::positionTexcoordNormal;
             }
+        }
         default:
             ERROR(LogCatag::asset, "Unknown obj face format");
         return FaceType::unknown;
@@ -156,7 +180,7 @@ void ObjParser::parse_f(std::stringstream& ss) {
     std::string token;
 
     std::vector<FaceIndex> faceIndices;
-    FaceType fType;
+    FaceType fType = FaceType::unknown;
     while(ss >> token) {
         FaceIndex faceIndex;
         fType = scanFaceToken(token, &faceIndex);

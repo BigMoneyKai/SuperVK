@@ -11,10 +11,10 @@ constexpr glm::vec3 defaultNormal = {0.f, 0.f, 0.f};
 
 // Data type struct
 struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 color;
-    glm::vec2 uv;
-    glm::vec3 normal;
+    glm::vec3 pos{defaultPos};
+    glm::vec3 color{defaultColor};
+    glm::vec2 uv{defaultUV};
+    glm::vec3 normal{defaultNormal};
 };
 
 } // namespace

@@ -40,24 +40,24 @@ public:
   T &at(u64 i);
   const T &at(u64 i) const;
 
-  T &front() {
+  SV_FORCE_INLINE T &front() {
     SV_ASSERT(m_size > 0, "RingBuffer is empty");
     return m_data[m_head];
   }
-  const T &front() const {
+  SV_FORCE_INLINE const T &front() const {
     SV_ASSERT(m_size > 0, "RingBuffer is empty");
     return m_data[m_head];
   }
-  T &back() {
+  SV_FORCE_INLINE T &back() {
     SV_ASSERT(m_size > 0, "RingBuffer is empty");
     return m_data[(m_tail - 1) & m_mask];
   }
-  const T &back() const {
+  SV_FORCE_INLINE const T &back() const {
     SV_ASSERT(m_size > 0, "RingBuffer is empty");
     return m_data[(m_tail - 1) & m_mask];
   }
-  T *data() { return m_data; }
-  const T *data() const { return m_data; }
+  SV_FORCE_INLINE T *data() { return m_data; }
+  SV_FORCE_INLINE const T *data() const { return m_data; }
 
   void push_back(const T &value);
   void push_back(T &&value);

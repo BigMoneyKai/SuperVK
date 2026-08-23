@@ -1,4 +1,5 @@
 #include "input_manager.h"
+#include "core/debug/debugger.h"
 
 static InputMan *g_inputMan = nullptr;
 
@@ -58,6 +59,11 @@ static void buttonCallback(GLFWwindow *window, i32 button, i32 action, i32) {
 static void cursorPosCallback(GLFWwindow *window, f64 x, f64 y) {
   if (!g_inputMan)
     return;
+  // Debug: log cursor movement to help diagnose lost mouse input
+  DEBUG(LogCatag::input,
+        "cursorPosCallback: x={} y={} focused={} mode={}",
+        x, y, glfwGetWindowAttrib(window, GLFW_FOCUSED),
+        glfwGetInputMode(window, GLFW_CURSOR));
   g_inputMan->getMouse().move(static_cast<f32>(x), static_cast<f32>(y));
 }
 

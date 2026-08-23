@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/define/platform.h"
 #include "core/container/string/string.hpp"
 #include "core/define/types.h"
 

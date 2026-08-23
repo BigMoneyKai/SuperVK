@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/define/compiler.h"
 #include "hash_key.hpp"
 #include "hashmap.hpp"
 #include <utility>
@@ -187,7 +188,7 @@ HashMap<K, V, Entry>::find(const K &key) {
     match_mask &= ~((1u << off) - 1);
 
     while (match_mask) {
-      u64 bit = __builtin_ctz(match_mask);
+      u64 bit = SV_CTZ32(match_mask);
       u64 idx = group + bit;
       if (m_hashKeys[idx] == hashVal && m_keys[idx] == key)
         return make_iter(idx);
@@ -222,7 +223,7 @@ HashMap<K, V, Entry>::find(const K &key) const {
     match_mask &= ~((1u << off) - 1);
 
     while (match_mask) {
-      u64 bit = __builtin_ctz(match_mask);
+      u64 bit = SV_CTZ32(match_mask);
       u64 idx = group + bit;
       if (m_hashKeys[idx] == hashVal && m_keys[idx] == key)
         return make_citer(idx);
@@ -287,7 +288,7 @@ void HashMap<K, V, Entry>::erase(const K &key) {
     match_mask &= ~((1u << off) - 1);
 
     while (match_mask) {
-      u64 bit = __builtin_ctz(match_mask);
+      u64 bit = SV_CTZ32(match_mask);
       u64 idx = group + bit;
       if (m_hashKeys[idx] == hashVal && m_keys[idx] == key) {
         m_occupied[idx] = SV_FALSE;

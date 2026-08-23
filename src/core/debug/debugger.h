@@ -13,7 +13,7 @@
   do {                                                                         \
     LogMsg msg{                                                                \
         LogLevel::trace, catag,                                                \
-        Logger::id(),    std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),  \
+        Logger::id(),    std::format(fmt, __VA_ARGS__).c_str(),  \
         __func__,        __FILE__,                                             \
         __LINE__,        static_cast<u64>(timer_now_ms() * 1000.0)};           \
     Logger::submit(std::move(msg));                                            \
@@ -27,7 +27,7 @@
   do {                                                                         \
     LogMsg msg{                                                                \
         LogLevel::debug, catag,                                                \
-        Logger::id(),    std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),  \
+        Logger::id(),    std::format(fmt, __VA_ARGS__).c_str(),  \
         __func__,        __FILE__,                                             \
         __LINE__,        static_cast<u64>(timer_now_ms() * 1000.0)};           \
     Logger::submit(std::move(msg));                                            \
@@ -40,7 +40,7 @@
   do {                                                                         \
     LogMsg msg{                                                                \
         LogLevel::info, catag,                                                 \
-        Logger::id(),   std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),   \
+        Logger::id(),   std::format(fmt, __VA_ARGS__).c_str(),   \
         __func__,       __FILE__,                                              \
         __LINE__,       static_cast<u64>(timer_now_ms() * 1000.0)};            \
     Logger::submit(std::move(msg));                                            \
@@ -51,7 +51,7 @@
     LogMsg msg{LogLevel::warning,                                              \
                catag,                                                          \
                Logger::id(),                                                   \
-               std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),            \
+               std::format(fmt, __VA_ARGS__).c_str(),            \
                __func__,                                                       \
                __FILE__,                                                       \
                __LINE__,                                                       \
@@ -63,7 +63,7 @@
   do {                                                                         \
     LogMsg msg{                                                                \
         LogLevel::error, catag,                                                \
-        Logger::id(),    std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),  \
+        Logger::id(),    std::format(fmt, __VA_ARGS__).c_str(),  \
         __func__,        __FILE__,                                             \
         __LINE__,        static_cast<u64>(timer_now_ms() * 1000.0)};           \
     Logger::submit(std::move(msg));                                            \
@@ -73,7 +73,7 @@
   do {                                                                         \
     LogMsg msg{                                                                \
         LogLevel::fatal, catag,                                                \
-        Logger::id(),    std::format(fmt __VA_OPT__(, ) __VA_ARGS__).c_str(),  \
+        Logger::id(),    std::format(fmt, __VA_ARGS__).c_str(),  \
         __func__,        __FILE__,                                             \
         __LINE__,        static_cast<u64>(timer_now_ms() * 1000.0)};           \
     Logger::submit(std::move(msg));                                            \

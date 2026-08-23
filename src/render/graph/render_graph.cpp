@@ -90,15 +90,17 @@ void RenderGraph::init(VkDevice device, VkExtent2D extent) {
 
 void RenderGraph::destroy() {
   for (auto &pass : m_passes) {
-    if (pass.framebuffer != VK_NULL_HANDLE) {
-      vkDestroyFramebuffer(m_device, pass.framebuffer, nullptr);
-      pass.framebuffer = VK_NULL_HANDLE;
-    }
     if (pass.renderPass != VK_NULL_HANDLE) {
       vkDestroyRenderPass(m_device, pass.renderPass, nullptr);
       pass.renderPass = VK_NULL_HANDLE;
     }
   }
+  for (auto& it : m_framebufferCache) {
+    if (it.second != VK_NULL_HANDLE) {
+      vkDestroyFramebuffer(m_device, it.second, nullptr);
+    }
+  }
+
   m_passes.clear();
   m_resources.clear();
   m_order.clear();
@@ -173,6 +175,7 @@ void RenderGraph::process() {
     if (p.renderPass == VK_NULL_HANDLE)
       buildRenderPass(p);
 }
+
 void RenderGraph::execute(VkCommandBuffer cmd) {
   for (u32 idx : m_order) {
     Pass &pass = m_passes[idx];
@@ -400,8 +403,6 @@ void RenderGraph::ensureFramebuffer(Pass &pass) {
   if (pass.framebuffer != VK_NULL_HANDLE &&
       pass.framebufferImage == m_presentImage)
     return;
-  if (pass.framebuffer != VK_NULL_HANDLE)
-    vkDestroyFramebuffer(m_device, pass.framebuffer, nullptr);
 
   std::vector<VkImageView> views;
   for (const auto &a : pass.desc.colorAttachments)
@@ -411,8 +412,10 @@ void RenderGraph::ensureFramebuffer(Pass &pass) {
   for (const auto &a : pass.desc.inputAttachments)
     views.push_back(viewOf(a.resource.id));
 
-  auto it = m_framebufferCache.find(pass);
+  // Use the current present image as the key for framebuffer cache
+  auto it = m_framebufferCache.find(m_presentImage);
   if (it == m_framebufferCache.end()) {
+    VkFramebuffer fb = VK_NULL_HANDLE;
     VkFramebufferCreateInfo ci{};
     ci.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     ci.renderPass = pass.renderPass;
@@ -421,9 +424,11 @@ void RenderGraph::ensureFramebuffer(Pass &pass) {
     ci.width = m_extent.width;
     ci.height = m_extent.height;
     ci.layers = 1;
-    VK_CHECK_RESULT(
-        vkCreateFramebuffer(m_device, &ci, nullptr, &pass.framebuffer));
-    m_framebufferCache.insert({pass, pass.framebufferImage});
+    VK_CHECK_RESULT(vkCreateFramebuffer(m_device, &ci, nullptr, &fb));
+    m_framebufferCache.insert({m_presentImage, fb});
+    pass.framebuffer = fb;
+  } else {
+    pass.framebuffer = it->second;
   }
   pass.framebufferImage = m_presentImage;
 }

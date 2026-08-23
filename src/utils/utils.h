@@ -1,6 +1,8 @@
 #pragma once
 
 #include "core/debug/debugger.h"
+#include "core/define/types.h"
+#include "core/define/compiler.h"
 
 #include <stdlib.h>
 #include <vulkan/vulkan.h>

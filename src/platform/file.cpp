@@ -228,7 +228,7 @@ FileHandle *file_open(const char *path, FileMode mode) {
   return f;
 }
 
-void file_close(File *f) {
+void file_close(FileHandle *f) {
   if (f) {
     if (f->h)
       CloseHandle(f->h);

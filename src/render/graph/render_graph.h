@@ -112,7 +112,7 @@ private:
   std::vector<ResourceState> m_resources;
   std::vector<Pass> m_passes;
   std::vector<u32> m_order;
-  std::unordered_map<Pass, VkImage> m_framebufferCache;
+  std::unordered_map<VkImage, VkFramebuffer> m_framebufferCache;
   VkImage m_presentImage{VK_NULL_HANDLE};
   VkImageView m_presentView{VK_NULL_HANDLE};
   VkFormat m_presentFormat{VK_FORMAT_UNDEFINED};

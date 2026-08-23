@@ -12,7 +12,7 @@ find_package(Vulkan REQUIRED)
 
 target_include_directories(supervk_core INTERFACE
     ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/thirdpar
+    ${PROJECT_SOURCE_DIR}/thirdparty
 )
 
 target_link_libraries(supervk_core INTERFACE

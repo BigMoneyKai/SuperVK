@@ -1,9 +1,9 @@
 #include "console.h"
 #include "core/define/platform.h"
-#include <sys/_types/_ssize_t.h>
 
 #if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
 #include <unistd.h>
+#include <sys/_types/_ssize_t.h>
 u64 console_read(void *buffer, u64 size) {
   ssize_t ret = ::read(STDIN_FILENO, buffer, size);
 

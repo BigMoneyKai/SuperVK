@@ -6,9 +6,9 @@
 #include <vulkan/vulkan.h>
 
 namespace image {
-constexpr u32 defaultWidth = 0.0f;
-constexpr u32 defaultHeight = 0.0f;
-constexpr u32 defaultDepth = 1.0f;
+constexpr u32 defaultWidth = 0;
+constexpr u32 defaultHeight = 0;
+constexpr u32 defaultDepth = 1;
 constexpr VkImageType defaultImageType = VK_IMAGE_TYPE_2D;
 constexpr VkFormat defaultFormat = VK_FORMAT_R8G8B8A8_SRGB;
 constexpr VkImageUsageFlags defaultUsage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
@@ -60,7 +60,7 @@ private:
   VkImage m_image{VK_NULL_HANDLE};
   VkImageView m_imageView{VK_NULL_HANDLE};
   VkDeviceMemory m_memory{VK_NULL_HANDLE};
-  VkFormat m_format;
+  VkFormat m_format{VK_FORMAT_UNDEFINED};
   VkExtent3D m_extent{};
   VkImageLayout m_layout{VK_IMAGE_LAYOUT_UNDEFINED};
 };

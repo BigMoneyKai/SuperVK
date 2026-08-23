@@ -7,6 +7,8 @@ shaders/spv/
 out/
 Testing/
 script/__pycache__
+.vs/
+bin/
 
 .mcp.json
 .DS_Store
@@ -14,3 +16,4 @@ CLAUDE.md
 AGENTS.md
 compile_commands.json
 ROADMAP.md
+CMakeSettings.json
