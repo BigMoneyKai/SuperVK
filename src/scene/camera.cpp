@@ -35,44 +35,46 @@ void Camera::update(const CameraInput &input) {
   m_yaw += input.mouseDelta.x * kRotationSpeed;
   m_pitch += input.mouseDelta.y * kRotationSpeed;
   m_pitch = clampF(m_pitch, -kMaxPitch, kMaxPitch);
+  const f32 sinYaw = glm::sin(m_yaw);
+  const f32 cosYaw = glm::cos(m_yaw);
+  const f32 sinPitch = glm::sin(m_pitch);
+  const f32 cosPitch = glm::cos(m_pitch);
 
   // ---- zoom (scroll wheel) ----
   m_distance -= input.scrollWheel * kZoomSpeed;
   m_distance = clampF(m_distance, kMinDistance, kMaxDistance);
 
   // ---- WASD pan (move target in view space) ----
-  glm::vec3 forward = m_target - m_eye;
-	forward.y = 0.f;
-	forward = glm::normalize(forward);
-  glm::vec3 right = glm::normalize(glm::cross(forward, defaultUp));
-  glm::vec3 up = glm::normalize(glm::cross(right, forward));
+  glm::vec3 forward{sinYaw, 0.0f, cosYaw};
+  glm::vec3 right{forward.z, 0.0f, -forward.x};
 
   if (input.moveForward) {
-    m_target.x += forward.x * kMoveSpeed;
-    m_target.z += forward.z * kMoveSpeed;
-  }
-  if (input.moveBackward) {
     m_target.x -= forward.x * kMoveSpeed;
     m_target.z -= forward.z * kMoveSpeed;
   }
-	  if (input.moveRight) {
-    m_target.x += right.x * kMoveSpeed;
-    m_target.z += right.z * kMoveSpeed;
+  if (input.moveBackward) {
+    m_target.x += forward.x * kMoveSpeed;
+    m_target.z += forward.z * kMoveSpeed;
   }
-  if (input.moveLeft) {
+  if (input.moveRight) {
     m_target.x -= right.x * kMoveSpeed;
     m_target.z -= right.z * kMoveSpeed;
   }
+  if (input.moveLeft) {
+    m_target.x += right.x * kMoveSpeed;
+    m_target.z += right.z * kMoveSpeed;
+  }
   if (input.moveUp)
-    m_target.y -= up.y * kMoveSpeed;
+    m_target.y -= defaultUp.y * kMoveSpeed;
   if (input.moveDown)
-    m_target.y += up.y * kMoveSpeed;
+    m_target.y += defaultUp.y * kMoveSpeed;
 
   // ---- spherical → cartesian eye position ----
   glm::vec3 dir;
-  dir.x = glm::sin(m_yaw) * glm::cos(m_pitch);
-  dir.y = glm::sin(m_pitch);
-  dir.z = glm::cos(m_yaw) * glm::cos(m_pitch);
+
+  dir.x = sinYaw * cosPitch;
+  dir.y = sinPitch;
+  dir.z = cosYaw * cosPitch;
 
   m_eye = m_target + dir * m_distance;
 
