@@ -2,6 +2,7 @@
 bin/
 build/
 cmake-build-debug/
+cmake-build-release/
 .claude/
 shaders/spv/
 out/
@@ -9,6 +10,7 @@ Testing/
 script/__pycache__
 .vs/
 bin/
+.idea/
 
 .mcp.json
 .DS_Store

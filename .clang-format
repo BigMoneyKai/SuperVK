@@ -1,0 +1,70 @@
+---
+BasedOnStyle: LLVM
+
+# Indentation: 2 spaces, matching the codebase.
+IndentWidth: 2
+ContinuationIndentWidth: 2
+UseTab: Never
+
+# Alignment.
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignConsecutiveMacros: false
+AlignEscapedNewlines: Right
+AlignTrailingComments: true
+
+# Keep multi-line case bodies and short ifs (matches the codebase).
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+
+# Pack arguments/parameters on one line when they fit.
+BinPackArguments: true
+BinPackParameters: true
+ExperimentalAutoDetectBinPacking: false
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# Spaces.
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpacesBeforeTrailingComments: 1
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInSquareBrackets: false
+
+# Pointers/references: `const VkDevice &device`.
+DerivePointerAlignment: false
+PointerAlignment: Right
+ReferenceAlignment: Pointer
+
+# Breaks: attached braces (K&R), like the codebase.
+BreakBeforeBraces: Attach
+BreakBeforeBinaryOperators: NonAssignment
+
+# Column width.
+ColumnLimit: 80
+
+# Case labels sit at the same level as the `switch` body.
+IndentCaseLabels: false
+
+# Sorting includes.
+# * The main header gets priority 0, and goes at the top. The main header is
+#   essentially any header file which corresponds to the current source file
+#   (e.g "foo.h" is the main header for "foo.c"). However, only header files
+#   that match the regex in `IncludeIsMainRegex` are considered.
+# * The "log/mod/blah.h" headers get priority 1.
+# * The "blah.h" headers get priority 2.
+# * The <blah.h> headers get priority 3.
+SortIncludes: CaseSensitive
+IncludeBlocks: Preserve
+IncludeIsMainRegex: '$?'
+IncludeCategories:
+  - Regex: '^"log/mod/.*"'
+    Priority: 1
+  - Regex: '^".*"'
+    Priority: 2
+  - Regex: '^<.*>'
+    Priority: 3
+
+# Misc.
+ReflowComments: true
