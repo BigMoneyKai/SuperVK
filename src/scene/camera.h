@@ -62,7 +62,7 @@ private:
   glm::vec3 m_target{0.0f, 0.0f, 0.0f};
   f32 m_yaw{defaultYaw};
   f32 m_pitch{defaultPitch};
-  f32 m_distance;
+  f32 m_distance{0.f};
 };
 
 } // namespace camera

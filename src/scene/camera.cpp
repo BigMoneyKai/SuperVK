@@ -70,11 +70,7 @@ void Camera::update(const CameraInput &input) {
     m_target.y += defaultUp.y * kMoveSpeed;
 
   // ---- spherical → cartesian eye position ----
-  glm::vec3 dir;
-
-  dir.x = sinYaw * cosPitch;
-  dir.y = sinPitch;
-  dir.z = cosYaw * cosPitch;
+  glm::vec3 dir = {sinYaw * cosPitch, sinPitch, cosYaw * cosPitch};
 
   m_eye = m_target + dir * m_distance;
 
@@ -85,5 +81,10 @@ void Camera::update(const CameraInput &input) {
 }
 
 void Camera::destroy() {
-  // no Vulkan resources owned by Camera
+  m_ubo = {{}, {}, {}};
+	m_eye = {defaultEye};
+	m_target = {};
+	m_yaw = defaultYaw;
+	m_pitch = defaultPitch;
+	m_distance = 0.f;
 }
