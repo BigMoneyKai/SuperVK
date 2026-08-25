@@ -4,9 +4,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // ---- orbit camera speed constants ----
-static constexpr f32 kRotationSpeed = 0.0005f;
+static constexpr f32 kRotationSpeed = 0.0004f;
 static constexpr f32 kZoomSpeed = 0.1f;
-static constexpr f32 kMoveSpeed = 0.01f;
+static constexpr f32 kWASDSpeed = 2.0f;
+static constexpr f32 kUpDownSpeed = 0.001f;
 static constexpr f32 kMinDistance = 0.5f;
 static constexpr f32 kMaxDistance = 50.0f;
 static constexpr f32 kMaxPitch = 1.55f; // ~89 degrees in radians
@@ -50,25 +51,25 @@ void Camera::update(const CameraInput &input) {
 
   const f32 dt = input.deltaTime;
   if (input.moveForward) {
-    m_target.x -= forward.x * kMoveSpeed * dt;
-    m_target.z -= forward.z * kMoveSpeed * dt;
+    m_target.x -= forward.x * kWASDSpeed * dt;
+    m_target.z -= forward.z * kWASDSpeed * dt;
   }
   if (input.moveBackward) {
-    m_target.x += forward.x * kMoveSpeed * dt;
-    m_target.z += forward.z * kMoveSpeed * dt;
+    m_target.x += forward.x * kWASDSpeed * dt;
+    m_target.z += forward.z * kWASDSpeed * dt;
   }
   if (input.moveRight) {
-    m_target.x -= right.x * kMoveSpeed * dt;
-    m_target.z -= right.z * kMoveSpeed * dt;
+    m_target.x -= right.x * kWASDSpeed * dt;
+    m_target.z -= right.z * kWASDSpeed * dt;
   }
   if (input.moveLeft) {
-    m_target.x += right.x * kMoveSpeed * dt;
-    m_target.z += right.z * kMoveSpeed * dt;
+    m_target.x += right.x * kWASDSpeed * dt;
+    m_target.z += right.z * kWASDSpeed * dt;
   }
   if (input.moveUp)
-    m_target.y -= defaultUp.y * kMoveSpeed;
+    m_target.y -= defaultUp.y * kUpDownSpeed;
   if (input.moveDown)
-    m_target.y += defaultUp.y * kMoveSpeed;
+    m_target.y += defaultUp.y * kUpDownSpeed;
 
   // ---- spherical → cartesian eye position ----
   glm::vec3 dir = {sinYaw * cosPitch, sinPitch, cosYaw * cosPitch};
