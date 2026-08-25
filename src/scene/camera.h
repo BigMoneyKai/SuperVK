@@ -35,6 +35,7 @@ struct CameraUBO {
 
 // ---- Input bundle passed from App::update() to Camera::update() ----
 struct CameraInput {
+  f32 deltaTime{0.f};
   glm::vec2 mouseDelta{defaultMouseDelta}; // Mouse move
   f32 scrollWheel{defaultScrollWheel};     // Mouse Scroll
   b32 moveForward{defaultMoveForward};     // W

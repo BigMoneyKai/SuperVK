@@ -1,8 +1,10 @@
 #include "app/app.h"
 #include "core/debug/debugger.h"
+#include "core/define/types.h"
+#include "platform/time.h"
 #include "scene/camera.h"
 
-#include <cstdio>
+#include <algorithm>
 
 static b32 waitForMeshLoad(JobSystem &js, AssetMan &am,
                            AssetMan::MeshHandle handle) {
@@ -45,9 +47,14 @@ void App::init(const char *title, DisplayMode mode, u64 threadCount) {
 }
 
 void App::run() {
+  f64 last = timer_now_ms();
   while (!glfwWindowShouldClose(m_winMan.window())) {
     glfwPollEvents();
-    update();
+    const f64 now = timer_now_ms();
+    const f32 dt = std::clamp(static_cast<f32>((now - last) * 0.001), 0.0f, 0.05f);
+    last = now;
+
+    update(dt);
     m_assetMan.update();
     m_renderer.render(m_scene);
   }
@@ -64,13 +71,14 @@ void App::destroy() {
   m_winMan.destroy();
 }
 
-void App::update() {
+void App::update(f32 dt) {
   m_inputMan.newFrame();
 
   CameraInput camInput;
   Mouse &mouse = m_inputMan.getMouse();
   Keyboard &kb = m_inputMan.getKeyboard();
 
+  camInput.deltaTime = dt;
   camInput.mouseDelta = mouse.delta();
   camInput.scrollWheel = mouse.wheel();
   camInput.moveForward = kb.isDown(Key::keyW);

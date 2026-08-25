@@ -28,7 +28,7 @@ public:
   void destroy();
 
 private:
-  void update();
+  void update(f32 dt);
 
 private:
   WinMan m_winMan;

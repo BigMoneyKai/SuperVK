@@ -48,21 +48,22 @@ void Camera::update(const CameraInput &input) {
   glm::vec3 forward{sinYaw, 0.0f, cosYaw};
   glm::vec3 right{forward.z, 0.0f, -forward.x};
 
+  const f32 dt = input.deltaTime;
   if (input.moveForward) {
-    m_target.x -= forward.x * kMoveSpeed;
-    m_target.z -= forward.z * kMoveSpeed;
+    m_target.x -= forward.x * kMoveSpeed * dt;
+    m_target.z -= forward.z * kMoveSpeed * dt;
   }
   if (input.moveBackward) {
-    m_target.x += forward.x * kMoveSpeed;
-    m_target.z += forward.z * kMoveSpeed;
+    m_target.x += forward.x * kMoveSpeed * dt;
+    m_target.z += forward.z * kMoveSpeed * dt;
   }
   if (input.moveRight) {
-    m_target.x -= right.x * kMoveSpeed;
-    m_target.z -= right.z * kMoveSpeed;
+    m_target.x -= right.x * kMoveSpeed * dt;
+    m_target.z -= right.z * kMoveSpeed * dt;
   }
   if (input.moveLeft) {
-    m_target.x += right.x * kMoveSpeed;
-    m_target.z += right.z * kMoveSpeed;
+    m_target.x += right.x * kMoveSpeed * dt;
+    m_target.z += right.z * kMoveSpeed * dt;
   }
   if (input.moveUp)
     m_target.y -= defaultUp.y * kMoveSpeed;
