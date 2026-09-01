@@ -6,6 +6,7 @@
 
 #include <GLFW/glfw3.h>
 
+namespace Input {
 class InputMan {
 public:
   void init(GLFWwindow *window);
@@ -21,3 +22,6 @@ private:
   Mouse m_mouse;
   Keyboard m_keyboard;
 };
+} // namespace Input
+
+using InputMan = Input::InputMan;

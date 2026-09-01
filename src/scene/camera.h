@@ -19,7 +19,7 @@ SV_INLINE constexpr f32 defaultPitch = 0.f;
 
 SV_INLINE constexpr glm::vec2 defaultMouseDelta = {0.f, 0.f};
 SV_INLINE constexpr f32 defaultScrollWheel = 0.f;
-// SV_INLINE constexpr b32 defaultOrbitEnabled = SV_FALSE;
+SV_INLINE constexpr b32 defaultOrbitEnabled = SV_FALSE;
 SV_INLINE constexpr b32 defaultMoveForward = SV_FALSE;
 SV_INLINE constexpr b32 defaultMoveBackward = SV_FALSE;
 SV_INLINE constexpr b32 defaultMoveLeft = SV_FALSE;
@@ -38,6 +38,7 @@ struct CameraInput {
   f32 deltaTime{0.f};
   glm::vec2 mouseDelta{defaultMouseDelta}; // Mouse move
   f32 scrollWheel{defaultScrollWheel};     // Mouse Scroll
+  b32 OrbitEnabled{defaultOrbitEnabled};    // Orbit enabled
   b32 moveForward{defaultMoveForward};     // W
   b32 moveBackward{defaultMoveBackward};   // S
   b32 moveLeft{defaultMoveLeft};           // A
@@ -49,6 +50,7 @@ struct CameraInput {
 class Camera {
 public:
   void init(f32 aspect);
+  void setAspect(f32 aspect); // 只更新 proj，不重置相机状态
   void update(const CameraInput &input = CameraInput{});
   void destroy();
 

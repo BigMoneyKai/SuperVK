@@ -1,5 +1,6 @@
 #pragma once
 
+namespace Event {
 enum class EventType {
 	keyEvent,
 	mouseButtonEvent,
@@ -7,3 +8,4 @@ enum class EventType {
 	windowResizeEvent,
 	
 };
+} // namespace Event

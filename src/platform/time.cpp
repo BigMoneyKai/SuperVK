@@ -1,6 +1,8 @@
 #include "time.h"
 #include "core/define/platform.h"
 
+namespace Platform {
+
 #if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
 #include <cerrno>
 #include <time.h>
@@ -103,3 +105,5 @@ void timer_sleep_us(u64 us) {
   CloseHandle(timer);
 }
 #endif
+
+} // namespace Platform

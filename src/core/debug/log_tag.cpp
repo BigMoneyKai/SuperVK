@@ -8,11 +8,12 @@ const char *logLevelTags[] = {"[Trace]",
                               COLOR_DARK_RED "[Fatal]" COLOR_RESET};
 
 const char *logCatagTags[] = {
-    COLOR_GRAY "[Container]" COLOR_RESET, COLOR_GRAY "[Memory]" COLOR_RESET,
-    COLOR_GRAY "[Render]" COLOR_RESET,    COLOR_GRAY "[IO]" COLOR_RESET,
-    COLOR_GRAY "[Input]" COLOR_RESET,     COLOR_GRAY "[Scene]" COLOR_RESET,
-    COLOR_GRAY "[Vulkan]" COLOR_RESET,    COLOR_GRAY "[Asset]" COLOR_RESET,
-    COLOR_GRAY "[JobSystem]" COLOR_RESET, COLOR_GRAY "[FileSystem]" COLOR_RESET,
-    COLOR_GRAY "[ECS]" COLOR_RESET,       COLOR_GRAY "[Window]" COLOR_RESET,
-    COLOR_GRAY "[Platform]" COLOR_RESET,  COLOR_GRAY "[Unknown]" COLOR_RESET,
+  COLOR_GRAY "[Container]" COLOR_RESET, COLOR_GRAY "[Memory]" COLOR_RESET,
+  COLOR_GRAY "[Render]" COLOR_RESET,    COLOR_GRAY "[IO]" COLOR_RESET,
+  COLOR_GRAY "[Input]" COLOR_RESET,     COLOR_GRAY "[Scene]" COLOR_RESET,
+  COLOR_GRAY "[Vulkan]" COLOR_RESET,    COLOR_GRAY "[Asset]" COLOR_RESET,
+  COLOR_GRAY "[JobSystem]" COLOR_RESET, COLOR_GRAY "[FileSystem]" COLOR_RESET,
+  COLOR_GRAY "[ECS]" COLOR_RESET,       COLOR_GRAY "[Window]" COLOR_RESET,
+  COLOR_GRAY "[Platform]" COLOR_RESET,  COLOR_GRAY "[UI]" COLOR_RESET,
+  COLOR_GRAY "[Unknown]" COLOR_RESET,
 };

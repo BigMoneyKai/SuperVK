@@ -3,6 +3,8 @@
 
 #include <cstring>
 
+namespace Platform {
+
 #ifdef SV_PLATFORM_WINDOWS
 static b32 g_wsaInitialized = false;
 #endif
@@ -107,3 +109,5 @@ b32 Socket::setNonBlocking(b32 enabled) {
 }
 
 b32 Socket::isValid() const { return m_socket != INVALID_SOCKET; }
+
+} // namespace Platform

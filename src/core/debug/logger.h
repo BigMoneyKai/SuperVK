@@ -19,6 +19,11 @@ public:
   static void print(u32 id);
   static void print_all();
 
+  // 增量读取日志（供 UI Console 使用）：回调 id >= fromId 的消息。
+  using LogCallback = void (*)(const LogMsg &msg, void *userData);
+  static void readMessages(u64 fromId, LogCallback cb, void *userData);
+  static u32 latestId();
+
   static void write_all(const String &path); // Write all log file
 
   static SV_FORCE_INLINE u32 id() {

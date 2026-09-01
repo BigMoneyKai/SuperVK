@@ -18,6 +18,7 @@ target_include_directories(supervk_render PRIVATE
     ${PROJECT_SOURCE_DIR}/thirdparty/glm
     ${PROJECT_SOURCE_DIR}/thirdparty/glfw/include
     ${PROJECT_SOURCE_DIR}/thirdparty/stb
+    ${PROJECT_SOURCE_DIR}/thirdparty/imgui
 )
 
 target_link_libraries(supervk_render PRIVATE
@@ -30,6 +31,8 @@ target_link_libraries(supervk_render PRIVATE
     supervk_render_resource
     supervk_render_pipeline
 
+    glfw
     Vulkan::Vulkan
     glm
+    imgui
 )

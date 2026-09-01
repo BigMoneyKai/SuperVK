@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+namespace Input {
 void Keyboard::init() {
     memset(m_current, SV_FALSE, sizeof(m_current));
     memset(m_previous, SV_FALSE, sizeof(m_previous));
@@ -39,3 +40,4 @@ b32 Keyboard::isUp(Key key) const {
 void Keyboard::newFrame() {
     memcpy(m_previous, m_current, sizeof(m_current));
 }
+} // namespace Input

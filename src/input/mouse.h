@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 
+namespace Input {
 enum class Button {
   button1,
   button2,
@@ -50,3 +51,7 @@ private:
   glm::vec2 m_prevPos;
   glm::vec2 m_delta;
 };
+} // namespace Input
+
+using Button = Input::Button;
+using Mouse = Input::Mouse;

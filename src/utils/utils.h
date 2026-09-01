@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <vulkan/vulkan.h>
 
+namespace Utils {
 SV_INLINE void success_exit_impl() { exit(EXIT_SUCCESS); }
 
 SV_INLINE void failure_exit_impl() { exit(EXIT_FAILURE); }
@@ -42,3 +43,12 @@ void endSingleTimeCommands(VkDevice device, VkQueue queue,
 inline u64 align_up(u64 value, u64 alignment) {
   return (value + alignment - 1) & ~(alignment - 1);
 }
+} // namespace Utils
+
+using Utils::success_exit_impl;
+using Utils::failure_exit_impl;
+using Utils::except_exit_impl;
+using Utils::findMemoryType;
+using Utils::beginSingleTimeCommands;
+using Utils::endSingleTimeCommands;
+using Utils::align_up;

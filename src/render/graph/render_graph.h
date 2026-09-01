@@ -44,11 +44,18 @@ public:
                                        VkImageLayout finalLayout);
   RenderGraphResource presentTarget() const;
   void setPresentTarget(VkImage image, VkImageView view, VkFormat format);
+  // resize 后更新渲染尺寸（framebuffer 缓存需先 destroyFramebuffer）
+  void setExtent(VkExtent2D extent);
+  // 外部资源重建后（如 depth），按 id 更新 image/view
+  void updateExternalResource(u32 id, VkImage image, VkImageView view,
+                              VkFormat format);
 
   void addPass(const char *name, const PassDesc &desc);
 
   void process();
   void execute(VkCommandBuffer cmd);
+
+  void destroyFramebuffer();
 
   VkRenderPass renderPassOf(u32 index) const;
   SV_FORCE_INLINE u32 passCount() const {

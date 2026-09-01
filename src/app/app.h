@@ -6,10 +6,12 @@
 #include "input/input_manager.h"
 #include "render/renderer.h"
 #include "scene/scene.h"
+#include "ui/manager.h"
 #include "window/window_manager.h"
 
 #include <GLFW/glfw3.h>
 
+namespace App {
 SV_INLINE constexpr u64 defaultThreadCount = 8;
 SV_INLINE constexpr const char *defaultTitle = "SuperVK";
 SV_INLINE constexpr DisplayMode defaultDisplayMode = DisplayMode::windowed;
@@ -31,9 +33,10 @@ private:
   void update(f32 dt);
 
 private:
-  WinMan m_winMan;
+  Window::WinMan m_winMan;
   InputMan m_inputMan;
-  Scene m_scene;
+  UI::Man m_uiMan;
+  Scene::Scene m_scene;
   Renderer m_renderer;
   JobSystem m_jobSystem;
   AssetMan m_assetMan;
@@ -43,3 +46,4 @@ private:
 
   AppInfo m_appInfo{};
 };
+} // namespace App

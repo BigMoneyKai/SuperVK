@@ -105,6 +105,21 @@ void Logger::print_all() {
   s_mutex.unlock();
 }
 
+void Logger::readMessages(u64 fromId, LogCallback cb, void *userData) {
+  if (!cb)
+    return;
+  s_mutex.lock();
+  for (const auto &msg : s_msgBuffer) {
+    if (msg.id >= fromId)
+      cb(msg, userData);
+  }
+  s_mutex.unlock();
+}
+
+u32 Logger::latestId() {
+  return s_counter.load(std::memory_order_relaxed);
+}
+
 void Logger::write_all(const String &path) {
   String target = path.empty() ? create_log_path() : path;
 

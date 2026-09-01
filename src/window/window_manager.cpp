@@ -2,6 +2,7 @@
 #include "core/debug/debugger.h"
 #include "core/debug/logger_attrib.h"
 
+namespace Window {
 WinMan::WinMan() {
   m_window = nullptr;
   m_width = 0;
@@ -36,7 +37,6 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
     m_window =
         glfwCreateWindow(static_cast<i32>(m_width), static_cast<i32>(m_height),
                          title, m_monitor, nullptr);
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     break;
   case DisplayMode::borderless:
     m_width = m_mode->width;
@@ -46,7 +46,6 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
     m_window =
         glfwCreateWindow(static_cast<i32>(m_width), static_cast<i32>(m_height),
                          title, nullptr, nullptr);
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     break;
   case DisplayMode::windowed:
     m_width = default_width;
@@ -54,7 +53,6 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
     m_window =
         glfwCreateWindow(static_cast<i32>(m_width), static_cast<i32>(m_height),
                          title, nullptr, nullptr);
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     break;
   default:
     FATAL(LogCatag::window, "Failed to load window");
@@ -71,3 +69,4 @@ void WinMan::destroy() {
   }
   glfwTerminate();
 }
+} // namespace Window

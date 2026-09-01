@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+namespace Input {
 void Mouse::init() {
   memset(m_currButtons, SV_FALSE, sizeof(m_currButtons));
   memset(m_prevButtons, SV_FALSE, sizeof(m_prevButtons));
@@ -52,3 +53,4 @@ bool Mouse::isReleased(Button button) const {
 bool Mouse::isDown(Button button) const {
   return m_currButtons[static_cast<u32>(button)];
 }
+} // namespace Input

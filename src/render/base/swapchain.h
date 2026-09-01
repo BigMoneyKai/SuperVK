@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 class Swapchain {
 public:
@@ -29,6 +30,8 @@ public:
   SV_FORCE_INLINE u32 imageCount() const {
     return static_cast<u32>(m_swapchainImages.size());
   }
+
+  static constexpr VkExtent2D defaultExtent = {};
 
 private:
   VkDevice m_device{VK_NULL_HANDLE};

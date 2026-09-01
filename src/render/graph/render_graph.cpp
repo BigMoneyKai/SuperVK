@@ -22,8 +22,8 @@ VkPipelineStageFlags slotStage(AttachmentSlot slot) {
   case AttachmentSlot::color:
     return VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
   case AttachmentSlot::depth:
-    return VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
-           VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+    return VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
+           | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
   case AttachmentSlot::input:
     return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
   }
@@ -95,7 +95,7 @@ void RenderGraph::destroy() {
       pass.renderPass = VK_NULL_HANDLE;
     }
   }
-  for (auto& it : m_framebufferCache) {
+  for (auto &it : m_framebufferCache) {
     if (it.second != VK_NULL_HANDLE) {
       vkDestroyFramebuffer(m_device, it.second, nullptr);
     }
@@ -107,6 +107,13 @@ void RenderGraph::destroy() {
   m_presentImage = VK_NULL_HANDLE;
   m_presentView = VK_NULL_HANDLE;
   m_presentFormat = VK_FORMAT_UNDEFINED;
+}
+void RenderGraph::destroyFramebuffer() {
+  for (auto &it : m_framebufferCache) {
+    if (it.second != VK_NULL_HANDLE) {
+      vkDestroyFramebuffer(m_device, it.second, nullptr);
+    }
+  }
 }
 
 RenderGraphResource RenderGraph::registerExternal(VkImage image,
@@ -132,6 +139,19 @@ void RenderGraph::setPresentTarget(VkImage image, VkImageView view,
   m_presentFormat = format;
   m_presentImage = image;
   m_presentView = view;
+}
+
+void RenderGraph::setExtent(VkExtent2D extent) { m_extent = extent; }
+
+void RenderGraph::updateExternalResource(u32 id, VkImage image,
+                                         VkImageView view, VkFormat format) {
+  if (id >= m_resources.size())
+    return;
+  ResourceState &state = m_resources[id];
+  state.image = image;
+  state.view = view;
+  state.format = format;
+  state.currentLayout = VK_IMAGE_LAYOUT_UNDEFINED; // 新 image 从未过渡过
 }
 
 void RenderGraph::addPass(const char *name, const PassDesc &desc) {
@@ -277,7 +297,7 @@ void RenderGraph::buildTransitions() {
       VkImageLayout target = slotLayout(u.slot);
       if (prevWrite || prevLayout != target) {
         m_passes[u.pass].transitions.push_back(Transition{
-            id, prevLayout, target, slotStage(u.slot), slotAccess(u.slot)});
+          id, prevLayout, target, slotStage(u.slot), slotAccess(u.slot)});
       }
       prevLayout = target;
       prevWrite = (u.slot != AttachmentSlot::input);
@@ -362,11 +382,11 @@ void RenderGraph::buildRenderPass(Pass &pass) {
     deps[1].srcAccessMask |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
   }
   if (hasDepth) {
-    deps[0].dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
-                            VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+    deps[0].dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
+                            | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
     deps[0].dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-    deps[1].srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
-                            VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+    deps[1].srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
+                            | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
     deps[1].srcAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
   }
   for (const auto &r : cfg.inputAttachments) {
@@ -390,18 +410,18 @@ void RenderGraph::buildRenderPass(Pass &pass) {
   u32 ci2 = 0;
   for (const auto &a : cfg.colorAttachments)
     pass.clearValues[ci2++] =
-        a.loadOp == LoadOp::clear
-            ? VkClearValue{.color = {{0.0f, 0.0f, 0.0f, 1.0f}}}
-            : VkClearValue{.color = {{0, 0, 0, 0}}};
+      a.loadOp == LoadOp::clear
+        ? VkClearValue{.color = {{0.0f, 0.0f, 0.0f, 1.0f}}}
+        : VkClearValue{.color = {{0, 0, 0, 0}}};
   if (hasDepth)
     pass.clearValues[ci2++] = cfg.depthAttachment.loadOp == LoadOp::clear
-                                  ? VkClearValue{.depthStencil = {1.0f, 0}}
-                                  : VkClearValue{.depthStencil = {0, 0}};
+                                ? VkClearValue{.depthStencil = {1.0f, 0}}
+                                : VkClearValue{.depthStencil = {0, 0}};
 }
 
 void RenderGraph::ensureFramebuffer(Pass &pass) {
-  if (pass.framebuffer != VK_NULL_HANDLE &&
-      pass.framebufferImage == m_presentImage)
+  if (pass.framebuffer != VK_NULL_HANDLE
+      && pass.framebufferImage == m_presentImage)
     return;
 
   std::vector<VkImageView> views;

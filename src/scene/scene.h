@@ -9,6 +9,7 @@
 
 #include <vulkan/vulkan.h>
 
+namespace Scene {
 class Scene {
 public:
   void init(const VkDevice &device, const VkPhysicalDevice &physicalDevice,
@@ -28,3 +29,4 @@ private:
   Light m_light;
   Mesh m_mesh;
 };
+} // namespace Scene

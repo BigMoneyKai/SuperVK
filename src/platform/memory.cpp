@@ -1,6 +1,8 @@
 #include "memory.h"
 #include "core/define/platform.h"
 
+namespace Platform {
+
 #if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
 #include <sys/mman.h>
 #include <unistd.h>
@@ -76,3 +78,5 @@ u64 allocation_granularity() {
   return static_cast<u64>(info.dwAllocationGranularity);
 }
 #endif
+
+} // namespace Platform

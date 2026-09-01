@@ -17,6 +17,7 @@ target_link_libraries(supervk_app PRIVATE
     supervk_render
     supervk_core_job
     supervk_asset
+    imgui
 
     Vulkan::Vulkan
     glm

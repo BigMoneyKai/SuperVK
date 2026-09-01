@@ -21,6 +21,7 @@ enum class LogCatag : u32 {
   entityComponentSystem,
   window,
   platform,
+  ui,
 
   unknown,
 

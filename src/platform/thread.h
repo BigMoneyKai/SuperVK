@@ -2,6 +2,7 @@
 
 #include "core/define/types.h"
 
+namespace Platform {
 class Thread {
 public:
   using EntryPoint = void (*)(void *);
@@ -62,3 +63,8 @@ public:
 private:
   void *m_handle{nullptr};
 };
+} // namespace Platform
+
+using Thread = Platform::Thread;
+using Mutex = Platform::Mutex;
+using CondVar = Platform::CondVar;

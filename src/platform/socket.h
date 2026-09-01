@@ -20,6 +20,7 @@ static constexpr SocketHandle INVALID_SOCKET = -1;
 static constexpr int SOCKET_ERROR = -1;
 #endif
 
+namespace Platform {
 class Socket {
 public:
   Socket() = default;
@@ -47,3 +48,6 @@ private:
   int m_socket{INVALID_SOCKET};
 #endif
 };
+} // namespace Platform
+
+using Socket = Platform::Socket;

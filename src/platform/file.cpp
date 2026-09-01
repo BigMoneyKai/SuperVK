@@ -1,6 +1,8 @@
 #include "file.h"
 #include "core/define/platform.h"
 
+namespace Platform {
+
 // TODO: replace all "delete" with allocator
 #if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
 #include <cstdio>
@@ -384,3 +386,5 @@ i32 fs_directory_exists(const char *path) {
              : 0;
 }
 #endif
+
+} // namespace Platform

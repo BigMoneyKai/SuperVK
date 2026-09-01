@@ -1,6 +1,7 @@
 #include "input_manager.h"
 #include "GLFW/glfw3.h"
 
+namespace Input {
 static InputMan *g_inputMan = nullptr;
 
 static void keyCallback(GLFWwindow *window, i32 key, i32, i32 action, i32) {
@@ -105,3 +106,4 @@ void InputMan::newFrame() {
   m_mouse.newFrame();
   m_keyboard.newFrame();
 }
+} // namespace Input

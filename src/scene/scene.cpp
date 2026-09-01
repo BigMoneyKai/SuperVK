@@ -1,5 +1,6 @@
 #include "scene/scene.h"
 
+namespace Scene {
 void Scene::init(const VkDevice& device, const VkPhysicalDevice& physicalDevice, u32 width, u32 height) {
     f32 aspect = static_cast<f32>(width) / static_cast<f32>(height);
     m_camera.init(aspect);
@@ -17,3 +18,4 @@ void Scene::destroy() {
     m_light.destroy();
     m_mesh.destroy();
 }
+} // namespace Scene

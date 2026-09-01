@@ -1,0 +1,18 @@
+{
+    "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/build/**": true,
+        "**/out/**": true,
+        "**/cmake-build-*/**": true,
+        "**/thirdparty": true
+
+    },
+
+    "search.exclude": {
+        "**/.git": true,
+        "**/build": true,
+        "**/out": true,
+        "**/cmake-build-*": true,
+        "**/thirdparty": true
+    }
+}

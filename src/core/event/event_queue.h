@@ -4,6 +4,7 @@
 #include "core/define/types.h"
 #include "core/event/event.h"
 
+namespace Event {
 // Thread-safe lock-free event queue.
 //
 // Any number of threads may push() at any time; the main loop drains the
@@ -23,3 +24,7 @@ public:
 private:
   MpmcQueue<Event, capacity> m_queue;
 };
+} // namespace Event
+
+template <u64 capacity = 256>
+using EventQueue = Event::EventQueue<capacity>;

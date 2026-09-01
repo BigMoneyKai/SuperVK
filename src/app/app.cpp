@@ -3,8 +3,13 @@
 #include "core/define/types.h"
 #include "platform/time.h"
 #include "scene/camera.h"
+#include "ui/manager.h"
 
+#include <thirdparty/imgui/imgui.h>
 #include <algorithm>
+#include <vulkan/vulkan_core.h>
+
+namespace App {
 
 static b32 waitForMeshLoad(JobSystem &js, AssetMan &am,
                            AssetMan::MeshHandle handle) {
@@ -23,6 +28,22 @@ void App::init(const char *title, DisplayMode mode, u64 threadCount) {
   m_winMan.init(title, mode);
   m_inputMan.init(m_winMan.window());
   m_renderer.init({&m_winMan});
+
+  UI::UIInitInfo uiInitInfo{};
+  uiInitInfo.window = m_winMan.window();
+  uiInitInfo.instance = m_renderer.instance();
+  uiInitInfo.physicalDevice = m_renderer.device().physicalDevice();
+  uiInitInfo.device = m_renderer.device().device();
+  uiInitInfo.queueFamily = m_renderer.device().graphicsQueueFamilyIndex();
+  uiInitInfo.queue = m_renderer.device().graphicsQueue();
+  uiInitInfo.renderPass = m_renderer.renderPass();
+  uiInitInfo.imageCount = m_renderer.imageCount();
+  m_uiMan.init(uiInitInfo);
+  m_renderer.setUiRenderHook(
+      [](VkCommandBuffer cmd, void *userData) {
+        static_cast<UI::Man *>(userData)->update(cmd);
+      },
+      &m_uiMan);
 
   m_assetMan.init(&m_jobSystem);
 
@@ -56,6 +77,20 @@ void App::run() {
 
     update(dt);
     m_assetMan.update();
+
+    // 把 UI 的 Scene 视口矩形换算成 framebuffer 像素，交给渲染器
+    const ImRect vp = m_uiMan.viewportRect();
+    // 唯一基准：swapchain extent（renderer 的坐标空间），不是 glfw framebuffer
+    const VkExtent2D ext = m_renderer.swapchainExtent();
+    const ImVec2 ds = ImGui::GetIO().DisplaySize;
+    const f32 scaleX = ds.x > 0.f ? static_cast<f32>(ext.width) / ds.x : 1.f;
+    const f32 scaleY = ds.y > 0.f ? static_cast<f32>(ext.height) / ds.y : 1.f;
+    m_renderer.setViewportRect(
+        static_cast<i32>(vp.Min.x * scaleX),
+        static_cast<i32>(vp.Min.y * scaleY),
+        static_cast<i32>((vp.Min.x + vp.GetWidth()) * scaleX),
+        static_cast<i32>((vp.Min.y + vp.GetHeight()) * scaleY));
+
     m_renderer.render(m_scene);
   }
 }
@@ -64,6 +99,7 @@ void App::destroy() {
   m_renderer.waitIdle();
 
   m_scene.destroy();
+  m_uiMan.destroy();
   m_renderer.destroy();
   m_assetMan.destroy();
   m_jobSystem.destroy();
@@ -72,6 +108,7 @@ void App::destroy() {
 }
 
 void App::update(f32 dt) {
+  m_uiMan.newFrame();
   m_inputMan.newFrame();
 
   CameraInput camInput;
@@ -79,8 +116,11 @@ void App::update(f32 dt) {
   Keyboard &kb = m_inputMan.getKeyboard();
 
   camInput.deltaTime = dt;
-  camInput.mouseDelta = mouse.delta();
-  camInput.scrollWheel = mouse.wheel();
+  if (!m_uiMan.captureMouseNeeded()) {
+    camInput.mouseDelta = mouse.delta();
+    camInput.scrollWheel = mouse.wheel();
+    camInput.OrbitEnabled = mouse.isDown(Button::button2);
+  }
   camInput.moveForward = kb.isDown(Key::keyW);
   camInput.moveBackward = kb.isDown(Key::keyS);
   camInput.moveLeft = kb.isDown(Key::keyA);
@@ -88,5 +128,12 @@ void App::update(f32 dt) {
   camInput.moveUp = kb.isDown(Key::keySpace);
   camInput.moveDown = kb.isDown(Key::keyLShift);
 
+  // 相机 aspect 跟随视口（而不是整个窗口）
+  const ImRect vp = m_uiMan.viewportRect();
+  if (vp.GetHeight() > 0.f)
+    m_scene.camera().setAspect(vp.GetWidth() / vp.GetHeight());
+
   m_scene.camera().update(camInput);
+  m_uiMan.endFrame();
 }
+} // namespace App

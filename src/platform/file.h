@@ -2,6 +2,7 @@
 
 #include "core/define/types.h"
 
+namespace Platform {
 struct FileHandle;
 
 enum class FileMode : u16 {
@@ -32,3 +33,25 @@ u64 fs_file_modified(const char *path);
 i32 fs_file_delete(const char *path);
 i32 fs_directory_create(const char *path);
 i32 fs_directory_exists(const char *path);
+} // namespace Platform
+
+using FileHandle = Platform::FileHandle;
+using FileMode = Platform::FileMode;
+using FileSeekOrigin = Platform::FileSeekOrigin;
+using Platform::file_open;
+using Platform::file_close;
+using Platform::file_read;
+using Platform::file_write;
+using Platform::file_seek;
+using Platform::file_tell;
+using Platform::file_size;
+using Platform::file_is_open;
+using Platform::file_is_eof;
+using Platform::fs_read_file;
+using Platform::fs_write_file;
+using Platform::fs_file_exists;
+using Platform::fs_file_size;
+using Platform::fs_file_modified;
+using Platform::fs_file_delete;
+using Platform::fs_directory_create;
+using Platform::fs_directory_exists;

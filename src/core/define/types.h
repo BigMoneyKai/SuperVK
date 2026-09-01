@@ -5,27 +5,27 @@
 #include <cstdint>
 
 // unsigned int
-typedef std::uint8_t u8;
-typedef std::uint16_t u16;
-typedef std::uint32_t u32;
-typedef std::uint64_t u64;
+using u8 = std::uint8_t;
+using u16 = std::uint16_t;
+using u32 = std::uint32_t;
+using u64 = std::uint64_t;
 
 // signed int
-typedef std::int8_t i8;
-typedef std::int16_t i16;
-typedef std::int32_t i32;
-typedef std::int64_t i64;
+using i8 = std::int8_t;
+using i16 = std::int16_t;
+using i32 = std::int32_t;
+using i64 = std::int64_t;
 
 // float point types
-typedef float f32;
-typedef double f64;
+using f32 = float;
+using f64 = double;
 
 // boolean types
-typedef std::int32_t b32;
-typedef std::int8_t b8;
+using b32 = std::int32_t;
+using b8 = std::int8_t;
 
 // address types
-typedef std::uintptr_t addr;
+using addr = std::uintptr_t;
 
 // type assertions
 SV_STATIC_ASSERT(sizeof(u8) == 1, "Exptypeofected u8 to be 1 byte.");

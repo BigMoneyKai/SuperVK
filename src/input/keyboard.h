@@ -2,6 +2,7 @@
 
 #include "core/define/types.h"
 
+namespace Input {
 enum class Key {
   keyW,
   keyS,
@@ -33,3 +34,7 @@ private:
   b32 m_current[static_cast<u32>(Key::keyMaxNum)];
   b32 m_previous[static_cast<u32>(Key::keyMaxNum)];
 };
+} // namespace Input
+
+using Key = Input::Key;
+using Keyboard = Input::Keyboard;

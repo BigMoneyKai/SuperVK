@@ -5,6 +5,7 @@
 #include "input/mouse.h"
 #include <variant>
 
+namespace Event {
 struct KeyEvent {
   Key key;
   b32 pressed;
@@ -29,3 +30,4 @@ using Event =
   std::variant<KeyEvent, MouseButtonEvent, MouseMoveEvent, WindowResizeEvent>;
 
 void handleEvent(const Event& event);
+} // namespace Event

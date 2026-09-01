@@ -1,6 +1,8 @@
 #include "thread.h"
 #include "core/define/platform.h"
 
+namespace Platform {
+
 #if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
 #include <pthread.h>
 #include <sched.h>
@@ -230,3 +232,5 @@ void CondVar::notify_all() {
   WakeAllConditionVariable(static_cast<CONDITION_VARIABLE *>(m_handle));
 }
 #endif
+
+} // namespace Platform

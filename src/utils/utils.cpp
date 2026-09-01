@@ -1,5 +1,6 @@
 #include "utils/utils.h"
 
+namespace Utils {
 u32 findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,
                    VkMemoryPropertyFlags propertiesFlags) {
   VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties;
@@ -63,3 +64,4 @@ void endSingleTimeCommands(VkDevice device, VkQueue queue,
 
   vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
+} // namespace Utils

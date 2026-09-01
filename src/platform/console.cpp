@@ -1,11 +1,13 @@
 #include "console.h"
 #include "core/define/platform.h"
 
+namespace Platform {
+
 #if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
 #include <unistd.h>
 #include <sys/_types/_ssize_t.h>
 u64 console_read(void *buffer, u64 size) {
-  ssize_t ret = ::read(STDIN_FILENO, buffer, size);
+  ssize_t ret = read(STDIN_FILENO, buffer, size);
 
   if (ret < 0)
     return 0;
@@ -13,7 +15,7 @@ u64 console_read(void *buffer, u64 size) {
   return static_cast<u64>(ret);
 }
 u64 console_write(const void *buffer, u64 size) {
-  ssize_t ret = ::write(STDOUT_FILENO, buffer, size);
+  ssize_t ret = write(STDOUT_FILENO, buffer, size);
 
   if (ret < 0)
     return 0;
@@ -40,3 +42,5 @@ u64 console_write(const void *buffer, u64 size) {
   return static_cast<u64>(writeBytes);
 }
 #endif
+
+} // namespace Platform
