@@ -31,7 +31,7 @@ void Renderer::init(const RendererDesc &desc) {
   m_depthResource.init(m_device.device(), m_device.physicalDevice(),
                        m_device.depthFormat(), m_swapchain.extent());
 
-  auto depthRT = m_renderGraph.registerExternal(
+  m_depthRGR = m_renderGraph.registerExternal(
     m_depthResource.depthImage(), m_depthResource.depthImageView(),
     m_device.depthFormat(), VK_IMAGE_LAYOUT_UNDEFINED,
     VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
@@ -40,7 +40,7 @@ void Renderer::init(const RendererDesc &desc) {
     "Main",
     {.colorAttachments = {{m_renderGraph.presentTarget(), LoadOp::clear,
                            StoreOp::store}},
-     .depthAttachment = {depthRT, LoadOp::clear, StoreOp::store},
+     .depthAttachment = {m_depthRGR.id, LoadOp::clear, StoreOp::store},
      .drawList = [this](VkCommandBuffer cmd) {
        if (m_scene == nullptr)
          return;
@@ -238,7 +238,7 @@ void Renderer::drawFrame(Scene::Scene &scene) {
     i32 width = 0, height = 0;
     glfwGetFramebufferSize(m_desc.pWinMan->window(), &width, &height);
     if (width > 0 && height > 0)
-      rebuildSwapchain(width, height);
+      rebuildSwapchain( width, height);
   }
   m_currFrame = (m_currFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
@@ -264,4 +264,9 @@ void Renderer::rebuildSwapchain(u32 width, u32 height) {
   m_frameResource.init(m_device.device(), m_swapchain.imageCount());
   m_frameResource.createSyncPrimitives();
   m_renderGraph.setExtent(m_swapchain.extent());
+
+  m_renderGraph.updateExternalResource(
+    m_depthRGR.id, m_depthResource.depthImage(),
+                               m_depthResource.depthImageView(),
+                               m_device.depthFormat());
 }

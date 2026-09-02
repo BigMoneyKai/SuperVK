@@ -3,9 +3,17 @@
 
 namespace Platform {
 
-#if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
+#if defined(SV_PLATFORM_LINUX)
+#include <unistd.h>
+#include <sys/types.h>
+#elif defined(SV_PLATFORM_APPLE)
 #include <unistd.h>
 #include <sys/_types/_ssize_t.h>
+#elif defined(SV_PLATFORM_WINDOWS)
+#include <Windows.h>
+#endif
+
+#if defined(SV_PLATFORM_LINUX) || defined(SV_PLATFORM_APPLE)
 u64 console_read(void *buffer, u64 size) {
   ssize_t ret = read(STDIN_FILENO, buffer, size);
 
@@ -24,7 +32,6 @@ u64 console_write(const void *buffer, u64 size) {
 }
 
 #elif defined(SV_PLATFORM_WINDOWS)
-#include <Windows.h>
 u64 console_read(void *buffer, u64 size) {
   DWORD readBytes = 0;
 

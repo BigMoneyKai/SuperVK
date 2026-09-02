@@ -3,7 +3,7 @@
 #include "core/container/string/string.hpp"
 #include "core/define/assert.h"
 #include "core/define/types.h"
-#include <new>
+#include "core/define/arch.h"
 
 enum class LogLevel : u32 { trace, debug, info, warning, error, fatal };
 
@@ -27,7 +27,8 @@ enum class LogCatag : u32 {
 
 };
 
-struct alignas(std::hardware_destructive_interference_size) LogMsg {
+
+struct alignas(SV::optimal_alignment) LogMsg {
   LogLevel level;
   LogCatag catag{LogCatag::unknown};
 

@@ -1,5 +1,6 @@
 #include "ui/settings/font.h"
 #include "core/debug/debugger.h"
+#include "core/define/platform.h"
 
 #include <imgui.h>
 
@@ -44,8 +45,16 @@ void FontMan::apply() {
     if (!f) {
       WARNING(LogCatag::ui, "Font not found: {}, fallback to system font",
               path ? path : "?");
+#if defined(SV_PLATFORM_APPLE)
       f = io.Fonts->AddFontFromFileTTF(
           "/System/Library/Fonts/Supplemental/Arial Black.ttf", size);
+#elif defined(SV_PLATFORM_LINUX)
+#error ("Linux: please use custom fonts or app default fonts")
+#elif defined(SV_PLATFORM_WINDOWS)
+      f = io.Fonts->AddFontFromFileTTF(
+        "C:\Windows\Fonts\SegoeIcons.ttf", size);
+#endif
+
     }
     return f;
   };

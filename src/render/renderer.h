@@ -26,7 +26,7 @@ class Scene;
 }
 
 struct RendererDesc {
-  WinMan *pWinMan{nullptr};
+  Window::WinMan *pWinMan{nullptr};
   VkExtent2D swapchainExtent{};
 };
 
@@ -87,7 +87,8 @@ private:
   FrameResource m_frameResource;
   DepthResource m_depthResource;
   RenderGraph m_renderGraph;
-  u32 m_depthRTId{0};
+  RenderGraphResource m_presenthRGR{};
+  RenderGraphResource m_depthRGR{};
 
   RendererDesc m_desc;
   Scene::Scene *m_scene{nullptr};

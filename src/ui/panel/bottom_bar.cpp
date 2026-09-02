@@ -1,5 +1,3 @@
-#pragma once
-
 #include "bottom_bar.h"
 #include "imgui.h"
 

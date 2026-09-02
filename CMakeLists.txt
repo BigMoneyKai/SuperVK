@@ -6,6 +6,8 @@ if(APPLE)
 elseif(WIN32)
     set(CMAKE_C_COMPILER cl)
     set(CMAKE_CXX_COMPILER cl)
+    add_compile_options(/utf-8)
+
 elseif(UNIX)
     set(CMAKE_C_COMPILER gcc)
     set(CMAKE_CXX_COMPILER g++)

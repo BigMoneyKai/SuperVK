@@ -48,8 +48,8 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
                          title, nullptr, nullptr);
     break;
   case DisplayMode::windowed:
-    m_width = default_width;
-    m_height = default_height;
+    m_width = defaultWidth;
+    m_height = defaultHeight;
     m_window =
         glfwCreateWindow(static_cast<i32>(m_width), static_cast<i32>(m_height),
                          title, nullptr, nullptr);
@@ -60,6 +60,7 @@ void WinMan::init(const char *title, DisplayMode displayMode) {
   if (!m_window) {
     FATAL(LogCatag::window, "Failed to create window");
   }
+  glfwSetWindowSizeLimits(m_window, defaultMinWidth, defaultMinHeight, defaultMaxWidth, defaultMaxHeight);
 }
 
 void WinMan::destroy() {

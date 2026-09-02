@@ -5,8 +5,13 @@
 #include <GLFW/glfw3.h>
 
 namespace Window {
-constexpr u32 default_width = 1920;
-constexpr u32 default_height = 1080;
+constexpr u32 defaultWidth = 1920;
+constexpr u32 defaultHeight = 1080;
+
+constexpr u32 defaultMinWidth = 640;
+constexpr u32 defaultMinHeight = 480;
+constexpr u32 defaultMaxWidth = UINT_MAX;
+constexpr u32 defaultMaxHeight = UINT_MAX;
 
 enum class DisplayMode {
   fullscreen,
@@ -44,6 +49,4 @@ private:
 } // namespace Window
 
 using DisplayMode = Window::DisplayMode;
-using WinMan = Window::WinMan;
-using Window::default_width;
-using Window::default_height;
+

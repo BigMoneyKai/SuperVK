@@ -20,3 +20,11 @@
 #define SV_ARCH_UNKNOWN
 #error "Unsupported chip architecture"
 #endif
+
+namespace SV {
+#if defined(SV_ARCH_AARCH64)
+static constexpr u64 optimal_alignment = 128;
+#else
+static constexpr u64 optimal_alignment = 64;
+#endif
+}

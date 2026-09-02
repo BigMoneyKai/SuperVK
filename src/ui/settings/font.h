@@ -16,7 +16,7 @@ struct FontInfo {
 };
 
 static constexpr FontInfo defaultFontInfo{
-  FontSource::app, FontSize::medium, "fonts/BitstromWeraNerdFont-Bold.ttf"};
+  FontSource::app, FontSize::medium, "resource/fonts/BitstromWeraNerdFont-Bold.ttf"};
 
 class FontMan {
 public:

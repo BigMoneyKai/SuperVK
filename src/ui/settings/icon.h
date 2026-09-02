@@ -31,7 +31,7 @@ struct IconInfo {
 
 static constexpr IconInfo defaultIconInfo{
   IconSize::medium,
-  "fonts/BitstromWeraNerdFont-Bold.ttf"
+  "resource/fonts/BitstromWeraNerdFont-Bold.ttf"
 };
 
 class IconMan {

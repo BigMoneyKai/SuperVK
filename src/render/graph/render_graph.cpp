@@ -100,6 +100,7 @@ void RenderGraph::destroy() {
       vkDestroyFramebuffer(m_device, it.second, nullptr);
     }
   }
+  m_framebufferCache.clear();
 
   m_passes.clear();
   m_resources.clear();
@@ -113,6 +114,11 @@ void RenderGraph::destroyFramebuffer() {
     if (it.second != VK_NULL_HANDLE) {
       vkDestroyFramebuffer(m_device, it.second, nullptr);
     }
+  }
+  m_framebufferCache.clear();
+  for (auto &pass : m_passes) {
+    pass.framebuffer = VK_NULL_HANDLE;
+    pass.framebufferImage = VK_NULL_HANDLE;
   }
 }
 

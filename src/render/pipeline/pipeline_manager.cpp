@@ -4,8 +4,8 @@ void PipelineMan::init(const VkDevice &device, const VkRenderPass &renderPass,
                        VkDescriptorSetLayout descriptorSetLayout) {
   m_device = device;
   // load shaders
-  m_vertShader.init(device, "shaders/spv/pbr.vert.spv", ShaderType::vertexShader);
-  m_fragShader.init(device, "shaders/spv/pbr.frag.spv", ShaderType::fragmentShader);
+  m_vertShader.init(device, "resource/shaders/spv/pbr.vert.spv", ShaderType::vertexShader);
+  m_fragShader.init(device, "resource/shaders/spv/pbr.frag.spv", ShaderType::fragmentShader);
 
   // build pipeline descriptor
   PipelineDesc desc;

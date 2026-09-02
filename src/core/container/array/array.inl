@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <utility>
 
+#if defined(__GNUC__)
+#include <cstring>
+#endif
+
 template <typename T> Array<T>::Array(Allocator *a) : m_allocator(a) {
   m_data = nullptr;
   m_size = 0;

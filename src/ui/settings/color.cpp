@@ -1,5 +1,3 @@
-#pragma once
-
 #include "color.h"
 #include "core/debug/debugger.h"
 #include "core/debug/logger_attrib.h"

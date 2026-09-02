@@ -1,5 +1,5 @@
-set(GLSL_DIR ${PROJECT_SOURCE_DIR}/shaders/glsl)
-set(SPV_DIR  ${PROJECT_SOURCE_DIR}/shaders/spv)
+set(GLSL_DIR ${PROJECT_SOURCE_DIR}/resource/shaders/glsl)
+set(SPV_DIR  ${PROJECT_SOURCE_DIR}/resource/shaders/spv)
 find_program(GLSLANG_VALIDATOR glslangValidator REQUIRED)
 file(GLOB GLSL_SOURCES
     CONFIGURE_DEPENDS

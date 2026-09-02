@@ -34,34 +34,6 @@ struct PassDesc {
 };
 
 class RenderGraph {
-public:
-  void init(VkDevice device, VkExtent2D extent);
-  void destroy();
-
-  RenderGraphResource registerExternal(VkImage image, VkImageView view,
-                                       VkFormat format,
-                                       VkImageLayout initialLayout,
-                                       VkImageLayout finalLayout);
-  RenderGraphResource presentTarget() const;
-  void setPresentTarget(VkImage image, VkImageView view, VkFormat format);
-  // resize 后更新渲染尺寸（framebuffer 缓存需先 destroyFramebuffer）
-  void setExtent(VkExtent2D extent);
-  // 外部资源重建后（如 depth），按 id 更新 image/view
-  void updateExternalResource(u32 id, VkImage image, VkImageView view,
-                              VkFormat format);
-
-  void addPass(const char *name, const PassDesc &desc);
-
-  void process();
-  void execute(VkCommandBuffer cmd);
-
-  void destroyFramebuffer();
-
-  VkRenderPass renderPassOf(u32 index) const;
-  SV_FORCE_INLINE u32 passCount() const {
-    return static_cast<u32>(m_passes.size());
-  }
-
 private:
   struct Usage {
     u32 pass;
@@ -92,12 +64,41 @@ private:
     std::vector<VkClearValue> clearValues;
   };
 
+public:
+  void init(VkDevice device, VkExtent2D extent);
+  void destroy();
+
+  RenderGraphResource registerExternal(VkImage image, VkImageView view,
+                                       VkFormat format,
+                                       VkImageLayout initialLayout,
+                                       VkImageLayout finalLayout);
+  RenderGraphResource presentTarget() const;
+  void setPresentTarget(VkImage image, VkImageView view, VkFormat format);
+  // resize 后更新渲染尺寸（framebuffer 缓存需先 destroyFramebuffer）
+  void setExtent(VkExtent2D extent);
+  // 外部资源重建后（如 depth），按 id 更新 image/view
+  void updateExternalResource(u32 id, VkImage image, VkImageView view,
+                              VkFormat format);
+
+  void ensureFramebuffer(Pass &pass);
+  void addPass(const char *name, const PassDesc &desc);
+
+  void process();
+  void execute(VkCommandBuffer cmd);
+
+  void destroyFramebuffer();
+
+  VkRenderPass renderPassOf(u32 index) const;
+  SV_FORCE_INLINE u32 passCount() const {
+    return static_cast<u32>(m_passes.size());
+  }
+
+private:
   void addUsage(RenderGraphResource resource, u32 pass, AttachmentSlot slot);
   void addEdge(u32 from, u32 to);
   void topoSort();
   void buildRenderPass(Pass &pass);
   void buildTransitions();
-  void ensureFramebuffer(Pass &pass);
   void transitionImage(VkCommandBuffer cmd, const Transition &t);
   void transitionImage(VkCommandBuffer cmd, u32 resource,
                        VkImageLayout oldLayout, VkImageLayout newLayout,
