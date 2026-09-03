@@ -52,12 +52,12 @@ void UI::Man::init(const UIInitInfo &info) {
   m_fileZone.init(PanelInfo{.title = "FileZone"});
   m_scene.init(PanelInfo{.title = "Scene", .flag = PanelFlag::transparent});
   m_console.init(ConsoleInfo{});
-  m_bottomBar.init(PanelInfo{.title = "BottomBar",
-                             .style = rectanglePanelStyle});
+  m_bottomBar.init(
+    PanelInfo{.title = "BottomBar", .style = rectanglePanelStyle});
   m_splitter1.bind(&m_layout, 1);
   m_splitter2.bind(&m_layout, 2);
-  m_settingsPanel.init(PanelInfo{.title = "Settings",
-                                 .flag = PanelFlag::scrollable});
+  m_settingsPanel.init(
+    PanelInfo{.title = "Settings", .flag = PanelFlag::scrollable});
   m_settingsPanel.bind(&m_settings);
 }
 
@@ -65,6 +65,18 @@ void UI::Man::init(const UIInitInfo &info) {
 void UI::Man::newFrame() {
   ImGui_ImplVulkan_NewFrame();
   ImGui_ImplGlfw_NewFrame();
+
+  // 尺寸同步：后端可能滞后/Retina 不准，这里手动对齐（必须在 NewFrame 之前）
+  ImGuiIO &io = ImGui::GetIO();
+  i32 winW = 0, winH = 0, fbW = 0, fbH = 0;
+  glfwGetWindowSize(m_window, &winW, &winH);
+  glfwGetFramebufferSize(m_window, &fbW, &fbH);
+  if (winW > 0 && winH > 0) {
+    io.DisplaySize = ImVec2(static_cast<f32>(winW), static_cast<f32>(winH));
+    io.DisplayFramebufferScale =
+        ImVec2(static_cast<f32>(fbW) / winW, static_cast<f32>(fbH) / winH);
+  }
+
   ImGui::NewFrame();
 
   // 布局：每帧按窗口尺寸重算
@@ -87,7 +99,6 @@ void UI::Man::newFrame() {
 
   m_splitter1.draw(m_layout.splitter1Rect());
   m_splitter2.draw(m_layout.splitter2Rect());
-
 }
 
 void UI::Man::endFrame() { ImGui::Render(); }

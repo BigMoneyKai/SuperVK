@@ -43,8 +43,9 @@ Array<T>::Array(void *data, u64 size, Allocator *a) : m_allocator(a) {
   if constexpr (std::is_trivially_copyable_v<T>) {
     memcpy(m_data, data, size * sizeof(T));
   } else {
+    const T* src = static_cast<const T*>(data);
     for (u64 i = 0; i < size; ++i)
-      new (m_data + i) T(data[i]);
+      new (m_data + i) T(src[i]);
   }
 
   m_size = size;

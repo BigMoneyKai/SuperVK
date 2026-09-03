@@ -10,14 +10,14 @@ void Renderer::init(const RendererDesc &desc) {
   m_instance.init();
   m_surface.init(m_instance.instance(), desc.pWinMan->window());
   m_device.init(m_instance.instance(), m_surface.surface());
-  
+
   // 初始 swapchain 用实际 framebuffer 像素尺寸（不能用窗口 points）
   i32 initW = 0, initH = 0;
   glfwGetFramebufferSize(desc.pWinMan->window(), &initW, &initH);
   m_swapchain.init(
-      m_device.device(), m_device.physicalDevice(), m_surface.surface(),
-      {initW > 0 ? static_cast<u32>(initW) : desc.pWinMan->width(),
-       initH > 0 ? static_cast<u32>(initH) : desc.pWinMan->height()});
+    m_device.device(), m_device.physicalDevice(), m_surface.surface(),
+    {initW > 0 ? static_cast<u32>(initW) : desc.pWinMan->width(),
+     initH > 0 ? static_cast<u32>(initH) : desc.pWinMan->height()});
 
   m_renderGraph.init(m_device.device(), m_swapchain.extent());
   m_renderGraph.setPresentTarget(m_swapchain.swapchainImages()[0],
@@ -161,50 +161,63 @@ void Renderer::destroy() {
 }
 
 void Renderer::drawFrame(Scene::Scene &scene) {
-  auto fence = m_frameResource.inFlightFence(m_currFrame);
-  auto imageSem = m_frameResource.imageAvailableSemaphore(m_currFrame);
-
-  // Wait for fence
+  VkFence fence = m_frameResource.inFlightFence(m_currFrame);
   vkWaitForFences(m_device.device(), 1, &fence, VK_TRUE, UINT64_MAX);
+  vkResetFences(m_device.device(), 1, &fence);
+  VkSemaphore imageSem = m_frameResource.imageAvailableSemaphore(m_currFrame);
 
-  // Acquire swapchain image
   VkResult result =
     vkAcquireNextImageKHR(m_device.device(), m_swapchain.swapchain(),
                           UINT64_MAX, imageSem, VK_NULL_HANDLE, &m_imageIndex);
   if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-    i32 width = 0, height = 0;
-    glfwGetFramebufferSize(m_desc.pWinMan->window(), &width, &height);
-    if (width > 0 && height > 0) // 最小化(0×0)时跳过，等恢复
-      rebuildSwapchain(width, height);
-    return;
+    i32 w, h;
+    glfwGetFramebufferSize(m_desc.pWinMan->window(), &w, &h);
+    if (w > 0 && h > 0) {
+      rebuildSwapchain(w, h);
+    }
+    return; // 不推进帧索引，下一帧重试
+  } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+    FATAL(LogCatag::render, "Failed to acquire swapchain image");
   }
-  // Reset fence
-  vkResetFences(m_device.device(), 1, &fence);
 
-  auto finishSem = m_frameResource.renderFinishedSemaphore(m_currFrame);
-
-  // Record command buffer
+  // ----- 3. 录制 Command Buffer -----
   VkCommandBuffer cmdBuf = m_commandBuffer.get(m_currFrame);
   VkCommandBufferBeginInfo beginInfo{};
   beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  // 使用 VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT 可优化
+  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
   if (vkBeginCommandBuffer(cmdBuf, &beginInfo) != VK_SUCCESS) {
-    FATAL(LogCatag::render, "Failed to record command buffer");
+    FATAL(LogCatag::render, "Failed to begin command buffer");
   }
 
-  // 这一帧画到哪张交换链图上
+  // 更新渲染目标的交换链图像
   m_renderGraph.setPresentTarget(
     m_swapchain.swapchainImages()[m_imageIndex],
     m_swapchain.swapchainImageViews()[m_imageIndex], m_swapchain.colorFormat());
 
+  // 重新生成 RenderGraph（内部会更新 Framebuffer 尺寸）
   m_renderGraph.process();
   m_renderGraph.execute(cmdBuf);
 
+  // ----- 4. （重要）更新 ImGui 尺寸（防止 UI 拉伸） -----
+  // 如果 m_uiRenderFn 被调用，确保它在录制前获取最新尺寸
+  // 但最好在外部（如主循环）每帧更新 io.DisplaySize
+  // 这里可以在执行 m_renderGraph 之前就设置好，但需要访问 ImGui。
+  // 推荐在 m_uiRenderFn 内部更新，或在这里设置：
+  int win_w, win_h, fb_w, fb_h;
+  glfwGetWindowSize(m_desc.pWinMan->window(), &win_w, &win_h);
+  glfwGetFramebufferSize(m_desc.pWinMan->window(), &fb_w, &fb_h);
+  ImGui::GetIO().DisplaySize = ImVec2((float)win_w, (float)win_h);
+  ImGui::GetIO().DisplayFramebufferScale =
+    ImVec2((float)fb_w / win_w, (float)fb_h / win_h);
+
   if (vkEndCommandBuffer(cmdBuf) != VK_SUCCESS) {
-    FATAL(LogCatag::render, "Failed to record command buffer");
+    FATAL(LogCatag::render, "Failed to end command buffer");
   }
 
-  // Submit command buffer
+  // ----- 5. 提交渲染 -----
+  VkSemaphore finishSem = m_frameResource.renderFinishedSemaphore(m_currFrame);
   VkSubmitInfo submitInfo{};
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
   submitInfo.commandBufferCount = 1;
@@ -221,10 +234,10 @@ void Renderer::drawFrame(Scene::Scene &scene) {
 
   if (vkQueueSubmit(m_device.graphicsQueue(), 1, &submitInfo, fence)
       != VK_SUCCESS) {
-    FATAL(LogCatag::render, "Failed to submit draw command buffer");
+    FATAL(LogCatag::render, "Failed to submit command buffer");
   }
 
-  // Present
+  // ----- 6. 呈现（处理可能的尺寸变化） -----
   VkPresentInfoKHR presentInfo{};
   presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
   presentInfo.waitSemaphoreCount = 1;
@@ -234,12 +247,18 @@ void Renderer::drawFrame(Scene::Scene &scene) {
   presentInfo.pImageIndices = &m_imageIndex;
 
   result = vkQueuePresentKHR(m_device.presentQueue(), &presentInfo);
-  if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-    i32 width = 0, height = 0;
-    glfwGetFramebufferSize(m_desc.pWinMan->window(), &width, &height);
-    if (width > 0 && height > 0)
-      rebuildSwapchain( width, height);
+  if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+    i32 w, h;
+    glfwGetFramebufferSize(m_desc.pWinMan->window(), &w, &h);
+    if (w > 0 && h > 0) {
+      rebuildSwapchain(w, h);
+    }
+    // 注意：这里重建后不 return，但我们已经提交了当前帧的渲染，
+    // 如果 present 失败，画面可能闪一下，但下一帧会使用新交换链。
+    // 你也可以选择在 present 失败时不推进 m_currFrame，但为了简单，通常就推进。
   }
+
+  // ----- 7. 推进帧索引 -----
   m_currFrame = (m_currFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
@@ -267,6 +286,5 @@ void Renderer::rebuildSwapchain(u32 width, u32 height) {
 
   m_renderGraph.updateExternalResource(
     m_depthRGR.id, m_depthResource.depthImage(),
-                               m_depthResource.depthImageView(),
-                               m_device.depthFormat());
+    m_depthResource.depthImageView(), m_device.depthFormat());
 }

@@ -1,6 +1,5 @@
 #include "layout.h"
 #include "imgui_internal.h"
-#include <algorithm>
 
 namespace UI {
 
@@ -10,7 +9,7 @@ constexpr f32 kDefaultSideBarWidth = 200.f;
 constexpr f32 kDefaultConsoleHeight = 200.f;
 constexpr f32 kMinRightWidth = 200.f; // scene/console 区最小宽度
 constexpr f32 kMinSceneHeight = 240.f;
-constexpr f32 kMinConsoleHeight = 60.f;
+constexpr f32 kMinConsoleHeight = 200.f;
 } // namespace
 
 void Layout::compute(const LayoutConfig &config, ImVec2 winSize) {

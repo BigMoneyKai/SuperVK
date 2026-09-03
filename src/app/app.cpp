@@ -1,12 +1,13 @@
 #include "app/app.h"
+#include "GLFW/glfw3.h"
 #include "core/debug/debugger.h"
 #include "core/define/types.h"
 #include "platform/time.h"
 #include "scene/camera.h"
 #include "ui/manager.h"
 
-#include <thirdparty/imgui/imgui.h>
 #include <algorithm>
+#include <thirdparty/imgui/imgui.h>
 #include <vulkan/vulkan_core.h>
 
 namespace App {
@@ -39,6 +40,7 @@ void App::init(const char *title, DisplayMode mode, u64 threadCount) {
   uiInitInfo.renderPass = m_renderer.renderPass();
   uiInitInfo.imageCount = m_renderer.imageCount();
   m_uiMan.init(uiInitInfo);
+
   m_renderer.setUiRenderHook(
       [](VkCommandBuffer cmd, void *userData) {
         static_cast<UI::Man *>(userData)->update(cmd);
@@ -48,7 +50,7 @@ void App::init(const char *title, DisplayMode mode, u64 threadCount) {
   m_assetMan.init(&m_jobSystem);
 
   m_meshHandle = m_assetMan.loadMesh(
-      "resource/AlphaBlendModeTest/glTF-Binary/AlphaBlendModeTest.glb");
+    "resource/AlphaBlendModeTest/glTF-Binary/AlphaBlendModeTest.glb");
 
   if (!waitForMeshLoad(m_jobSystem, m_assetMan, m_meshHandle)) {
     FATAL(LogCatag::asset, "App: failed to load initial mesh");
@@ -72,7 +74,8 @@ void App::run() {
   while (!glfwWindowShouldClose(m_winMan.window())) {
     glfwPollEvents();
     const f64 now = timer_now_ms();
-    const f32 dt = std::clamp(static_cast<f32>((now - last) * 0.001), 0.0f, 0.05f);
+    const f32 dt =
+      std::clamp(static_cast<f32>((now - last) * 0.001), 0.0f, 0.05f);
     last = now;
 
     update(dt);
@@ -86,10 +89,9 @@ void App::run() {
     const f32 scaleX = ds.x > 0.f ? static_cast<f32>(ext.width) / ds.x : 1.f;
     const f32 scaleY = ds.y > 0.f ? static_cast<f32>(ext.height) / ds.y : 1.f;
     m_renderer.setViewportRect(
-        static_cast<i32>(vp.Min.x * scaleX),
-        static_cast<i32>(vp.Min.y * scaleY),
-        static_cast<i32>((vp.Min.x + vp.GetWidth()) * scaleX),
-        static_cast<i32>((vp.Min.y + vp.GetHeight()) * scaleY));
+      static_cast<i32>(vp.Min.x * scaleX), static_cast<i32>(vp.Min.y * scaleY),
+      static_cast<i32>((vp.Min.x + vp.GetWidth()) * scaleX),
+      static_cast<i32>((vp.Min.y + vp.GetHeight()) * scaleY));
 
     m_renderer.render(m_scene);
   }

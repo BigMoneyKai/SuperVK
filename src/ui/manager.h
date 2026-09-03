@@ -34,7 +34,7 @@ public:
   void init(const UIInitInfo &info);
   void newFrame();
   void endFrame();
-  void update(VkCommandBuffer cmd);
+  void update(VkCommandBuffer cmd); // 渲染 hook 内调用（render pass 中）
   void destroy();
   b32 captureMouseNeeded();
 
