@@ -160,8 +160,8 @@ public:
   Allocator *allocator();
 
 private:
-  // Storage layout (40 bytes total):
-  //   union: 24 bytes (SSO buffer 23 + padding, or heap data/control)
+  // Storage layout (80 bytes total):
+  //   union: 64 bytes (SSO buffer 63 + padding, or heap data/control)
   //   m_size + m_heap flag: 8 bytes (63-bit size + 1-bit flag)
   //   m_allocator: 8 bytes
   //

@@ -16,6 +16,9 @@
 #elif defined(__riscv)
 #define SV_ARCH_RISCV
 
+#elif defined(__aarch64__)
+#define SV_ARCH_AARCH64
+
 #else
 #define SV_ARCH_UNKNOWN
 #error "Unsupported chip architecture"

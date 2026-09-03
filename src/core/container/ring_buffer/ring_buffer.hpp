@@ -6,6 +6,8 @@
 #include "core/define/types.h"
 #include "core/memory/allocator.h"
 
+#include <algorithm>
+
 template <typename T> class RingBuffer {
 public:
   using iterator = RingBufferIterator<T>;
@@ -102,7 +104,7 @@ private:
   u64 m_head{0};
   u64 m_tail{0};
 
-  static constexpr u64 ALIGNMENT = 16;
+  static constexpr u64 ALIGNMENT = std::max(static_cast<u64>(16), alignof(T));
 
   SV_FORCE_INLINE static u64 next_pow2(u64 v) {
     if (v < 2)

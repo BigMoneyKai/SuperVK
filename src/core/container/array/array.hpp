@@ -7,10 +7,10 @@
 
 template <typename T> class Array {
 public:
-  using iterator = Iterator<T>;
-  using const_iterator = Iterator<const T>;
-  using reverse_iterator = ReverseIterator<iterator>;
-  using const_reverse_iterator = ReverseIterator<const_iterator>;
+  using iterator = ArrayIterator<T>;
+  using const_iterator = ArrayIterator<const T>;
+  using reverse_iterator = ArrayReverseIterator<iterator>;
+  using const_reverse_iterator = ArrayReverseIterator<const_iterator>;
 
   explicit Array(Allocator *a = &default_allocator());
   Array(u64 capacity, const T &value = T{},
