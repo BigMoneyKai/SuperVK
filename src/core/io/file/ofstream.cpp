@@ -7,7 +7,7 @@ FileHandle* FileOutputStream::open(const char* path, FileMode mode) {
 }
 
 b32 FileOutputStream::write(const void* buf, u64 size) {
-    return file_write(m_file, buf, size);
+    return static_cast<b32>(file_write(m_file, buf, size));
 }
 
 b32 FileOutputStream::is_open() const {

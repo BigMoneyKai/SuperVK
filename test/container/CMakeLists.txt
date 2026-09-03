@@ -45,13 +45,6 @@ add_executable(test_container_hashmap
 target_include_directories(test_container_hashmap PRIVATE ${CONTAINER_TEST_INCLUDES})
 target_link_libraries(test_container_hashmap PRIVATE ${CONTAINER_TEST_LIBS})
 
-# --- Iterator tests ---
-add_executable(test_container_iterator
-    iterator/iterator_test.cpp
-)
-target_include_directories(test_container_iterator PRIVATE ${CONTAINER_TEST_INCLUDES})
-target_link_libraries(test_container_iterator PRIVATE ${CONTAINER_TEST_LIBS})
-
 # --- RingBuffer tests ---
 add_executable(test_container_ring_buffer
     ring_buffer/ring_buffer_test.cpp
@@ -68,7 +61,6 @@ add_executable(test_container
     string/string_view_test.cpp
     hashmap/hashmap_test.cpp
     hashmap/hashmap_stress_test.cpp
-    iterator/iterator_test.cpp
     ring_buffer/ring_buffer_test.cpp
     ring_buffer/ring_buffer_stress_test.cpp
 )

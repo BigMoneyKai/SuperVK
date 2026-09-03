@@ -5,7 +5,6 @@ target_include_directories(supervk_core_container_string INTERFACE
 )
 
 target_link_libraries(supervk_core_container_string INTERFACE
-    supervk_core_container_iterator
     supervk_platform
     supervk_core_memory
 )

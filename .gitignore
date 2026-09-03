@@ -9,6 +9,7 @@ out/
 Testing/
 script/__pycache__
 .vs/
+.vscode/
 bin/
 .idea/
 

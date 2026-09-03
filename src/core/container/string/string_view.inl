@@ -191,11 +191,11 @@ SV_FORCE_INLINE String StringView::substr(u64 pos, u64 count) const {
 }
 
 SV_FORCE_INLINE i32 StringView::compare(const StringView &view) const {
-  return m_size - view.size();
+  return static_cast<i32>(m_size - view.size());
 }
 
 SV_FORCE_INLINE i32 StringView::compare(const String &str) const {
-  return m_size - str.size();
+  return static_cast<i32>(m_size - str.size());
 }
 
 SV_FORCE_INLINE i32 StringView::compare(const char *str) const {

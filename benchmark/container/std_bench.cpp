@@ -171,7 +171,7 @@ static void BM_StdUnorderedMap_Insert(benchmark::State& state) {
 }
 BENCHMARK(BM_StdUnorderedMap_Insert)->Arg(100)->Arg(1000)->Arg(10000)->Arg(100000);
 
-static void BM_HashMap_Find(benchmark::State& state) {
+static void BM_HashMap_Contains(benchmark::State& state) {
     const i64 n = state.range(0);
     HashMap<u64, u64> map(16);
     for (i64 i = 0; i < n; ++i) {
@@ -186,11 +186,11 @@ static void BM_HashMap_Find(benchmark::State& state) {
     benchmark::DoNotOptimize(found);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_HashMap_Find)->Arg(100)->Arg(1000)->Arg(10000)->Arg(100000);
+BENCHMARK(BM_HashMap_Contains)->Arg(100)->Arg(1000)->Arg(10000)->Arg(100000);
 
-static void BM_StdUnorderedMap_Find(benchmark::State& state) {
+static void BM_StdUnorderedMap_Contains(benchmark::State& state) {
     const i64 n = state.range(0);
-    std::unordered_map<u64, u64> map;
+    std::unordered_map<u64, u64> map(16);
     for (i64 i = 0; i < n; ++i) {
         map.emplace(static_cast<u64>(i), static_cast<u64>(i));
     }
@@ -203,7 +203,7 @@ static void BM_StdUnorderedMap_Find(benchmark::State& state) {
     benchmark::DoNotOptimize(found);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_StdUnorderedMap_Find)->Arg(100)->Arg(1000)->Arg(10000)->Arg(100000);
+BENCHMARK(BM_StdUnorderedMap_Contains)->Arg(100)->Arg(1000)->Arg(10000)->Arg(100000);
 
 // ============================================================================
 // String vs std::string

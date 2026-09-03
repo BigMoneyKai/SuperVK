@@ -41,6 +41,6 @@ public:
   b32 operator==(const ReverseIterator &rhs) const { return m_it == rhs.m_it; }
   b32 operator!=(const ReverseIterator &rhs) const { return m_it != rhs.m_it; }
 
-protected:
+private:
   It m_it;
 };

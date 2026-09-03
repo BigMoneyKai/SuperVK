@@ -35,8 +35,19 @@ Array<T>::Array(u64 size, const T &value, Allocator *a)
 
 template <typename T>
 Array<T>::Array(void *data, u64 size, Allocator *a) : m_allocator(a) {
-  resize(size);
-  memcpy(m_data, data, size * sizeof(T));
+  if (size == 0)
+    return;
+
+  reserve(size);
+
+  if constexpr (std::is_trivially_copyable_v<T>) {
+    memcpy(m_data, data, size * sizeof(T));
+  } else {
+    for (u64 i = 0; i < size; ++i)
+      new (m_data + i) T(data[i]);
+  }
+
+  m_size = size;
 }
 
 template <typename T>
@@ -158,8 +169,13 @@ template <typename T> void Array<T>::resize(u64 newSize, const T &value) {
 
   u64 copyCount = std::min(m_size, newSize);
   for (u64 i = 0; i < copyCount; i++) {
-    new (newData + i) T(std::move_if_noexcept(m_data[i]));
-    m_data[i].~T();
+    if constexpr (std::is_trivially_copyable_v<T>) {
+      memcpy(newData, m_data, m_size * sizeof(T));
+    }
+    else {
+      new (newData + i) T(std::move_if_noexcept(m_data[i]));
+      m_data[i].~T();
+    }
   }
   for (u64 i = copyCount; i < newSize; i++) {
     new (newData + i) T(value);
@@ -181,8 +197,6 @@ template <typename T> void Array<T>::resize(u64 newSize, const T &value) {
   m_data = newData;
 }
 
-template <typename T> void Array<T>::shrink_to_fit() {}
-
 template <typename T> Allocator *Array<T>::allocator() const {
   return m_allocator;
 }
@@ -192,16 +206,6 @@ template <typename T> u64 Array<T>::size() const { return m_size; }
 template <typename T> u64 Array<T>::capacity() const { return m_capacity; }
 
 template <typename T> b32 Array<T>::empty() const { return m_size == 0; }
-
-template <typename T> T &Array<T>::operator[](u64 i) {
-  SV_ASSERT(i < m_size, "Index {} out of bound", i);
-  return m_data[i];
-}
-
-template <typename T> const T &Array<T>::operator[](u64 i) const {
-  SV_ASSERT(i < m_size, "Index {} out of bound", i);
-  return m_data[i];
-}
 
 template <typename T> T &Array<T>::at(u64 i) {
   SV_ASSERT(i < m_size, "Index {} out of bound", i);

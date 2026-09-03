@@ -54,7 +54,8 @@ public:
       m_hasViewport = SV_FALSE;
       return;
     }
-    m_viewportRect = ImRect(x1, y1, x2, y2);
+    m_viewportRect = ImRect(static_cast<f32>(x1), static_cast<f32>(y1),
+                            static_cast<f32>(x2), static_cast<f32>(y2));
     m_hasViewport = SV_TRUE;
   }
 

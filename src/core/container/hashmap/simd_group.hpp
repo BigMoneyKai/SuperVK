@@ -1,5 +1,3 @@
-#pragma once
-
 #include "core/define/compiler.h"
 #include "core/define/types.h"
 

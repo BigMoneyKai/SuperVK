@@ -1,21 +1,22 @@
 #pragma once
 
-#include "core/container/iterator/iterator.hpp"
-#include "core/container/iterator/reverse_iterator.hpp"
+#include "iterator.hpp"
+#include "reverse_iterator.hpp"
 #include "core/define/compiler.h"
 #include "core/define/types.h"
 #include "core/memory/allocator.h"
+
 #include <iostream>
 
 class String {
 public:
   static constexpr u64 npos = ~u64{0};
-  static constexpr u64 SSO_CAPACITY = 23;
+  static constexpr u64 SSO_CAPACITY = 63;
 
-  using iterator = Iterator<char>;
-  using const_iterator = Iterator<const char>;
-  using reverse_iterator = ReverseIterator<iterator>;
-  using const_reverse_iterator = ReverseIterator<const_iterator>;
+  using iterator = StringIterator<char>;
+  using const_iterator = StringIterator<const char>;
+  using reverse_iterator = StringReverseIterator<iterator>;
+  using const_reverse_iterator = StringReverseIterator<const_iterator>;
 
   // --- constructors ---
   explicit String(Allocator *a = &default_allocator());

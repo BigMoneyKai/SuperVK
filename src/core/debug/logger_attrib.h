@@ -28,7 +28,7 @@ enum class LogCatag : u32 {
 };
 
 
-struct alignas(SV::optimal_alignment) LogMsg {
+struct alignas(SV_CACHE_LINE_SIZE) LogMsg {
   LogLevel level;
   LogCatag catag{LogCatag::unknown};
 

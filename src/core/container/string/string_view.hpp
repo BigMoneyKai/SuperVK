@@ -1,15 +1,15 @@
 #pragma once
 
-#include "core/container/iterator/iterator.hpp"
-#include "core/container/iterator/reverse_iterator.hpp"
+#include "iterator.hpp"
+#include "reverse_iterator.hpp"
 #include "core/container/string/string.hpp"
 
 class StringView {
 public:
   static constexpr u64 npos = ~u64{0};
 
-  using const_iterator = Iterator<const char>;
-  using const_reverse_iterator = ReverseIterator<const_iterator>;
+  using const_iterator = StringIterator<const char>;
+  using const_reverse_iterator = StringReverseIterator<const_iterator>;
 
   StringView(const char *str);
   StringView(const char *str, u64 count);

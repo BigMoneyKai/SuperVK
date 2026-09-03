@@ -12,9 +12,9 @@ template <typename Entry> class HashMapIterator {
 
 public:
   HashMapIterator(u64 idx, u64 end, const NK *keys, const NV *vals,
-                  const u64 *hashes, const u64 *dists, const b32 *occ)
+                  const u64 *hashes, const u64 *dists, const u8 *fingerprints)
       : m_idx(idx), m_end(end), m_keys(keys), m_vals(vals), m_hashes(hashes),
-        m_dists(dists), m_occupied(occ) {}
+        m_dists(dists), m_fingerprints(fingerprints) {}
 
   const Entry &operator*() const {
     sync();
@@ -27,7 +27,7 @@ public:
 
   HashMapIterator &operator++() {
     ++m_idx;
-    while (m_idx != m_end && !m_occupied[m_idx])
+    while (m_idx != m_end && !m_fingerprints[m_idx])
       ++m_idx;
     return *this;
   }
@@ -59,7 +59,7 @@ private:
     m_cache.val = m_vals[m_idx];
     m_cache.hash = m_hashes[m_idx];
     m_cache.probeDist = m_dists[m_idx];
-    m_cache.occupied = m_occupied[m_idx];
+    m_cache.fingerprint = m_fingerprints[m_idx];
   }
 
   u64 m_idx;
@@ -68,6 +68,6 @@ private:
   const NV *m_vals;
   const u64 *m_hashes;
   const u64 *m_dists;
-  const b32 *m_occupied;
+  const u8 *m_fingerprints;
   mutable HashEntry<NK, NV> m_cache;
 };

@@ -53,7 +53,7 @@ void *LinearAllocator::allocate(u64 size, u64 alignment) {
 
   Header *header = reinterpret_cast<Header *>(headerPtr);
   header->size = size;
-  header->alignment = alignment;
+  header->alignment = static_cast<u32>(alignment);
   header->allocationId = AllocCounter::add();
   header->allocatorId = AllocatorType::linear;
   header->state = HeaderState::allocated;

@@ -19,7 +19,7 @@ struct LayoutConfig {
   // Height
   static constexpr f32 topBarHeight = 16.f;
   static constexpr f32 bottomBarHeight = 16.f;
-  static constexpr f32 defaultSceneHeight = 600.f;
+  static constexpr f32 defaultSceneHeight = 800.f;
 
   // Width
   static constexpr f32 sideBarWidth = 64.f;
@@ -30,9 +30,9 @@ struct LayoutConfig {
   static constexpr f32 panelSpacing = 2.f;
 
   // max & min
-  static constexpr f32 minWidth = 540.f;
+  static constexpr f32 minWidth = 640.f;
   static constexpr f32 maxWidth = FLT_MAX;
-  static constexpr f32 minHeight = 300.f;
+  static constexpr f32 minHeight = 480.f;
   static constexpr f32 maxHeight = FLT_MAX;
 
   // The only variable - Splitter Position

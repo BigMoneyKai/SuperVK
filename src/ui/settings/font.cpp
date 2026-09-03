@@ -52,7 +52,7 @@ void FontMan::apply() {
 #error ("Linux: please use custom fonts or app default fonts")
 #elif defined(SV_PLATFORM_WINDOWS)
       f = io.Fonts->AddFontFromFileTTF(
-        "C:\Windows\Fonts\SegoeIcons.ttf", size);
+        "C:\\Windows\\Fonts\\SegoeIcons.ttf", size);
 #endif
 
     }

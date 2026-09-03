@@ -7,7 +7,6 @@ target_include_directories(supervk_core_container_array INTERFACE
 )
 
 target_link_libraries(supervk_core_container_array INTERFACE
-    supervk_core_container_iterator
     supervk_platform
     supervk_core_memory
 

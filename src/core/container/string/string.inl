@@ -382,10 +382,9 @@ inline void String::resize(u64 count, char ch) {
 
   if (count > m_size)
     memset(ptr + m_size, ch, count - m_size);
-  else
-    ptr[count] = '\0';
 
   m_size = count;
+  ptr[m_size] = '\0';
 }
 
 inline void String::shrink_to_fit() {
@@ -508,11 +507,14 @@ inline void String::pop_back() {
 }
 
 inline void String::append(const char *str) {
-  u64 len = str ? strlen(str) : 0;
+  if (!str)
+    return;
+  u64 len = strlen(str);
   if (len == 0)
     return;
 
   u64 newSize = m_size + len;
+
   if (newSize > capacity())
     grow(newSize);
 
@@ -590,10 +592,6 @@ SV_FORCE_INLINE String &String::operator+=(char ch) {
   push_back(ch);
   return *this;
 }
-
-// ============================================================================
-// string operations
-// ============================================================================
 
 inline u64 String::find(char ch, u64 pos) const {
   if (pos >= m_size)
@@ -806,9 +804,6 @@ inline i32 String::compare(const char *str) const {
   return *a < *b ? -1 : 1;
 }
 
-// ============================================================================
-// non-member operators
-// ============================================================================
 SV_FORCE_INLINE b32 operator==(const String &lhs, const String &rhs) {
   return rhs.compare(lhs) == 0;
 }

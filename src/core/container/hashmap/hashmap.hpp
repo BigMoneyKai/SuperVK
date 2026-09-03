@@ -53,24 +53,24 @@ public:
     auto *v = m_vals.data();
     auto *h = m_hashKeys.data();
     auto *d = m_probeDists.data();
-    auto *o = m_occupied.data();
     auto ei = m_capacity;
+    auto *f = m_fingerprints.data();
     u64 i = 0;
-    while (i != ei && !o[i])
+    while (i != ei && !f[i])
       ++i;
-    return iterator(i, ei, k, v, h, d, o);
+    return iterator(i, ei, k, v, h, d, f);
   }
   SV_FORCE_INLINE const_iterator begin() const {
     auto *k = m_keys.data();
     auto *v = m_vals.data();
     auto *h = m_hashKeys.data();
     auto *d = m_probeDists.data();
-    auto *o = m_occupied.data();
     auto ei = m_capacity;
+    auto *f = m_fingerprints.data();
     u64 i = 0;
-    while (i != ei && !o[i])
+    while (i != ei && !f[i])
       ++i;
-    return const_iterator(i, ei, k, v, h, d, o);
+    return const_iterator(i, ei, k, v, h, d, f);
   }
   SV_FORCE_INLINE iterator end() {
     auto ei = m_capacity;
@@ -78,8 +78,8 @@ public:
     auto *v = m_vals.data();
     auto *h = m_hashKeys.data();
     auto *d = m_probeDists.data();
-    auto *o = m_occupied.data();
-    return iterator(ei, ei, k, v, h, d, o);
+    auto *f = m_fingerprints.data();
+    return iterator(ei, ei, k, v, h, d, f);
   }
   SV_FORCE_INLINE const_iterator end() const {
     auto ei = m_capacity;
@@ -87,8 +87,8 @@ public:
     auto *v = m_vals.data();
     auto *h = m_hashKeys.data();
     auto *d = m_probeDists.data();
-    auto *o = m_occupied.data();
-    return const_iterator(ei, ei, k, v, h, d, o);
+    auto *f = m_fingerprints.data();
+    return const_iterator(ei, ei, k, v, h, d, f);
   }
 
   SV_FORCE_INLINE u64 size() const { return m_size; }
@@ -112,25 +112,27 @@ private:
 
   SV_FORCE_INLINE iterator make_iter(u64 idx) {
     return iterator(idx, m_capacity, m_keys.data(), m_vals.data(),
-                    m_hashKeys.data(), m_probeDists.data(), m_occupied.data());
+                    m_hashKeys.data(), m_probeDists.data(),
+                    m_fingerprints.data());
   }
   SV_FORCE_INLINE const_iterator make_citer(u64 idx) const {
     return const_iterator(idx, m_capacity, m_keys.data(), m_vals.data(),
                           m_hashKeys.data(), m_probeDists.data(),
-                          m_occupied.data());
+                          m_fingerprints.data()
+                          );
   }
 
   // group-probe helpers
   SV_FORCE_INLINE u64 group_start(u64 idx) const { return idx & ~GROUP_MASK; }
   SV_FORCE_INLINE bool group_has_empty(u64 g) const {
     for (u64 i = 0; i < GROUP_SIZE; ++i)
-      if (!m_occupied[g + i])
+      if (m_fingerprints[g + i] == 0)
         return true;
     return false;
   }
 
 private:
-  static constexpr f32 REHASH_FACTOR = 0.875f;
+  static constexpr f32 REHASH_FACTOR = 0.5f;
   static constexpr f32 GROWTH_FACTOR = 2.0f;
 
   Allocator *m_allocator{nullptr};
@@ -142,7 +144,6 @@ private:
   Array<V> m_vals;
   Array<u64> m_hashKeys;
   Array<u64> m_probeDists;
-  Array<b32> m_occupied;
   Array<u8> m_fingerprints; // 1-byte hash fingerprint per slot
 };
 

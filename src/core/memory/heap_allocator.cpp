@@ -23,7 +23,7 @@ void *HeapAllocator::allocate(u64 size, u64 alignment) {
 
   Header *header = reinterpret_cast<Header *>(realPtr);
   header->size = size;
-  header->alignment = allocAlignment;
+  header->alignment = static_cast<u32>(allocAlignment);
   header->allocationId = AllocCounter::add();
   header->allocatorId = AllocatorType::heap;
   header->state = HeaderState::allocated;

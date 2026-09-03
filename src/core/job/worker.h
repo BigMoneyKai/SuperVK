@@ -1,10 +1,11 @@
 #pragma once
 
+#include "core/define/arch.h"
 #include "platform/thread.h"
 
 class JobSystem;
 
-struct Worker {
+struct alignas(SV_CACHE_LINE_SIZE) Worker {
   void run();
   void steal();
 

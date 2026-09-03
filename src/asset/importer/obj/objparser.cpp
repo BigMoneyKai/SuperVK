@@ -226,7 +226,7 @@ void ObjParser::parse_f(std::stringstream& ss) {
             }
 
             m_currMesh->vertices().push_back(vertex);
-            m_currMesh->indices().push_back(m_currMesh->vertices().size() - 1);
+            m_currMesh->indices().push_back(static_cast<u32>(m_currMesh->vertices().size()) - 1);
         }
     }
 }

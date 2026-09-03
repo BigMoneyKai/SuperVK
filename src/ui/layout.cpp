@@ -7,10 +7,10 @@ namespace UI {
 namespace {
 // 默认/边界值（splitter 位置没设置时用这些兜底）
 constexpr f32 kDefaultSideBarWidth = 200.f;
-constexpr f32 kDefaultConsoleHeight = 220.f;
+constexpr f32 kDefaultConsoleHeight = 200.f;
 constexpr f32 kMinRightWidth = 200.f; // scene/console 区最小宽度
-constexpr f32 kMinSceneHeight = 150.f;
-constexpr f32 kMinConsoleHeight = 80.f;
+constexpr f32 kMinSceneHeight = 240.f;
+constexpr f32 kMinConsoleHeight = 60.f;
 } // namespace
 
 void Layout::compute(const LayoutConfig &config, ImVec2 winSize) {
@@ -91,7 +91,7 @@ void Layout::compute(const LayoutConfig &config, ImVec2 winSize) {
   m_sideBarRect = ImRect(0, sideBarTop, sideBarRight, sideBarBottom);
 
   // 3) splitter1 保护（若 resize 分支未触发，此处仍会限制用户拖拽的极端值）
-  f32 minSplitter1X = sideBarRight + m_config.defaultFileZoneWidth;
+  f32 minSplitter1X = sideBarRight + m_config.defaultFileZoneWidth * 0.7f;
   f32 maxSplitter1X = winSize.x * 0.5f; // 保证右侧至少 kMinRightWidth
   if (m_config.splitter1Pos.x < minSplitter1X)
     m_config.splitter1Pos.x = minSplitter1X;

@@ -9,24 +9,22 @@
 template <typename K, typename V, typename Entry>
 SV_FORCE_INLINE static void
 swap_slot(Array<K> &keys, Array<V> &vals, Array<u64> &hashes, Array<u64> &dists,
-          Array<b32> &occ, Array<u8> &fps, u64 a, u64 b) {
+          Array<u8> &fps, u64 a, u64 b) {
   std::swap(keys[a], keys[b]);
   std::swap(vals[a], vals[b]);
   std::swap(hashes[a], hashes[b]);
   std::swap(dists[a], dists[b]);
-  std::swap(occ[a], occ[b]);
   std::swap(fps[a], fps[b]);
 }
 
 template <typename K, typename V, typename Entry>
 SV_FORCE_INLINE static void
 move_slot(Array<K> &keys, Array<V> &vals, Array<u64> &hashes, Array<u64> &dists,
-          Array<b32> &occ, Array<u8> &fps, u64 dst, u64 src) {
+          Array<u8> &fps, u64 dst, u64 src) {
   keys[dst] = std::move(keys[src]);
   vals[dst] = std::move(vals[src]);
   hashes[dst] = hashes[src];
   dists[dst] = dists[src];
-  occ[dst] = occ[src];
   fps[dst] = fps[src];
 }
 
@@ -37,15 +35,14 @@ move_slot(Array<K> &keys, Array<V> &vals, Array<u64> &hashes, Array<u64> &dists,
 template <typename K, typename V, typename Entry>
 HashMap<K, V, Entry>::HashMap(u64 capacity, Allocator *a)
     : m_allocator(a), m_keys(a), m_vals(a), m_hashKeys(a), m_probeDists(a),
-      m_occupied(a), m_fingerprints(a) {
+      m_fingerprints(a) {
   m_capacity = next_pow2(capacity);
   m_mask = m_capacity - 1;
   m_keys.resize(m_capacity);
   m_vals.resize(m_capacity);
   m_hashKeys.resize(m_capacity);
   m_probeDists.resize(m_capacity);
-  m_occupied.resize(m_capacity);
-  m_fingerprints.resize(m_capacity);
+  m_fingerprints.resize(m_capacity, 0);
   for (u64 i = 0; i < m_capacity; ++i)
     m_fingerprints[i] = 0;
 }
@@ -57,7 +54,6 @@ HashMap<K, V, Entry>::HashMap(HashMap<K, V, Entry> &&other) noexcept
       m_keys(std::move(other.m_keys)), m_vals(std::move(other.m_vals)),
       m_hashKeys(std::move(other.m_hashKeys)),
       m_probeDists(std::move(other.m_probeDists)),
-      m_occupied(std::move(other.m_occupied)),
       m_fingerprints(std::move(other.m_fingerprints)) {
   other.m_allocator = nullptr;
   other.m_size = 0;
@@ -73,7 +69,6 @@ HashMap<K, V, Entry>::operator=(HashMap<K, V, Entry> &&other) noexcept {
     m_vals = std::move(other.m_vals);
     m_hashKeys = std::move(other.m_hashKeys);
     m_probeDists = std::move(other.m_probeDists);
-    m_occupied = std::move(other.m_occupied);
     m_fingerprints = std::move(other.m_fingerprints);
     m_allocator = other.m_allocator;
     m_size = other.m_size;
@@ -153,10 +148,10 @@ HashMap<K, V, Entry>::emplace(Args &&...args) {
     // ... not group-simd for emplace (rarely used), just linear scan
     for (u64 i = offset; i < GROUP_SIZE; ++i) {
       u64 idx = group + i;
-      if (m_occupied[idx] && m_fingerprints[idx] == fp &&
+      if (m_fingerprints[idx] == fp &&
           m_hashKeys[idx] == entry.hash && m_keys[idx] == entry.key)
         return make_iter(idx);
-      if (!m_occupied[idx] || m_probeDists[idx] < dist)
+      if (!m_fingerprints[group + i] || m_probeDists[idx] < dist)
         return end();
       ++dist;
     }
@@ -197,7 +192,7 @@ HashMap<K, V, Entry>::find(const K &key) {
 
     // if any slot in this group (from probe start onward) is empty, key absent
     for (u64 i = off; i < GROUP_SIZE; ++i) {
-      if (!m_occupied[group + i])
+      if (m_fingerprints[group + i] == 0)
         return end();
     }
 
@@ -219,6 +214,8 @@ HashMap<K, V, Entry>::find(const K &key) const {
 
   while (true) {
     u32 match_mask = match_group(m_fingerprints.data() + group, fp);
+
+    // only look at positions at or after our probe start within this group
     u64 off = index & GROUP_MASK;
     match_mask &= ~((1u << off) - 1);
 
@@ -230,9 +227,11 @@ HashMap<K, V, Entry>::find(const K &key) const {
       match_mask &= match_mask - 1;
     }
 
-    for (u64 i = off; i < GROUP_SIZE; ++i)
-      if (!m_occupied[group + i])
+    // if any slot in this group (from probe start onward) is empty, key absent
+    for (u64 i = off; i < GROUP_SIZE; ++i) {
+      if (m_fingerprints[group + i] == 0)
         return end();
+    }
 
     group = (group + GROUP_SIZE) & m_mask;
     index = group;
@@ -245,7 +244,38 @@ HashMap<K, V, Entry>::find(const K &key) const {
 
 template <typename K, typename V, typename Entry>
 b32 HashMap<K, V, Entry>::contains(const K &key) const {
-  return find(key) != end();
+  if (m_size == 0)
+    return SV_FALSE;
+
+  u64 hashVal = hash_key<K>{}(key);
+  u8 fp = make_fingerprint(hashVal);
+  u64 index = hashVal & m_mask;
+  u64 group = group_start(index);
+
+  while (true) {
+    u32 match_mask = match_group(m_fingerprints.data() + group, fp);
+
+    // only look at positions at or after our probe start within this group
+    u64 off = index & GROUP_MASK;
+    match_mask &= ~((1u << off) - 1);
+
+    while (match_mask) {
+      u64 bit = SV_CTZ32(match_mask);
+      u64 idx = group + bit;
+      if (m_hashKeys[idx] == hashVal && m_keys[idx] == key)
+        return SV_TRUE;
+      match_mask &= match_mask - 1;
+    }
+
+    // if any slot in this group (from probe start onward) is empty, key absent
+    for (u64 i = off; i < GROUP_SIZE; ++i) {
+      if (m_fingerprints[group + i] == 0)
+        return SV_FALSE;
+    }
+
+    group = (group + GROUP_SIZE) & m_mask;
+    index = group;
+  }
 }
 
 // =========================================================================
@@ -291,17 +321,15 @@ void HashMap<K, V, Entry>::erase(const K &key) {
       u64 bit = SV_CTZ32(match_mask);
       u64 idx = group + bit;
       if (m_hashKeys[idx] == hashVal && m_keys[idx] == key) {
-        m_occupied[idx] = SV_FALSE;
         m_fingerprints[idx] = 0;
         --m_size;
 
         // backward shift
         u64 next = (idx + 1) & m_mask;
-        while (m_occupied[next] && m_probeDists[next] > 0) {
+        while (m_fingerprints[next] && m_probeDists[next] > 0) {
           move_slot<K, V, Entry>(m_keys, m_vals, m_hashKeys, m_probeDists,
-                                 m_occupied, m_fingerprints, idx, next);
+                                 m_fingerprints, idx, next);
           m_probeDists[idx]--;
-          m_occupied[next] = SV_FALSE;
           m_fingerprints[next] = 0;
           idx = next;
           next = (idx + 1) & m_mask;
@@ -312,7 +340,7 @@ void HashMap<K, V, Entry>::erase(const K &key) {
     }
 
     for (u64 i = off; i < GROUP_SIZE; ++i)
-      if (!m_occupied[group + i])
+      if (m_fingerprints[group + i] == 0)
         return;
 
     group = (group + GROUP_SIZE) & m_mask;
@@ -327,7 +355,6 @@ void HashMap<K, V, Entry>::erase(const K &key) {
 template <typename K, typename V, typename Entry>
 void HashMap<K, V, Entry>::clear() {
   for (u64 i = 0; i < m_capacity; ++i) {
-    m_occupied[i] = SV_FALSE;
     m_fingerprints[i] = 0;
   }
   m_size = 0;
@@ -345,8 +372,8 @@ void HashMap<K, V, Entry>::rehash(u64 newCapacity) {
   Array<V> oldVals = std::move(m_vals);
   Array<u64> oldHashes = std::move(m_hashKeys);
   Array<u64> oldDists = std::move(m_probeDists);
-  Array<b32> oldOcc = std::move(m_occupied);
   u64 oldCapacity = m_capacity;
+  Array<u8> oldFingerprints = std::move(m_fingerprints);
 
   m_capacity = newCapacity;
   m_mask = m_capacity - 1;
@@ -358,8 +385,6 @@ void HashMap<K, V, Entry>::rehash(u64 newCapacity) {
   m_hashKeys.resize(m_capacity);
   m_probeDists = Array<u64>(m_allocator);
   m_probeDists.resize(m_capacity);
-  m_occupied = Array<b32>(m_allocator);
-  m_occupied.resize(m_capacity);
   m_fingerprints = Array<u8>(m_allocator);
   m_fingerprints.resize(m_capacity);
   for (u64 i = 0; i < m_capacity; ++i)
@@ -367,7 +392,7 @@ void HashMap<K, V, Entry>::rehash(u64 newCapacity) {
   m_size = 0;
 
   for (u64 i = 0; i < oldCapacity; ++i) {
-    if (!oldOcc[i])
+    if (!oldFingerprints[i])
       continue;
 
     u64 hashVal = oldHashes[i];
@@ -376,12 +401,11 @@ void HashMap<K, V, Entry>::rehash(u64 newCapacity) {
     u64 index = hashVal & m_mask;
 
     while (true) {
-      if (!m_occupied[index]) {
+      if (!m_fingerprints[index]) {
         m_keys[index] = std::move(oldKeys[i]);
         m_vals[index] = std::move(oldVals[i]);
         m_hashKeys[index] = hashVal;
         m_probeDists[index] = probe;
-        m_occupied[index] = SV_TRUE;
         m_fingerprints[index] = fp;
         ++m_size;
         break;
@@ -437,13 +461,12 @@ void HashMap<K, V, Entry>::insert_impl(Key &&key, Val &&val) {
     for (u64 i = off; i < GROUP_SIZE; ++i) {
       u64 idx = group + i;
 
-      if (!m_occupied[idx]) {
+      if (!m_fingerprints[idx]) {
         m_keys[idx] = std::move(curKey);
         m_vals[idx] = std::move(curVal);
         m_hashKeys[idx] = curHash;
         m_fingerprints[idx] = curFp;
         m_probeDists[idx] = curProbe;
-        m_occupied[idx] = SV_TRUE;
         ++m_size;
         return;
       }

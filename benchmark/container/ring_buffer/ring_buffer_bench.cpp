@@ -154,9 +154,10 @@ static void BM_RingBuffer_ReverseIterate(benchmark::State& state) {
     for (i64 i = 0; i < n; ++i) rb.push_back(static_cast<u64>(i));
 
     for (auto _ : state) {
-        u64 sum = 0;
-        for (auto it = rb.rbegin(); it != rb.rend(); ++it) sum += *it;
-        benchmark::DoNotOptimize(sum);
+      u64 sum = 0;
+      for (auto it = rb.rbegin(); it != rb.rend(); ++it)
+        sum += (*it);
+      benchmark::DoNotOptimize(sum);
     }
     state.SetItemsProcessed(state.iterations() * n);
 }

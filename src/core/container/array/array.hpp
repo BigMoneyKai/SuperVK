@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/container/iterator/iterator.hpp"
-#include "core/container/iterator/reverse_iterator.hpp"
+#include "iterator.hpp"
+#include "reverse_iterator.hpp"
 #include "core/define/compiler.h"
 #include "core/memory/allocator.h"
 
@@ -27,14 +27,19 @@ public:
 
   void reserve(u64 capacity);
   void resize(u64 size, const T &value = T{});
-  void shrink_to_fit();
   Allocator *allocator() const;
   u64 size() const;
   u64 capacity() const;
   b32 empty() const;
 
-  T &operator[](u64 i);
-  const T &operator[](u64 i) const;
+  SV_FORCE_INLINE T& operator[](u64 i) {
+    SV_ASSERT(i < m_size, "Index {} out of bound", i);
+    return m_data[i];
+  }
+  SV_FORCE_INLINE const T& operator[](u64 i) const {
+    SV_ASSERT(i < m_size, "Index {} out of bound", i);
+    return m_data[i];
+  }
   T &at(u64 i);
   const T &at(u64 i) const;
   T &front();

@@ -18,6 +18,7 @@ MeshManager::Handle MeshManager::load(const String& path) {
     jd->self         = this;
     jd->handle       = handle;
     std::strncpy(jd->path, path.c_str(), sizeof(jd->path) - 1);
+
     jd->path[sizeof(jd->path) - 1] = '\0';
     m_jobSystem->submit(jobFunc, jd);
 

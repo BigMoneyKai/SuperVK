@@ -1,17 +1,17 @@
 #pragma once
 
-#include "core/container/iterator/reverse_iterator.hpp"
+#include "iterator.hpp"
+#include "reverse_iterator.hpp"
 #include "core/define/compiler.h"
 #include "core/define/types.h"
 #include "core/memory/allocator.h"
-#include "ring_iterator.hpp"
 
 template <typename T> class RingBuffer {
 public:
   using iterator = RingBufferIterator<T>;
   using const_iterator = RingBufferIterator<const T>;
-  using reverse_iterator = ReverseIterator<iterator>;
-  using const_reverse_iterator = ReverseIterator<const_iterator>;
+  using reverse_iterator = RingBufferReverseIterator<iterator>;
+  using const_reverse_iterator = RingBufferReverseIterator<const_iterator>;
 
   explicit RingBuffer(Allocator *a = &default_allocator());
   RingBuffer(u64 capacity, const T &value = T{},

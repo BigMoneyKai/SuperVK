@@ -18,7 +18,7 @@ u32 TextureMan::loadTexture(const char* path) {
     texture.init(m_device, m_physicalDevice, m_commandPool, m_graphicsQueue, path);
     m_textures.push_back(std::move(texture));
 
-    return m_textures.size() - 1;
+    return static_cast<u32>(m_textures.size() - 1);
 }
 
 void TextureMan::destroy() {

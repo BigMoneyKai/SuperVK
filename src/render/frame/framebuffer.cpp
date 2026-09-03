@@ -12,7 +12,7 @@ void Framebuffer::init(const VkDevice &device, const VkRenderPass &renderPass,
   VkFramebufferCreateInfo framebufferInfo{};
   framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
   framebufferInfo.renderPass = renderPass;
-  framebufferInfo.attachmentCount = attachments.size();
+  framebufferInfo.attachmentCount = static_cast<u32>(attachments.size());
   framebufferInfo.pAttachments = attachments.data();
   framebufferInfo.width = extent.width;
   framebufferInfo.height = extent.height;

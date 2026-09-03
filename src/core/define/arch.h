@@ -21,10 +21,9 @@
 #error "Unsupported chip architecture"
 #endif
 
-namespace SV {
 #if defined(SV_ARCH_AARCH64)
-static constexpr u64 optimal_alignment = 128;
+#define SV_CACHE_LINE_SIZE 128
 #else
-static constexpr u64 optimal_alignment = 64;
+#define SV_CACHE_LINE_SIZE 64
 #endif
-}
+
